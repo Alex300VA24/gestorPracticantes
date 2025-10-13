@@ -203,7 +203,7 @@ function renderDocumentos(documentos) {
                                     <i class="fas fa-download"></i> Descargar
                                 </button>
                             </td>
-                            <td style="color: ${obligatorio ? '#e74c3c' : '#27ae60'}; font-weight: bold;">
+                            <td style="color: ${obligatorio ? '#FF664A' : '#7575FA'}; font-weight: bold;">
                                 ${obligatorio ? 'Obligatorio' : 'Opcional'}
                             </td>
                         </tr>

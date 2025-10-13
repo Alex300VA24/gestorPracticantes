@@ -1,93 +1,128 @@
 /* === ESTILOS GENERALES === */
 body {
     margin: 0;
-    font-family: "Georgia", "Times New Roman",serif;
-    background-color: #f5f6fa;
-    display: flex;
+    font-family: "Georgia", "Times New Roman", serif;
+    background-color: #f8f9fa;
     height: 100vh;
 }
 
+/* === DASHBOARD PRINCIPAL === */
 .dashboard-container {
     display: flex;
-    width: 100%;
+    min-height: 100vh;
 }
 
 /* === SIDEBAR === */
 .sideBar {
-    width: 260px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
     background: linear-gradient(180deg, #1e3a47 0%, #2c5364 100%);
-    color: #fff;
+    padding: 20px 0;
+    overflow-y: auto;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.15);
 }
 
 .sidebar-header {
+    padding: 0 20px 30px;
     text-align: center;
-    padding: 30px 20px 10px;
+    border-bottom: 1px solid #455570;
 }
 
 .sidebar-logo {
-    width: 70px;
-    height: 70px;
+    max-width: 60px;
+    height: auto;
+    margin-bottom: 10px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 10px;
 }
 
 .sidebar-title {
-    font-size: 20px;
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
     font-weight: bold;
 }
 
 .sidebar-subtitle {
-    font-size: 13px;
-    opacity: 0.8;
+    color: #bdc3c7;
+    font-size: 0.9rem;
 }
 
+/* === OPCIONES DEL SIDEBAR === */
 .option {
-    padding: 15px 25px;
-    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 15px;
-    transition: 0.3s;
+    padding: 15px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
-.option:hover, .option.active {
-    background-color: rgba(255, 255, 255, 0.15);
+.option:hover,
+.option.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateX(5px);
+}
+
+.containerIconOption {
+    margin-right: 15px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .containerIconOption i {
     font-size: 18px;
 }
 
+.option p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* === INFORMACIÓN DEL USUARIO Y BOTÓN DE SALIDA === */
 .user-info {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    padding: 30px;
     text-align: center;
 }
 
 .logout-btn {
-    margin-top: 15px;
-    background: #e74c3c;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
     border: none;
-    color: #fff;
-    padding: 10px 15px;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
 }
 
 /* === CONTENIDO PRINCIPAL === */
 .main-content {
-    flex: 1;
-    padding: 40px;
+    margin-left: 280px; /* espacio del sidebar */
+    padding: 30px;
+    min-height: 100vh;
+    background: #f8f9fa;
+    width: calc(100% - 280px);
     overflow-y: auto;
 }
 
@@ -99,12 +134,13 @@ body {
     display: block;
 }
 
+/* === ENCABEZADO DE PÁGINA === */
 .page-header {
     background: white;
     padding: 25px 30px;
     border-radius: 15px;
     margin-bottom: 30px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h1 {
@@ -113,102 +149,18 @@ body {
     color: #364fc7;
 }
 
-.page-subtitle {
-    color: #666;
-    margin-bottom: 30px;
-}
-
-.hidden { display: none; }
-
-
-/* === BOTONES DE ACCIÓN === */
-.action-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #28a745, #20c997);
-}
-
-.btn-warning {
-    background: linear-gradient(135deg, #ffc107, #fd7e14);
-    color: #212529;
-}
-
-.btn-info {
-    background: linear-gradient(135deg, #17a2b8, #138496);
-}
-
-.btn-primary:hover, .btn-success:hover, .btn-warning:hover, .btn-info:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-/* === TARJETAS DE CONTENIDO === */
-.content-card {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
-}
-
-.card-title {
-    font-size: 18px;
-    color: #2c3e50;
-    margin-bottom: 15px;
-}
-
-/* === TABLAS === */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.table th, .table td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.table th {
-    background: #f8f9fa;
+.page-title {
+    color: #1e3a47;
+    font-size: 2rem;
+    margin-bottom: 5px;
     font-weight: 600;
-    color: #555;
 }
 
-.table tr:hover {
-    background: #f8f9fa;
+.page-subtitle {
+    color: #7f8c8d;
+    font-size: 1.1rem;
 }
 
-.status-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
+.hidden {
+    display: none;
 }
-
-.status-pendiente { background: #ffc107; }
-.status-vigente { background: #17a2b8; }
-.status-finalizado { background: #28a745; }
-.status-rechazado { background: #dc3545; }
-.status-activo { background: #6f42c1; }
-
