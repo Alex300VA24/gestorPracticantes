@@ -1,0 +1,19 @@
+Array
+(
+    [practicanteID] => 1
+    [tipoDocumento] => carnet_vacunacion
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => MINSA - Carné Vacunación Document.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpED83.tmp
+            [error] => 0
+            [size] => 614100
+        )
+
+)

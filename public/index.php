@@ -3,7 +3,7 @@ require_once __DIR__ . '/../autoload.php';
 
 
 // Para no mostrar los errores
-error_reporting(0);
+error_reporting();
 ini_set('display_errors', 0);
 
 // Iniciar la sesion
@@ -11,6 +11,7 @@ session_start();
 
 // Constante BASE_URL
 define('BASE_URL', '/gestorPracticantes/public/');
+
 
 
 
@@ -30,6 +31,12 @@ $request_uri = $_SERVER['REQUEST_URI'];
 $script_name = dirname($_SERVER['SCRIPT_NAME']);
 $path = str_replace($script_name, '', $request_uri);
 $path = parse_url($path, PHP_URL_PATH);
+
+if ($path[0] !== '/') {
+    $path = '/' . $path;
+}
+
+error_log("PATH RECIBIDO: " . $path);
 
 // Rutas de la API
 switch (true) {
@@ -72,8 +79,27 @@ switch (true) {
             $controller->eliminar($practicanteID); // ✅ Agrega este bloque
         }
         break;
+    
+    // Rutas de Documentos
+
+    // Rutas de Documentos
+    // Solicitudes / Documentos
+    case $path === '/api/solicitudes/listarPracticantes':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->listarPracticantes();
+        break;
+
+    case preg_match('#^/api/solicitudes/documentos$#', $path):
+        header('Content-Type: application/json; charset=utf-8');
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->obtenerDocumentosPorPracticante();
+        break;
 
 
+    case $path === '/api/solicitudes/subirDocumento':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->subirDocumento();
+        break;
     
     // Vista de Login
     case $path === '/' || $path === '/login':
@@ -86,7 +112,7 @@ switch (true) {
             header('Location: /login');
             exit;
         }
-        require __DIR__ . '/../views/dashboard.php';
+        require __DIR__ . '/../views/dashboard/index.php';
         break;
     
     default:

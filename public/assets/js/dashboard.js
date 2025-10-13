@@ -1,15 +1,28 @@
-function mostrarSeccion(id) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(id).classList.add('active');
+document.addEventListener('DOMContentLoaded', async () => {
 
-    document.querySelectorAll('.menu li').forEach(li => li.classList.remove('active'));
-    event.target.closest('li').classList.add('active');
-}
+    let BASE_URL = '/gestorPracticantes/public/';
 
-function cerrarSesion() {
-    if (confirm("¿Deseas cerrar sesión?")) {
-        window.location.href = "logout.php";
+    // Navegación
+    window.showPage = function (pageId, element) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+        document.getElementById('page' + capitalize(pageId)).classList.add('active');
+        document.querySelectorAll('.option').forEach(o => o.classList.remove('active'));
+        element.classList.add('active');
+    };
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
     }
-}
+
+    // Logout
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+        try{
+            await api.logout();
+            window.location.href = BASE_URL + 'login';
+        }catch (error){
+            alert('Error al cerrar sesion');
+        }
+    });
+
+
+});

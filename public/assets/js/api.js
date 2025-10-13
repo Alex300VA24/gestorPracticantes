@@ -71,7 +71,7 @@ class API {
     }
 
     async getPracticantes() {
-        // 🔹 Esta es la URL que tu backend reconoce
+        // Esta es la URL que tu backend reconoce
         return this.get('/practicantes');
     }
 
@@ -89,6 +89,24 @@ class API {
     async eliminarPracticante(id) {
         return await this.delete(`practicantes/${id}`);
     }
+
+    async listarNombrePracticantes() {
+        return this.get('/solicitudes/listarPracticantes');
+    }
+
+    async obtenerDocumentosPorPracticante(practicanteID) {
+        return this.get(`/solicitudes/documentos?practicanteID=${practicanteID}`);
+    }
+
+    async subirDocumento(formData) {
+        const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {
+            method: "POST",
+            body: formData  // 🔹 No uses JSON aquí
+        });
+
+        return await response.json();
+    }
+
 
 
 }

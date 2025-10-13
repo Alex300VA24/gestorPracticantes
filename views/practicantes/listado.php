@@ -31,53 +31,29 @@
 </div>
 
 <!-- Modal para crear practicante -->
-<div id="nuevoPracticanteModal" class="modal" style="display:none;">
+<div id="PracticanteModal" class="modal" style="display:none;">
   <div class="modal-content">
-    <h3>Nuevo Practicante</h3>
-    <form id="formNuevoPracticante">
-      <input type="text" name="DNI" placeholder="DNI" required>
-      <input type="text" name="Nombres" placeholder="Nombres" required>
-      <input type="text" name="ApellidoPaterno" placeholder="Apellido Paterno" required>
-      <input type="text" name="ApellidoMaterno" placeholder="Apellido Materno" required>
-      <input type="text" name="Carrera" placeholder="Carrera" required>
-      <input type="email" name="Email" placeholder="Correo">
-      <input type="text" name="Telefono" placeholder="Teléfono">
-      <input type="text" name="Direccion" placeholder="Dirección">
-      <input type="text" name="Universidad" placeholder="Universidad">
-      <input type="date" name="FechaEntrada" required>
-      <input type="date" name="FechaSalida" required>
+    <h3 id="tituloModalPracticante">Nuevo Practicante</h3>
+    <form id="formPracticante">
+      <input type="hidden" id="practicanteID" name="ID">
+      <input type="text" id="DNI" name="DNI" placeholder="DNI" required>
+      <input type="text" id="Nombres" name="Nombres" placeholder="Nombres" required>
+      <input type="text" id="ApellidoPaterno" name="ApellidoPaterno" placeholder="Apellido Paterno" required>
+      <input type="text" id="ApellidoMaterno" name="ApellidoMaterno" placeholder="Apellido Materno" required>
+      <input type="text" id="Carrera" name="Carrera" placeholder="Carrera" required>
+      <input type="email" id="Email" name="Email" placeholder="Correo">
+      <input type="text" id="Telefono" name="Telefono" placeholder="Teléfono">
+      <input type="text" id="Direccion" name="Direccion" placeholder="Dirección">
+      <input type="text" id="Universidad" name="Universidad" placeholder="Universidad">
+      <input type="text" id="Area" name="Area" placeholder="Área">
+      <input type="date" id="FechaEntrada" name="FechaEntrada">
+      <input type="date" id="FechaSalida" name="FechaSalida">
       <button type="submit">Guardar</button>
       <button type="button" onclick="cerrarModal()">Cancelar</button>
     </form>
+
   </div>
 </div>
-
-
-<!-- Modal para editar practicante -->
-<div id="editarPracticanteModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h3>Editar Practicante</h3>
-    <form id="formEditarPracticante">
-      <input type="hidden" name="ID">
-
-      <input type="text" name="DNI" placeholder="DNI" required>
-      <input type="text" name="Nombres" placeholder="Nombres" required>
-      <input type="text" name="ApellidoPaterno" placeholder="Apellido Paterno" required>
-      <input type="text" name="ApellidoMaterno" placeholder="Apellido Materno" required>
-      <input type="text" name="Carrera" placeholder="Carrera" required>
-      <input type="email" name="Email" placeholder="Correo">
-      <input type="text" name="Telefono" placeholder="Teléfono">
-      <input type="text" name="Direccion" placeholder="Dirección">
-      <input type="text" name="Universidad" placeholder="Universidad">
-      <input type="date" name="FechaEntrada" required>
-      <input type="date" name="FechaSalida" required>
-
-      <button type="submit">Actualizar</button>
-      <button type="button" onclick="cerrarModalEditar()">Cancelar</button>
-    </form>
-  </div>
-</div>
-
 
 
 
