@@ -32,45 +32,20 @@ class PracticanteRepository {
     /**
      * Obtiene un practicante por ID (incluye estado y área más reciente)
      */
-    public function findById($practicanteID) {
+    public function obtenerPorID($practicanteID) {
         try {
-            $sql = "
-                SELECT 
-                    p.PracticanteID,
-                    p.DNI,
-                    p.Nombres,
-                    p.ApellidoPaterno,
-                    p.ApellidoMaterno,
-                    CONCAT(p.Nombres, ' ', p.ApellidoPaterno, ' ', p.ApellidoMaterno) AS NombreCompleto,
-                    p.Carrera,
-                    p.Universidad,
-                    ISNULL(e.Descripcion, '-') AS Estado,
-                    CONVERT(VARCHAR(10), p.FechaEntrada, 103) AS FechaRegistro,
-                    p.Email,
-                    p.Telefono,
-                    p.Direccion,
-                    ISNULL(a.NombreArea, '-') AS Area
-                FROM Practicante p
-                LEFT JOIN Estado e ON p.EstadoID = e.EstadoID
-                OUTER APPLY (
-                    SELECT TOP 1 ar.NombreArea
-                    FROM SolicitudPracticas sp
-                    JOIN Area ar ON sp.AreaID = ar.AreaID
-                    WHERE sp.PracticanteID = p.PracticanteID
-                    ORDER BY sp.FechaSolicitud DESC, sp.SolicitudID DESC
-                ) a
-                WHERE p.PracticanteID = :id
-            ";
+            $sql = "EXEC sp_ObtenerPracticantePorID :id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $practicanteID, PDO::PARAM_INT);
             $stmt->execute();
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             return $row ?: null;
         } catch (PDOException $e) {
-            error_log("PracticanteRepository::findById - " . $e->getMessage());
-            throw new \Exception("Error al buscar practicante: " . $e->getMessage());
+            error_log("PracticanteRepository::obtenerPorID - " . $e->getMessage());
+            throw new \Exception("Error al obtener practicante: " . $e->getMessage());
         }
     }
+
 
     /**
      * Crea un practicante (usa sp_CrearPracticante). Devuelve el ID insertado.
@@ -78,7 +53,7 @@ class PracticanteRepository {
      */
     public function registrarPracticante($p, $areaID = null) {
         try {
-            $stmt = $this->db->prepare("EXEC sp_RegistrarPracticante ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+            $stmt = $this->db->prepare("EXEC sp_RegistrarPracticante ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
             $stmt->execute([
                 $p->getDNI(),
@@ -90,22 +65,14 @@ class PracticanteRepository {
                 $p->getTelefono(),
                 $p->getDireccion(),
                 $p->getUniversidad(),
-                $p->getFechaEntrada(),
-                $p->getFechaSalida() ?? null
+                $p->getFechaEntrada() ?? null,
+                $p->getFechaSalida() ?? null,
+                $p->getFechaRegistro()
             ]);
 
             // El SP devuelve SELECT @NewID AS PracticanteID;
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $nuevoID = $row['PracticanteID'] ?? null;
-
-            // Si se especificó un área, crear también la solicitud
-            if ($areaID) {
-                $stmt2 = $this->db->prepare("
-                    INSERT INTO SolicitudPracticas (FechaSolicitud, EstadoID, PracticanteID, AreaID)
-                    VALUES (GETDATE(), 1, ?, ?)
-                ");
-                $stmt2->execute([$nuevoID, $areaID]);
-            }
 
             return $nuevoID;
         } catch (\PDOException $e) {
@@ -114,12 +81,6 @@ class PracticanteRepository {
         }
     }
 
-    public function obtenerPorId($id) {
-        $stmt = $this->db->prepare("SELECT * FROM Practicante WHERE PracticanteID = :id");
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
 
     public function actualizar($id, $data) {
         $sql = "EXEC sp_ActualizarPracticante 

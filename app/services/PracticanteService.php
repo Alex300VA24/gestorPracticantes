@@ -19,7 +19,7 @@ class PracticanteService {
         if (empty($practicanteID)) {
             throw new \Exception("ID de practicante requerido");
         }
-        $row = $this->repo->findById($practicanteID);
+        $row = $this->repo->obtenerPorID($practicanteID);
         if ($row === null) {
             throw new \Exception("Practicante no encontrado");
         }

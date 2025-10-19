@@ -6,9 +6,6 @@
         <button class="btn-success" id="btnGenerarCarta">
             <i class="fas fa-file-contract"></i> Generar Carta
         </button>
-        <button class="btn-info" id="btnRevisarDocumentos">
-            <i class="fas fa-search"></i> Revisar Documentos
-        </button>
     </div>
 </div>
 
@@ -44,6 +41,8 @@
                     </select>
                 </div>
 
+                <input type="hidden" id="solicitudID" name="solicitudID">
+
                 <div class="form-group">
                     <label for="tipoDocumento">Tipo de Documento:</label>
                     <select id="tipoDocumento" name="tipoDocumento" required>
@@ -57,8 +56,12 @@
 
                 <div class="form-group">
                     <label for="archivoDocumento">Archivo:</label>
-                    <input type="file" id="archivoDocumento" name="archivoDocumento" accept=".pdf,.doc,.docx,.jpg,.png" required>
+                    <input type="file" id="archivoDocumento" name="archivoDocumento" accept=".pdf,.doc,.docx,.jpg,.png">
+                    
+                    <!-- Contenedor donde aparecerá el documento actual -->
+                    <div id="contenedorArchivoActual" style="margin-top: 10px;"></div>
                 </div>
+
 
                 <div class="form-group">
                     <label for="observacionesDoc">Observaciones:</label>
@@ -74,12 +77,7 @@
                     </button>
                 </div>
             </form>
-
-            <!-- 📄 Vista previa de documentos subidos -->
-            <div id="documentosSubidos" style="margin-top: 1rem;">
-                <h4>Archivos Subidos</h4>
-                <div id="listaArchivosSubidos"></div>
-            </div>
         </div>
     </div>
 </div>
+

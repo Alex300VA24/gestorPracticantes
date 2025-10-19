@@ -14,6 +14,7 @@ class Practicante {
     private $universidad;
     private $fechaEntrada;
     private $fechaSalida;
+    private $fechaRegistro;
     private $estadoID;
     
     // Getters
@@ -29,6 +30,7 @@ class Practicante {
     public function getUniversidad() { return $this->universidad; }
     public function getFechaEntrada() { return $this->fechaEntrada; }
     public function getFechaSalida() { return $this->fechaSalida; }
+    public function getFechaRegistro() { return $this->fechaRegistro; }
     public function getEstadoID() { return $this->estadoID; }
     
     // Setters
@@ -44,6 +46,7 @@ class Practicante {
     public function setUniversidad($universidad) { $this->universidad = $universidad; }
     public function setFechaEntrada($fechaEntrada) { $this->fechaEntrada = $fechaEntrada; }
     public function setFechaSalida($fechaSalida) { $this->fechaSalida = $fechaSalida; }
+    public function setFechaRegistro($fechaRegistro) { $this->fechaRegistro = $fechaRegistro; }
     public function setEstadoID($estadoID) { $this->estadoID = $estadoID; }
     
     public function getNombreCompleto() {
@@ -64,6 +67,7 @@ class Practicante {
             'universidad' => $this->universidad,
             'fechaEntrada' => $this->fechaEntrada,
             'fechaSalida' => $this->fechaSalida,
+            'fechaRegistro' => $this->fechaRegistro,
             'estadoID' => $this->estadoID,
             'nombreCompleto' => $this->getNombreCompleto()
         ];

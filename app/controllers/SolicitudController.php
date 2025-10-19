@@ -15,141 +15,97 @@ class SolicitudController {
         echo json_encode($data);
     }
 
-    public function obtenerDocumentosPorPracticante(){
-
+    public function obtenerDocumentosPorPracticante() {
         if (!isset($_GET['practicanteID'])) {
             echo json_encode([]);
             return;
         }
 
-        $id = $_GET['practicanteID'];
-        $solicitud = $this->service->obtenerDocumentosPorPracticante($id);
+        $id = (int) $_GET['practicanteID'];
+        $documentos = $this->service->obtenerDocumentosPorPracticante($id);
 
-        $documentos = [];
-
-        // Codificamos cada documento en Base64 (solo si existe)
-        if ($solicitud->getDocCV()) {
-            $documentos[] = [
-                'tipo' => 'CV',
-                'fecha' => '',
-                'archivo' => base64_encode($solicitud->getDocCV()),
-                'observaciones' => ''
-            ];
-        }
-
-        if ($solicitud->getDocCartaPresentacionUniversidad()) {
-            $documentos[] = [
-                'tipo' => 'Carta de Presentacion',
-                'fecha' => '',
-                'archivo' => base64_encode($solicitud->getDocCartaPresentacionUniversidad()),
-                'observaciones' => ''
-            ];
-        }
-
-        if ($solicitud->getDocCarnetVacunacion()) {
-            $documentos[] = [
-                'tipo' => 'Carnet de Vacunacion',
-                'fecha' => '',
-                'archivo' => base64_encode($solicitud->getDocCarnetVacunacion()),
-                'observaciones' => ''
-            ];
-        }
-
-        if ($solicitud->getDocDNI()) {
-            $documentos[] = [
-                'tipo' => 'DNI',
-                'fecha' => '',
-                'archivo' => base64_encode($solicitud->getDocDNI()),
-                'observaciones' => ''
-            ];
-        }
-
-        // ✅ Codificamos el JSON con manejo de errores
-        $json = json_encode($documentos, JSON_UNESCAPED_UNICODE);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log("❌ JSON Error: " . json_last_error_msg());
-            //echo json_encode(['error' => json_last_error_msg()]);
+        if (!$documentos || count($documentos) === 0) {
+            echo json_encode([]);
             return;
         }
 
-        echo $json;
+        $resultado = [];
+
+        foreach ($documentos as $doc) {
+            $resultado[] = [
+                'documentoID'   => $doc['DocumentoID'],
+                'solicitudID'   => $doc['SolicitudID'],
+                'tipo'          => $doc['TipoDocumento'],
+                'fecha'         => $doc['FechaSubida'],
+                'archivo'       => $doc['Archivo'],
+                'observaciones' => $doc['Observaciones'] ?? '',
+                'area'          => $doc['Area'] ?? '-'
+            ];
+        }
+
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
     }
 
-    public function verDocumento()
+    public function obtenerDocumentoPorTipoYPracticante()
     {
+        // Siempre devolver JSON
         header('Content-Type: application/json; charset=utf-8');
 
-        if (!isset($_GET['id']) || !isset($_GET['tipo'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Parámetros insuficientes']);
-            return;
-        }
+        try {
+            // 🔹 Obtener parámetros desde la URL
+            $practicanteID = $_GET['practicanteID'] ?? null;
+            $tipoDocumento = $_GET['tipoDocumento'] ?? null;
 
-        $id = $_GET['id'];
-        $tipo = $_GET['tipo']; // por ejemplo: cv, carta_presentacion, dni, etc.
-
-        // Obtener los datos desde el servicio
-        $solicitud = $this->service->obtenerDocumentosPorPracticante($id);
-
-        if (!$solicitud) {
-            http_response_code(404);
-            echo json_encode(['error' => 'No se encontró el practicante']);
-            return;
-        }
-
-        // Seleccionar el documento binario según el tipo
-        switch ($tipo) {
-            case 'cv':
-                $contenido = $solicitud->getDocCV();
-                $nombre = "Curriculum_Vitae.pdf";
-                break;
-            case 'carta_presentacion':
-                $contenido = $solicitud->getDocCartaPresentacionUniversidad();
-                $nombre = "Carta_Presentacion.pdf";
-                break;
-            case 'carnet_vacunacion':
-                $contenido = $solicitud->getDocCarnetVacunacion();
-                $nombre = "Constancia_Universidad.pdf";
-                break;
-            case 'dni':
-                $contenido = $solicitud->getDocDNI();
-                $nombre = "DNI.pdf";
-                break;
-            default:
-                http_response_code(400);
-                echo json_encode(['error' => 'Tipo de documento inválido']);
+            if (!$practicanteID || !$tipoDocumento) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Faltan parámetros: practianteID o tipoDocumento."
+                ], JSON_UNESCAPED_UNICODE);
                 return;
-        }
+            }
 
-        if (!$contenido) {
-            http_response_code(404);
-            echo json_encode(['error' => 'Documento vacío o no encontrado']);
-            return;
-        }
+            // 🔹 Llamar al servicio (modelo)
+            $documento = $this->service->obtenerDocumentoPorTipoYPracticante($practicanteID, $tipoDocumento);
 
-        // Cabeceras para descarga o visualización
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: inline; filename="' . $nombre . '"');
-        echo $contenido;
+            // 🔹 Asegurar respuesta coherente
+            if ($documento && is_array($documento)) {
+                echo json_encode([
+                    "success" => true,
+                    "data" => $documento
+                ], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode([
+                    "success" => true,
+                    "data" => null
+                ], JSON_UNESCAPED_UNICODE);
+            }
+        } catch (\Throwable $e) {
+            // 🔹 Capturar cualquier error del servidor
+            echo json_encode([
+                "success" => false,
+                "message" => "Error en el servidor: " . $e->getMessage()
+            ], JSON_UNESCAPED_UNICODE);
+        }
     }
-
 
 
 
     public function subirDocumento() {
         try {
-            // Log rápido de lo que llega
-            file_put_contents("debug_subida.txt", print_r($_POST, true) . "\n" . print_r($_FILES, true));
+            // Log rápido para depuración
+            file_put_contents("debug_subida.txt", print_r($_POST, true) . "\n" . print_r($_FILES, true), FILE_APPEND);
 
-            $practicanteID = $_POST['practicanteID'] ?? null;
+            $solicitudID   = $_POST['solicitudID'] ?? null;
             $tipoDocumento = $_POST['tipoDocumento'] ?? null;
-            $archivo = $_FILES['archivoDocumento']['tmp_name'] ?? null;
+            $observaciones = $_POST['observacionesDoc'] ?? null;
+            $archivo       = $_FILES['archivoDocumento']['tmp_name'] ?? null;
 
-            if (!$practicanteID || !$tipoDocumento || !$archivo) {
+            if (!$solicitudID || !$tipoDocumento || !$archivo) {
                 echo json_encode(['error' => 'Datos incompletos']);
                 return;
             }
 
+            // Mapeo de tipos válidos
             $mapaTipos = [
                 'cv' => 'cv',
                 'carta_presentacion' => 'carta_presentacion',
@@ -175,7 +131,8 @@ class SolicitudController {
                 return;
             }
 
-            $ok = $this->service->subirDocumento($practicanteID, $tipoSP, $contenido);
+            // Llamar al servicio con 4 parámetros
+            $ok = $this->service->subirDocumento($solicitudID, $tipoSP, $contenido, $observaciones);
 
             echo json_encode(['success' => $ok]);
         } catch (\Throwable $e) {
@@ -183,8 +140,79 @@ class SolicitudController {
             http_response_code(500);
             echo json_encode(['error' => 'Excepción: ' . $e->getMessage()]);
         }
-
     }
+
+    public function actualizarDocumento(){
+        try {
+            // debug pre
+            file_put_contents("debug_actualizar.txt", "---- INICIO Llamada actualizarDocumento ----\n", FILE_APPEND);
+            file_put_contents("debug_actualizar.txt", print_r($_POST, true) . "\n" . print_r($_FILES, true) . "\n", FILE_APPEND);
+
+            $solicitudID   = $_POST['solicitudID'] ?? null;
+            $tipoDocumento = $_POST['tipoDocumento'] ?? null;
+            $observaciones = $_POST['observacionesDoc'] ?? null;
+            $archivoTmp    = $_FILES['archivoDocumento']['tmp_name'] ?? null;
+            $archivoErr    = $_FILES['archivoDocumento']['error'] ?? 4; // 4 = UPLOAD_ERR_NO_FILE
+            $archivoSize   = $_FILES['archivoDocumento']['size'] ?? 0;
+
+            if (!$solicitudID || !$tipoDocumento) {
+                echo json_encode(['success' => false, 'message' => 'Faltan datos: solicitudID o tipoDocumento']);
+                return;
+            }
+
+            // Normalizar tipoDocumento por seguridad
+            $tipoDocumento = strtolower(trim($tipoDocumento));
+            $tipoDocumento = str_replace([' ', '-'], '_', $tipoDocumento);
+            $tipoDocumento = iconv('UTF-8', 'ASCII//TRANSLIT', $tipoDocumento);
+
+            // Leer archivo si existe y si no hubo error
+            $contenido = null;
+            if ($archivoTmp && file_exists($archivoTmp) && $archivoErr === UPLOAD_ERR_OK && $archivoSize > 0) {
+                $contenido = file_get_contents($archivoTmp);
+                if ($contenido === false) {
+                    echo json_encode(['success' => false, 'message' => 'No se pudo leer el archivo en el servidor']);
+                    return;
+                }
+                // fijar fecha de subida sólo si hay archivo
+                $fechaSubida = date('Y-m-d H:i:s');
+                file_put_contents("debug_actualizar.txt", "Archivo leido, bytes: " . strlen($contenido) . " FechaSubida: $fechaSubida\n", FILE_APPEND);
+            } else {
+                $contenido = null;
+                $fechaSubida = null;
+                file_put_contents("debug_actualizar.txt", "No hay archivo para actualizar (archivoErr=$archivoErr size=$archivoSize)\n", FILE_APPEND);
+            }
+
+            // Llamada a la capa de servicio/repositorio
+            $ok = false;
+
+            try {
+                $ok = $this->service->actualizarDocumento($solicitudID, $tipoDocumento, $contenido, $observaciones);
+
+                file_put_contents("debug_actualizar.txt", "Resultado service.actualizarDocumento: " . json_encode($ok) . "\n", FILE_APPEND);
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Documento procesado correctamente'
+                ]);
+            } catch (\Exception $e) {
+                file_put_contents("debug_actualizar.txt", "❌ Error en actualizarDocumento: " . $e->getMessage() . "\n", FILE_APPEND);
+
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error al procesar el documento: ' . $e->getMessage()
+                ]);
+            }
+
+        } catch (\Throwable $e) {
+            file_put_contents("error_actualizar.txt", $e->getMessage() . "\n" . $e->getTraceAsString(), FILE_APPEND);
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+
+
+
 
 
 

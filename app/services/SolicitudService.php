@@ -19,7 +19,15 @@ class SolicitudService {
         
     }
 
-    public function subirDocumento($id, $tipo, $archivo) {
-        return $this->repo->subirDocumento($id, $tipo, $archivo);
+    public function subirDocumento($id, $tipo, $archivo, $observaciones = null) {
+        return $this->repo->subirDocumento($id, $tipo, $archivo, $observaciones);
+    }
+
+    public function actualizarDocumento($id, $tipo = null, $archivo = null, $observaciones = null) {
+        return $this->repo->actualizarDocumento($id, $tipo, $archivo, $observaciones);
+    }
+
+    public function obtenerDocumentoPorTipoYPracticante($practicanteID, $tipoDocumento) {
+        return $this->repo->obtenerDocumentoPorTipoYPracticante($practicanteID, $tipoDocumento);
     }
 }

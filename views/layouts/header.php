@@ -16,8 +16,9 @@ $nombreArea    = $_SESSION['nombreArea'] ?? 'Sin área';
     <meta charset="UTF-8">
     <title><?= $titulo ?? 'Dashboard - Gestión de Practicantes' ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/dashboard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/practicantes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/documentos.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/asistencias.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/dashboard.css">
 </head>
 <body>

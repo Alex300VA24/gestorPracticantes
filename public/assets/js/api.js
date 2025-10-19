@@ -98,15 +98,27 @@ class API {
         return this.get(`/solicitudes/documentos?practicanteID=${practicanteID}`);
     }
 
+    async obtenerDocumentoPorTipoYPracticante(practicanteID, tipoDocumento) {
+        return this.get(`/solicitudes/obtenerPorTipoYPracticante?practicanteID=${practicanteID}&tipoDocumento=${tipoDocumento}`);
+    }
+
+
     async subirDocumento(formData) {
         const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {
             method: "POST",
-            body: formData  // 🔹 No uses JSON aquí
+            body: formData
         });
 
-        return await response.json();
+        // Devuelve directamente el objeto Response, no el JSON
+        return response;
     }
 
+    async actualizarDocumento(formData) {
+        return fetch(`${this.baseURL}/solicitudes/actualizarDocumento`, {
+            method: "POST",
+            body: formData
+        });
+    }
 
 
 }

@@ -15,14 +15,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Logout
-    document.getElementById('btnLogout').addEventListener('click', async () => {
-        try{
+    document.getElementById('btnLogout').addEventListener('click', () => {
+        const modal = document.getElementById('logoutModal');
+        modal.style.display = 'flex';
+    });
+
+    document.getElementById('cancelLogout').addEventListener('click', () => {
+        const modal = document.getElementById('logoutModal');
+        modal.style.display = 'none';
+    });
+
+    document.getElementById('confirmLogout').addEventListener('click', async () => {
+        const modal = document.getElementById('logoutModal');
+        modal.style.display = 'none';
+        try {
             await api.logout();
             window.location.href = BASE_URL + 'login';
-        }catch (error){
-            alert('Error al cerrar sesion');
+        } catch (error) {
+            alert('Error al cerrar sesión');
         }
     });
+
 
 
 });

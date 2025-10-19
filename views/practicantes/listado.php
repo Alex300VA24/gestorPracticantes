@@ -30,7 +30,7 @@
 
 </div>
 
-<!-- Modal para crear practicante -->
+<!-- Modal para practicante -->
 <div id="PracticanteModal" class="modal" style="display:none;">
   <div class="modal-content">
     <h3 id="tituloModalPracticante">Nuevo Practicante</h3>
@@ -45,9 +45,6 @@
       <input type="text" id="Telefono" name="Telefono" placeholder="Teléfono">
       <input type="text" id="Direccion" name="Direccion" placeholder="Dirección">
       <input type="text" id="Universidad" name="Universidad" placeholder="Universidad">
-      <input type="text" id="Area" name="Area" placeholder="Área">
-      <input type="date" id="FechaEntrada" name="FechaEntrada">
-      <input type="date" id="FechaSalida" name="FechaSalida">
       <button type="submit">Guardar</button>
       <button type="button" onclick="cerrarModal()">Cancelar</button>
     </form>

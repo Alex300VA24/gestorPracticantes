@@ -101,6 +101,17 @@ switch (true) {
         $controller->subirDocumento();
         break;
     
+    case $path === '/api/solicitudes/actualizarDocumento':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->actualizarDocumento();
+        break;
+    
+    case $path === '/api/solicitudes/obtenerPorTipoYPracticante':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->obtenerDocumentoPorTipoYPracticante();
+        break;
+
+    
     // Vista de Login
     case $path === '/' || $path === '/login':
         require __DIR__ . '/../views/login.php';

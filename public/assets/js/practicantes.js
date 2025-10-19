@@ -38,7 +38,6 @@ async function abrirModalEditarPracticante(id) {
         document.getElementById("DNI").value = p.DNI || "";
         document.getElementById("Carrera").value = p.Carrera || "";
         document.getElementById("Universidad").value = p.Universidad || "";
-        document.getElementById("Area").value = p.Area || "";
         document.getElementById("Direccion").value = p.Direccion || "";
         document.getElementById("Telefono").value = p.Telefono || "";
         document.getElementById("Email").value = p.Email || "";
@@ -94,6 +93,9 @@ async function verPracticante(id) {
         Direccion: ${p.Direccion}
         Telefono: ${p.Telefono}
         Email: ${p.Email}
+        Fecha de Registro: ${p.FechaRegistro}
+        Fecha de Entrada: ${p.FechaEntrada}
+        Fecha de Salida: ${p.FechaSalida}
         Estado: ${p.Estado}`);
     } catch (err) {
         alert("Error al obtener practicante: " + err.message);
@@ -144,7 +146,7 @@ async function cargarPracticantes() {
                 <td>${p.NombreCompleto}</td>
                 <td>${p.Carrera || '-'}</td>
                 <td>${p.Universidad}</td>
-                <td>${p.FechaEntrada ? new Date(p.FechaEntrada).toLocaleDateString() : '-'}</td>
+                <td>${p.FechaRegistro ? new Date(p.FechaRegistro).toLocaleDateString() : '-'}</td>
                 <td>${p.Area || '-'}</td>
                 <td>${estadoBadge}</td>
                 <td>

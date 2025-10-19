@@ -19,44 +19,47 @@ class SolicitudRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerDocumentosPorPracticante($id) {
-        try {
+    public function obtenerDocumentosPorPracticante($practicanteID) {
+        $stmt = $this->conn->prepare("EXEC sp_ObtenerDocumentosPorPracticante :id");
+        $stmt->bindValue(':id', $practicanteID, PDO::PARAM_INT);
+        $stmt->execute();
 
-            $stmt = $this->conn->prepare("EXEC sp_ObtenerDocumentosPorPracticante @PracticanteID = :PracticanteID");
-            $stmt->bindParam(':PracticanteID', $id, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$row) return null;
-
-            $solicitud = new SolicitudPracticas();
-            $solicitud->setSolicitudID($row['SolicitudID']);
-            $solicitud->setFechaSolicitud($row['FechaSolicitud'] ?? null);
-            $solicitud->setEstadoID($row['EstadoID'] ?? null);
-            $solicitud->setPracticanteID($id);
-            $solicitud->setAreaID($row['AreaID'] ?? null);
-            $solicitud->setDocCV($row['DocCV']);
-            $solicitud->setDocCartaPresentacionUniversidad($row['DocCartaPresentacionUniversidad']);
-            $solicitud->setDocCarnetVacunacion($row['DocCarnetVacunacion']);
-            $solicitud->setDocDNI($row['DocDNI']);
-
-            return $solicitud;
-
-        } catch (\Exception $e) {
-            error_log("❌ Error en obtenerDocumentosPorPracticante: " . $e->getMessage());
-            return null;
+        $result = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // ✅ Convertir binario a Base64
+            if (isset($row['Archivo'])) {
+                $row['Archivo'] = base64_encode($row['Archivo']);
+            }
+            $result[] = $row;
         }
+
+        return $result;
     }
 
+    public function obtenerDocumentoPorTipoYPracticante($practicanteID, $tipoDocumento)
+    {
+        $sql = "EXEC sp_ObtenerDocumentoPorTipoYPracticante ?, ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$practicanteID, $tipoDocumento]);
 
-    public function subirDocumento($id, $tipo, $archivo) {
-        $sql = "EXEC sp_SubirDocumento ?, ?, ?";
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($fila && isset($fila['Archivo'])) {
+            // Convertir binario a base64
+            $fila['Archivo'] = base64_encode($fila['Archivo']);
+        }
+
+        return $fila;
+    }
+
+    public function subirDocumento($id, $tipo, $archivo, $observaciones = null) {
+        $sql = "EXEC sp_SubirDocumento ?, ?, ?, ?";
         $stmt = $this->conn->prepare($sql);
 
-        $stmt->bindValue(1, (int)$id, PDO::PARAM_INT);
-        $stmt->bindValue(2, $tipo, PDO::PARAM_STR);
-        $stmt->bindParam(3, $archivo, PDO::PARAM_LOB, 0, PDO::SQLSRV_ENCODING_BINARY);
+        $stmt->bindValue(1, (int)$id, PDO::PARAM_INT);                     // @SolicitudID
+        $stmt->bindValue(2, $tipo, PDO::PARAM_STR);                        // @TipoDocumento
+        $stmt->bindParam(3, $archivo, PDO::PARAM_LOB, 0, PDO::SQLSRV_ENCODING_BINARY); // @Archivo
+        $stmt->bindValue(4, $observaciones, PDO::PARAM_STR);               // @Observaciones (puede ser NULL)
 
         $res = $stmt->execute();
         if ($res === false) {
@@ -66,6 +69,44 @@ class SolicitudRepository {
 
         return $res;
     }
+
+    public function actualizarDocumento($solicitudID, $tipoDocumento, $archivo = null, $observaciones = null)
+    {
+        // Si hay archivo, incluimos el parámetro @Archivo
+        if ($archivo !== null) {
+            $sql = "EXEC spActualizarDocumento @SolicitudID = ?, @TipoDocumento = ?, @Archivo = ?, @Observaciones = ?";
+        } else {
+            // Sin archivo, lo excluimos completamente
+            $sql = "EXEC spActualizarDocumento @SolicitudID = ?, @TipoDocumento = ?, @Observaciones = ?";
+        }
+
+        $stmt = $this->conn->prepare($sql);
+
+        $stmt->bindValue(1, (int)$solicitudID, PDO::PARAM_INT);
+        $stmt->bindValue(2, $tipoDocumento, PDO::PARAM_STR);
+
+        if ($archivo !== null) {
+            $stmt->bindParam(3, $archivo, PDO::PARAM_LOB, 0, PDO::SQLSRV_ENCODING_BINARY);
+            $stmt->bindValue(4, $observaciones, PDO::PARAM_STR);
+        } else {
+            $stmt->bindValue(3, $observaciones, PDO::PARAM_STR);
+        }
+
+        if (!$stmt->execute()) {
+            $err = $stmt->errorInfo();
+            throw new \Exception("Error al ejecutar spActualizarDocumento: " . json_encode($err));
+        }
+
+        return $stmt->rowCount() > 0;
+    }
+
+
+
+
+
+
+
+
 
 
 

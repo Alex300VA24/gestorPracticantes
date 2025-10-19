@@ -1,8 +1,10 @@
 Array
 (
     [practicanteID] => 1
+    [solicitudID] => 1
     [tipoDocumento] => carnet_vacunacion
-    [observacionesDoc] => 
+    [observacionesDoc] => esto
+
 )
 
 Array
@@ -11,9 +13,29 @@ Array
         (
             [name] => MINSA - Carné Vacunación Document.pdf
             [type] => application/pdf
-            [tmp_name] => C:\xampp\tmp\phpED83.tmp
+            [tmp_name] => C:\xampp\tmp\phpFAB9.tmp
             [error] => 0
             [size] => 614100
+        )
+
+)
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => dni
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => DNI_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpA35E.tmp
+            [error] => 0
+            [size] => 318812
         )
 
 )

@@ -32,6 +32,18 @@
         </div>
     </div>
 
+    <!-- === Modal de Confirmación de Cierre de Sesión === -->
+    <div id="logoutModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3>¿Estás seguro que quieres cerrar sesión?</h3>
+        <p>Tu sesión actual se cerrará y volverás a la pantalla de inicio de sesión.</p>
+        <div class="modal-buttons">
+        <button id="cancelLogout" class="btn-cancel">Cancelar</button>
+        <button id="confirmLogout" class="btn-logout">Cerrar sesión</button>
+        </div>
+    </div>
+    </div>
+
     <div class="user-info">
         <div><strong id="currentUserName"><?= htmlspecialchars($nombreUsuario) ?></strong></div>
         <div id="currentUserRole">
@@ -41,5 +53,7 @@
         <button class="logout-btn" id="btnLogout">
             <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
         </button>
+
     </div>
 </div>
+
