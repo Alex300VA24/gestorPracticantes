@@ -63,39 +63,41 @@ async function cargarAsistencias() {
 
 async function registrarEntrada(practicanteID) {
     try {
-        console.log({practicanteID});
-        const res = await api.registrarEntrada({ practicanteID }); // ✅ correcto
+        console.log({ practicanteID });
+        const res = await api.registrarEntrada({ practicanteID });
 
         if (!res.success) {
-            alert(res.message);
+            alert(res.message || 'Ocurrió un error al registrar la entrada.');
         } else {
             alert('Entrada registrada exitosamente.');
         }
 
         await cargarAsistencias();
     } catch (err) {
-        console.error(err);
-        alert('Error al registrar la entrada.');
+        console.error('Error en registrarEntrada:', err);
+        // Si el backend envía un mensaje JSON, intentamos mostrarlo
+        alert((err.message || err));
     }
 }
 
 async function registrarSalida(practicanteID) {
     try {
-        console.log({practicanteID});
-        const res = await api.registrarSalida({ practicanteID }); // ✅ correcto
+        console.log({ practicanteID });
+        const res = await api.registrarSalida({ practicanteID });
 
         if (!res.success) {
-            alert(res.message);
+            alert(res.message || 'Ocurrió un error al registrar la salida.');
         } else {
             alert('Salida registrada exitosamente.');
         }
 
         await cargarAsistencias();
     } catch (err) {
-        console.error(err);
-        alert('Error al registrar la salida.');
+        console.error('Error en registrarSalida:', err);
+        alert('Error: ' + (err.message || err));
     }
 }
+
 
 
 
