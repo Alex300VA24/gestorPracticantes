@@ -56,6 +56,13 @@ switch (true) {
         $controller = new \App\Controllers\UsuarioController();
         $controller->logout();
         break;
+
+    // Ruta de Inicio
+    case preg_match('#^/api/inicio$#', $path):
+        $controller = new \App\Controllers\DashboardController();
+        $controller->obtenerDatosInicio();
+        break;
+
     
     // Rutas de Practicantes
     case preg_match('#^/api/practicantes$#', $path):
