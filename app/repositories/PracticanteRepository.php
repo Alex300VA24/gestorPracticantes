@@ -58,7 +58,7 @@ class PracticanteRepository {
      */
     public function registrarPracticante($p, $areaID = null) {
         try {
-            $stmt = $this->db->prepare("EXEC sp_RegistrarPracticante ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+            $stmt = $this->db->prepare("EXEC sp_RegistrarPracticante ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
             $stmt->execute([
                 $p->getDNI(),
@@ -70,9 +70,6 @@ class PracticanteRepository {
                 $p->getTelefono(),
                 $p->getDireccion(),
                 $p->getUniversidad(),
-                $p->getFechaEntrada() ?? null,
-                $p->getFechaSalida() ?? null,
-                $p->getFechaRegistro()
             ]);
 
             // El SP devuelve SELECT @NewID AS PracticanteID;
