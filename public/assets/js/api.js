@@ -116,8 +116,6 @@ class API {
     }
 
 
-
-
     async subirDocumento(formData) {
         const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {
             method: "POST",
