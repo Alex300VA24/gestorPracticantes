@@ -115,6 +115,12 @@ class API {
         return this.post('/asistencias/salida', data);
     }
 
+    // Inicio
+
+    // 📌 --- INICIO / DASHBOARD ---
+    async obtenerDatosInicio() {
+        return this.get('/inicio');
+    }
 
     async subirDocumento(formData) {
         const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {
