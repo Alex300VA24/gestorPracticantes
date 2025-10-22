@@ -134,7 +134,13 @@ class SolicitudController {
             // Llamar al servicio con 4 parámetros
             $ok = $this->service->subirDocumento($solicitudID, $tipoSP, $contenido, $observaciones);
 
-            echo json_encode(['success' => $ok]);
+            if ($ok) {
+                // Si la subida fue exitosa ($ok es true)
+                echo json_encode(['success' => true, 'message' => 'Documento subido correctamente']); 
+            } else {
+                // Si no fue exitosa ($ok es false)
+                echo json_encode(['success' => false, 'message' => 'Error al subir el documento en el servicio']); 
+            }
         } catch (\Throwable $e) {
             file_put_contents("error_subida.txt", $e->getMessage());
             http_response_code(500);

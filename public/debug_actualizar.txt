@@ -168,3 +168,27 @@ Array
 
 Archivo leido, bytes: 318812 FechaSubida: 2025-10-17 18:22:02
 Resultado service.actualizarDocumento: false
+---- INICIO Llamada actualizarDocumento ----
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => dni
+    [observacionesDoc] => nueva observacion
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => 
+            [type] => 
+            [tmp_name] => 
+            [error] => 4
+            [size] => 0
+        )
+
+)
+
+No hay archivo para actualizar (archivoErr=4 size=0)
+Resultado service.actualizarDocumento: false

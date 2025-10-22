@@ -39,3 +39,43 @@ Array
         )
 
 )
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => cv
+    [observacionesDoc] => este es el curriculum
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Laboral_CV_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpCE83.tmp
+            [error] => 0
+            [size] => 52700
+        )
+
+)
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => carnet_vacunacion
+    [observacionesDoc] => este es el carnet de vacunacion
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => MINSA - Carné Vacunación Document.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php6F26.tmp
+            [error] => 0
+            [size] => 614100
+        )
+
+)

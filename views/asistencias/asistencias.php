@@ -1,11 +1,11 @@
 <div class="action-buttons">
-    <button class="btn-success" onclick="">
+    <button class="btn-success" onclick="registrarEntrada()">
         <i class="fas fa-sign-in-alt"></i> Registrar Entrada
     </button>
-    <button class="btn-warning" onclick="">
+    <button class="btn-warning" onclick="registrarSalida()">
         <i class="fas fa-sign-out-alt"></i> Registrar Salida
     </button>
-    <button class="btn-info" onclick="">
+    <button class="btn-info" onclick="generarReporte()">
         <i class="fas fa-file-export"></i> Generar Reporte
     </button>
 </div>
@@ -33,9 +33,10 @@
         <thead>
             <tr>
                 <th>Practicante</th>
-                <th>Área</th>
+                <th>Turno</th>
                 <th>Hora Entrada</th>
                 <th>Hora Salida</th>
+                <th>Tiempo</th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>
@@ -45,3 +46,4 @@
         </tbody>
     </table>
 </div>
+

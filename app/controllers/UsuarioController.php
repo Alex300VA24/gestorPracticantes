@@ -31,6 +31,7 @@ class UsuarioController {
             $_SESSION['nombreUsuario'] = $usuario->getNombreUsuario();
             $_SESSION['nombreCargo'] = $usuario->getCargo()->getNombreCargo();
             $_SESSION['nombreArea'] = $usuario->getArea()->getNombreArea();
+            $_SESSION['cargoID'] = $usuario->getCargo()->getCargoID();
             $_SESSION['requireCUI'] = true;
             
             $this->jsonResponse([

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../autoload.php';
 // Para no mostrar los errores
 error_reporting();
 ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 
 // Iniciar la sesion
 session_start();
@@ -80,9 +81,7 @@ switch (true) {
         }
         break;
     
-    // Rutas de Documentos
 
-    // Rutas de Documentos
     // Solicitudes / Documentos
     case $path === '/api/solicitudes/listarPracticantes':
         $controller = new \App\Controllers\SolicitudController();
@@ -111,6 +110,28 @@ switch (true) {
         $controller->obtenerDocumentoPorTipoYPracticante();
         break;
 
+
+    // Rutas de Asistencias
+    case $path === '/api/asistencias':
+        $controller = new \App\Controllers\AsistenciaController();
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $controller->listarAsistencias();
+        }
+        break;
+
+    case $path === '/api/asistencias/entrada':
+        $controller = new \App\Controllers\AsistenciaController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->registrarEntrada();
+        }
+        break;
+
+    case $path === '/api/asistencias/salida':
+        $controller = new \App\Controllers\AsistenciaController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->registrarSalida();
+        }
+        break;
     
     // Vista de Login
     case $path === '/' || $path === '/login':

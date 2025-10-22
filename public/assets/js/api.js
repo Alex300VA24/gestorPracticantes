@@ -102,6 +102,21 @@ class API {
         return this.get(`/solicitudes/obtenerPorTipoYPracticante?practicanteID=${practicanteID}&tipoDocumento=${tipoDocumento}`);
     }
 
+    // 📌 --- ASISTENCIAS ---
+    async listarAsistencias() {
+        return this.get('/asistencias');
+    }
+
+    async registrarEntrada(data) {
+        return this.post('/asistencias/entrada', data);
+    }
+
+    async registrarSalida(data) {
+        return this.post('/asistencias/salida', data);
+    }
+
+
+
 
     async subirDocumento(formData) {
         const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {

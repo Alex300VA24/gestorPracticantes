@@ -10,7 +10,12 @@ class PracticanteRepository {
     private $db;
 
     public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
+        try {
+            $this->db = Database::getInstance()->getConnection();
+        } catch (\Throwable $e) {
+            error_log("Error en conexión DB: " . $e->getMessage());
+            throw $e;
+        }
     }
 
 
