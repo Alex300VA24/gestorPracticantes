@@ -132,6 +132,63 @@ textarea {
     transform: scale(1.03);
 }
 
+.btn-descargar {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* Estilos para el contenedor de enviar solicitud */
+.enviar-solicitud-container {
+    margin-top: 20px;
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.btn-enviar {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-enviar:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+.btn-enviar:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.msg-ok {
+    color: #28a745;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.msg-warn {
+    color: #ffc107;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
 /* === VISTA PREVIA DE DOCUMENTOS === */
 #documentosSubidos {
     border-top: 1px solid #ddd;

@@ -70,8 +70,8 @@ class API {
         return this.post('/logout');
     }
 
+    // --- PRACTICANTES ---
     async getPracticantes() {
-        // Esta es la URL que tu backend reconoce
         return this.get('/practicantes');
     }
 
@@ -86,10 +86,32 @@ class API {
     async actualizarPracticante(id, data) {
         return this.put(`/practicantes/${id}`, data);
     }
+
     async eliminarPracticante(id) {
-        return await this.delete(`practicantes/${id}`);
+        return await this.delete(`/practicantes/${id}`);
     }
 
+    // 🆕 Filtrar practicantes
+    async filtrarPracticantes(nombre = null, areaID = null) {
+        const params = new URLSearchParams();
+        if (nombre) params.append('nombre', nombre);
+        if (areaID) params.append('areaID', areaID);
+        
+        const query = params.toString() ? `?${params.toString()}` : '';
+        return this.get(`/practicantes/filtrar${query}`);
+    }
+
+    // 🆕 Aceptar practicante
+    async aceptarPracticante(data) {
+        return this.post('/practicantes/aceptar', data);
+    }
+
+    // 🆕 Rechazar practicante
+    async rechazarPracticante(data) {
+        return this.post('/practicantes/rechazar', data);
+    }
+
+    // --- SOLICITUDES / DOCUMENTOS ---
     async listarNombrePracticantes() {
         return this.get('/solicitudes/listarPracticantes');
     }
@@ -102,7 +124,54 @@ class API {
         return this.get(`/solicitudes/obtenerPorTipoYPracticante?practicanteID=${practicanteID}&tipoDocumento=${tipoDocumento}`);
     }
 
-    // 📌 --- ASISTENCIAS ---
+    // 🆕 Obtener solicitud por practicante
+    async obtenerSolicitudPorPracticante(practicanteID) {
+        return this.get(`/solicitudes/por-practicante?practicanteID=${practicanteID}`);
+    }
+
+    async subirDocumento(formData) {
+        const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {
+            method: "POST",
+            body: formData
+        });
+        return response;
+    }
+
+    async actualizarDocumento(formData) {
+        return fetch(`${this.baseURL}/solicitudes/actualizarDocumento`, {
+            method: "POST",
+            body: formData
+        });
+    }
+
+    // 🆕 --- MENSAJES ---
+    async enviarSolicitudArea(data) {
+        return this.post('/mensajes/enviar', data);
+    }
+
+    async responderSolicitud(data) {
+        return this.post('/mensajes/responder', data);
+    }
+
+    async listarMensajes(areaID) {
+        return this.get(`/mensajes/${areaID}`);
+    }
+
+    // 🆕 --- ÁREAS ---
+    async listarAreas() {
+        return this.get('/areas');
+    }
+
+    // 🆕 --- TURNOS ---
+    async listarTurnos() {
+        return this.get('/turnos');
+    }
+
+    async obtenerTurnosPracticante(practicanteID) {
+        return this.get(`/turnos/practicante/${practicanteID}`);
+    }
+
+    // --- ASISTENCIAS ---
     async listarAsistencias() {
         return this.get('/asistencias');
     }
@@ -115,31 +184,10 @@ class API {
         return this.post('/asistencias/salida', data);
     }
 
-    // Inicio
-
-    // 📌 --- INICIO / DASHBOARD ---
+    // --- INICIO / DASHBOARD ---
     async obtenerDatosInicio() {
         return this.get('/inicio');
     }
-
-    async subirDocumento(formData) {
-        const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {
-            method: "POST",
-            body: formData
-        });
-
-        // Devuelve directamente el objeto Response, no el JSON
-        return response;
-    }
-
-    async actualizarDocumento(formData) {
-        return fetch(`${this.baseURL}/solicitudes/actualizarDocumento`, {
-            method: "POST",
-            body: formData
-        });
-    }
-
-
 }
 
 const api = new API();

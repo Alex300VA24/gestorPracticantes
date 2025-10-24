@@ -3,11 +3,6 @@ session_start();
 use App\Helpers\Permisos;
 require_once __DIR__ . '/../../app/helpers/Permisos.php';
 
-// Validar sesión
-if (!isset($_SESSION['usuarioID'])) {
-    header("Location: /login");
-    exit;
-}
 
 // 🔹 Obtener permisos según cargo
 $cargoID = $_SESSION['cargoID'];

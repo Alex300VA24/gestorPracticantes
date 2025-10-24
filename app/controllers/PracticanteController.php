@@ -121,6 +121,70 @@ class PracticanteController {
         }
     }
 
+    public function filtrarPracticantes() {
+        try {
+            $nombre = $_GET['nombre'] ?? null;
+            $areaID = $_GET['areaID'] ?? null;
+            
+            $practicantes = $this->practicanteService->filtrarPracticantes($nombre, $areaID);
+            $this->jsonResponse([
+                'success' => true,
+                'data' => $practicantes
+            ]);
+        } catch (\Exception $e) {
+            $this->jsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function aceptarPracticante() {
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            $this->practicanteService->aceptarPracticante(
+                $data['practicanteID'],
+                $data['solicitudID'],
+                $data['areaID'],
+                $data['turnos'], // Array de objetos turno
+                $data['mensajeRespuesta']
+            );
+            
+            $this->jsonResponse([
+                'success' => true,
+                'message' => 'Practicante aceptado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            $this->jsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function rechazarPracticante() {
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            $this->practicanteService->rechazarPracticante(
+                $data['practicanteID'],
+                $data['solicitudID'],
+                $data['mensajeRespuesta']
+            );
+            
+            $this->jsonResponse([
+                'success' => true,
+                'message' => 'Practicante rechazado'
+            ]);
+        } catch (\Exception $e) {
+            $this->jsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 
     

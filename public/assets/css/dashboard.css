@@ -248,3 +248,141 @@ body {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+
+
+/* DEsde aca hay css que debo arreglar*/
+/* Estilos para badges */
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Estilos para botones pequeños */
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin: 2px;
+}
+
+/* Estilos para mensajes */
+.mensaje-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background: #fff;
+}
+
+.mensaje-item:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Estilos para modal más ancho */
+.modal-content {
+    max-width: 600px;
+    width: 90%;
+}
+
+/* Contenedor de info del practicante */
+#infoPracticante {
+    background: #f5f5f5;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+
+#infoPracticante h4 {
+    margin-top: 0;
+    color: #007bff;
+}
+
+/* Filtros */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+/* Para turnos */
+
+/* Estilos para turnos */
+.turno-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background: #fff;
+}
+
+.dias-checkboxes {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.dias-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 8px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.dias-checkboxes label:hover {
+    background: #e0e0e0;
+}
+
+.dias-checkboxes input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}

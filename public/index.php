@@ -1,9 +1,8 @@
 <?php
 require_once __DIR__ . '/../autoload.php';
 
-
 // Para no mostrar los errores
-error_reporting();
+error_reporting(0);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 
@@ -13,14 +12,10 @@ session_start();
 // Constante BASE_URL
 define('BASE_URL', '/gestorPracticantes/public/');
 
-
-
-
 // Configurar headers para CORS si es necesario
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -41,7 +36,9 @@ error_log("PATH RECIBIDO: " . $path);
 
 // Rutas de la API
 switch (true) {
-    // Rutas de Usuario/Auth
+    // ============================================
+    // RUTAS DE USUARIO/AUTH
+    // ============================================
     case preg_match('#^/api/login$#', $path):
         $controller = new \App\Controllers\UsuarioController();
         $controller->login();
@@ -57,14 +54,32 @@ switch (true) {
         $controller->logout();
         break;
 
-    // Ruta de Inicio
+    // ============================================
+    // RUTA DE INICIO/DASHBOARD
+    // ============================================
     case preg_match('#^/api/inicio$#', $path):
         $controller = new \App\Controllers\DashboardController();
         $controller->obtenerDatosInicio();
         break;
 
+    // ============================================
+    // RUTAS DE PRACTICANTES
+    // ============================================
+    case $path === '/api/practicantes/filtrar':
+        $controller = new \App\Controllers\PracticanteController();
+        $controller->filtrarPracticantes();
+        break;
     
-    // Rutas de Practicantes
+    case $path === '/api/practicantes/aceptar':
+        $controller = new \App\Controllers\PracticanteController();
+        $controller->aceptarPracticante();
+        break;
+    
+    case $path === '/api/practicantes/rechazar':
+        $controller = new \App\Controllers\PracticanteController();
+        $controller->rechazarPracticante();
+        break;
+
     case preg_match('#^/api/practicantes$#', $path):
         $controller = new \App\Controllers\PracticanteController();
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -73,7 +88,6 @@ switch (true) {
             $controller->registrarPracticante();
         }
         break;
-        
     
     case preg_match('#^/api/practicantes/(\d+)$#', $path, $matches):
         $controller = new \App\Controllers\PracticanteController();
@@ -84,15 +98,21 @@ switch (true) {
         } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             $controller->actualizar($practicanteID);
         } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            $controller->eliminar($practicanteID); // ✅ Agrega este bloque
+            $controller->eliminar($practicanteID);
         }
         break;
-    
 
-    // Solicitudes / Documentos
+    // ============================================
+    // RUTAS DE SOLICITUDES / DOCUMENTOS
+    // ============================================
     case $path === '/api/solicitudes/listarPracticantes':
         $controller = new \App\Controllers\SolicitudController();
         $controller->listarPracticantes();
+        break;
+
+    case $path === '/api/solicitudes/por-practicante':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->obtenerSolicitudPorPracticante();
         break;
 
     case preg_match('#^/api/solicitudes/documentos$#', $path):
@@ -100,7 +120,6 @@ switch (true) {
         $controller = new \App\Controllers\SolicitudController();
         $controller->obtenerDocumentosPorPracticante();
         break;
-
 
     case $path === '/api/solicitudes/subirDocumento':
         $controller = new \App\Controllers\SolicitudController();
@@ -117,8 +136,48 @@ switch (true) {
         $controller->obtenerDocumentoPorTipoYPracticante();
         break;
 
+    // ============================================
+    // RUTAS DE MENSAJES
+    // ============================================
+    case $path === '/api/mensajes/enviar':
+        $controller = new \App\Controllers\MensajeController();
+        $controller->enviarSolicitud();
+        break;
+    
+    case $path === '/api/mensajes/responder':
+        $controller = new \App\Controllers\MensajeController();
+        $controller->responderSolicitud();
+        break;
+    
+    case preg_match('#^/api/mensajes/(\d+)$#', $path, $matches):
+        $controller = new \App\Controllers\MensajeController();
+        $controller->listarMensajes($matches[1]);
+        break;
 
-    // Rutas de Asistencias
+    // ============================================
+    // RUTAS DE ÁREAS
+    // ============================================
+    case $path === '/api/areas':
+        $controller = new \App\Controllers\AreaController();
+        $controller->listar();
+        break;
+
+    // ============================================
+    // RUTAS DE TURNOS
+    // ============================================
+    case $path === '/api/turnos':
+        $controller = new \App\Controllers\TurnoController();
+        $controller->listar();
+        break;
+    
+    case preg_match('#^/api/turnos/practicante/(\d+)$#', $path, $matches):
+        $controller = new \App\Controllers\TurnoController();
+        $controller->obtenerPorPracticante($matches[1]);
+        break;
+
+    // ============================================
+    // RUTAS DE ASISTENCIAS
+    // ============================================
     case $path === '/api/asistencias':
         $controller = new \App\Controllers\AsistenciaController();
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -139,23 +198,27 @@ switch (true) {
             $controller->registrarSalida();
         }
         break;
-    
-    // Vista de Login
+
+    // ============================================
+    // RUTAS DE VISTAS
+    // ============================================
     case $path === '/' || $path === '/login':
         require __DIR__ . '/../views/login.php';
         break;
         
-    // Vista de Dashboard
     case $path === '/dashboard':
         if (!isset($_SESSION['authenticated']) || !$_SESSION['authenticated']) {
-            header('Location: /login');
+            require __DIR__ . '/../views/login.php';
             exit;
         }
         require __DIR__ . '/../views/dashboard/index.php';
         break;
     
+    // ============================================
+    // RUTA 404
+    // ============================================
     default:
         http_response_code(404);
-        echo json_encode(['error' => 'Ruta no encontrada']);
+        echo json_encode(['error' => 'Ruta no encontrada: ' . $path]);
         break;
 }

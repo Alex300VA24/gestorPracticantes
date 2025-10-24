@@ -3,9 +3,38 @@
         <button class="btn-primary" id="btnSubirDocumento">
             <i class="fas fa-upload"></i> Subir Documento
         </button>
-        <button class="btn-success" id="btnGenerarCarta">
+        <button class="btn-success" id="btnGenerarCarta" disabled>
             <i class="fas fa-file-contract"></i> Generar Carta
         </button>
+        <button class="btn-info" id="btnEnviarSolicitudArea" disabled>
+            <i class="fas fa-paper-plane"></i> Enviar Solicitud a Área
+        </button>
+    </div>
+</div>
+
+<!-- Modal para enviar solicitud -->
+<div id="modalEnviarSolicitud" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Enviar Solicitud a Área</h3>
+        <form id="formEnviarSolicitud">
+            <input type="hidden" id="solicitudEnvioID">
+            
+            <div class="form-group">
+                <label>Área Destino:</label>
+                <select id="areaDestino" required>
+                    <option value="">Seleccionar área...</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Mensaje:</label>
+                <textarea id="mensajeSolicitud" rows="4" required 
+                    placeholder="Descripción de la solicitud..."></textarea>
+            </div>
+            
+            <button type="submit" class="btn-success">Enviar Solicitud</button>
+            <button type="button" onclick="cerrarModalEnviarSolicitud()">Cancelar</button>
+        </form>
     </div>
 </div>
 

@@ -1,22 +1,22 @@
-   // ===================================== Documentos ====================================================
+// ===================================== Documentos ====================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
     const selectPracticante = document.getElementById("selectPracticanteDoc");
     const listaDocumentos = document.getElementById("listaDocumentos");
-
-
     const selectPracticanteModal = document.getElementById("practicanteDocumento");
     const selectTipoDocumento = document.getElementById("tipoDocumento");
     const inputArchivo = document.getElementById("archivoDocumento");
     const textareaObs = document.getElementById("observacionesDoc");
-    const contenedorArchivoActual = document.createElement("div"); // contenedor dinámico
-    inputArchivo.parentElement.appendChild(contenedorArchivoActual); // lo colocamos debajo del input
+    const contenedorArchivoActual = document.createElement("div");
+    inputArchivo.parentElement.appendChild(contenedorArchivoActual);
 
     let archivoExistente = null;
     let existeDocumento = false;
 
+    // 🆕 Cargar áreas para el modal de envío de solicitud
+    await cargarAreasParaSolicitud();
 
-    // 🔹 Cuando se selecciona practicante o tipo de documento
+    // 🔹 Verificar si existe documento previo
     async function verificarDocumentoExistente() {
         const practicanteID = document.getElementById("practicanteDocumento").value;
         const tipoDocumento = document.getElementById("tipoDocumento").value;
@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (result.success && result.data) {
                 existeDocumento = true;
-                // Guardamos el ID para hacer actualización en lugar de crear
                 document.getElementById("solicitudID").value = result.data.SolicitudID;
                 textareaObs.value = result.data.Observaciones || "";
 
@@ -44,7 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                 `;
 
-                // Ver documento en nueva pestaña
                 document.getElementById("btnVerDocumento").addEventListener("click", () => {
                     const base64 = result.data.Archivo;
                     const tipoMime = base64.startsWith("JVBER") ? "application/pdf"
@@ -57,33 +55,54 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
             } else {
-                existeDocumento = false; // ✅ Marca que no existe
+                existeDocumento = false;
                 textareaObs.value = "";
                 contenedorArchivoActual.innerHTML = "";
-                console.log("ℹ️ No hay documento previo, pero se mantiene SolicitudID actual:", document.getElementById("solicitudID").value);
+                console.log("ℹ️ No hay documento previo");
             }
-
-            //window.solicitudActualID = result.data.SolicitudID;
-            //document.getElementById("solicitudID").value = result.data.SolicitudID;
 
         } catch (err) {
             console.error("❌ Error al verificar documento existente:", err);
         }
     }
 
-
     // 🔹 Detectar cambios
-    selectPracticanteModal.addEventListener("change", verificarDocumentoExistente);
+    selectPracticanteModal.addEventListener("change", async (e) => {
+        const practicanteID = e.target.value;
+        if (!practicanteID) return;
+
+        // Obtener datos del practicante y su solicitud
+        try {
+            const result = await api.getPracticante(practicanteID);
+            console.log("🧾 Datos completos recibidos:", result);
+
+            const campoSolicitud = document.getElementById("solicitudID");
+
+            if ((!campoSolicitud.value || campoSolicitud.value === "undefined") &&
+                result.success && result.data && result.data.SolicitudID) {
+                campoSolicitud.value = result.data.SolicitudID;
+                window.solicitudActualID = result.data.SolicitudID;
+                solicitudIDActual = result.data.SolicitudID;
+                console.log("✅ Solicitud asociada:", result.data.SolicitudID);
+            }
+
+        } catch (error) {
+            console.error("❌ Error al obtener datos del practicante:", error);
+        }
+
+        verificarDocumentoExistente();
+    });
+
     selectTipoDocumento.addEventListener("change", verificarDocumentoExistente);
 
-    // 🔹 Si se selecciona un nuevo archivo, se reemplaza
+    // 🔹 Si se selecciona un nuevo archivo
     inputArchivo.addEventListener("change", () => {
         if (inputArchivo.files.length > 0) {
             contenedorArchivoActual.innerHTML = `
                 <p style="color:orange;">Se reemplazará el documento existente al subir uno nuevo.</p>
             `;
         } else if (archivoExistente) {
-            verificarDocumentoExistente(); // restaurar si cancela
+            verificarDocumentoExistente();
         }
     });
 
@@ -95,46 +114,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         return new Blob([byteArray], { type });
     }
 
-
-    // 🔹 Cuando se selecciona un practicante en el modal, obtenemos su SolicitudID
-    
-    selectPracticanteModal.addEventListener("change", async (e) => {
-        const practicanteID = e.target.value;
-        if (!practicanteID) return;
-
-        try {
-            const result = await api.getPracticante(practicanteID);
-            console.log("🧾 Datos completos recibidos:", result);
-
-            const campoSolicitud = document.getElementById("solicitudID");
-
-            // 🧩 Solo actualiza si el campo está vacío o no tiene valor válido
-            if ((!campoSolicitud.value || campoSolicitud.value === "undefined") &&
-                result.success && result.data && result.data.SolicitudID) {
-
-                campoSolicitud.value = result.data.SolicitudID;
-                window.solicitudActualID = result.data.SolicitudID;
-                console.log("✅ Solicitud asociada:", result.data.SolicitudID);
-            } else {
-                console.log("⚙️ Se mantiene solicitudID actual:", campoSolicitud.value);
-            }
-
-        } catch (error) {
-            console.error("❌ Error al obtener datos del practicante:", error);
-        }
-    });
-
-
-
-
     // 🔹 Cargar practicantes en ambos select
     try {
         const practicantes = await api.listarNombrePracticantes();
 
-        // 1. **Verificar** si practicantes es un array válido antes de usar forEach.
         if (!practicantes || !Array.isArray(practicantes)) {
             console.warn("La respuesta de la API no es un array válido de practicantes.");
-            // Opcional: podrías lanzar un error o simplemente salir de la función
             return; 
         }
 
@@ -148,7 +133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error cargando practicantes:", err);
     }
 
-    // Cuando se selecciona un practicante
+    // 🔹 Cuando se selecciona un practicante en la vista principal
     selectPracticante.addEventListener("change", async () => {
         const id = selectPracticante.value;
         if (!id) {
@@ -156,12 +141,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
+        // 🆕 Obtener solicitudID del practicante seleccionado
+        try {
+            const solicitudData = await api.obtenerSolicitudPorPracticante(id);
+            if (solicitudData.success && solicitudData.data) {
+                solicitudIDActual = solicitudData.data.SolicitudID;
+                console.log("📋 SolicitudID obtenida:", solicitudIDActual);
+            }
+        } catch (error) {
+            console.error("Error al obtener solicitud:", error);
+        }
+
         const documentos = await getDocumentosPorPracticante(id);
         renderDocumentos(documentos);
     });
 
-
-    // Botón subir documento
+    // 🔹 Botón subir documento
     document.getElementById("btnSubirDocumento").addEventListener("click", () => {
         openModal("modalSubirDocumento");
     });
@@ -170,16 +165,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("formSubirDocumento").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // 🔧 Asegura que el campo tenga valor
         if (window.solicitudActualID) {
             document.getElementById("solicitudID").value = window.solicitudActualID;
         }
         const formData = new FormData(e.target);
 
-
         console.log("📦 FormData enviado:", Object.fromEntries(formData.entries()));
         console.log("🧩 existeDocumento =", existeDocumento, "| solicitudID =", formData.get("solicitudID"));
-
 
         let response;
 
@@ -204,14 +196,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             e.target.reset();
 
             // 🔄 Actualizar lista de documentos
-            const selectPracticante = document.getElementById("selectPracticanteDoc");
             const idSeleccionado = selectPracticante.value;
             if (idSeleccionado) {
                 const documentos = await getDocumentosPorPracticante(idSeleccionado);
                 renderDocumentos(documentos);
             }
 
-            // Reiniciar flag
             existeDocumento = false;
 
         } catch (err) {
@@ -220,16 +210,112 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    // 🆕 Botón para generar carta (cuando documentos completos)
+    document.getElementById("btnGenerarCarta")?.addEventListener("click", async () => {
+        const practicanteID = selectPracticante.value;
+        if (!practicanteID) {
+            alert("Seleccione un practicante primero");
+            return;
+        }
 
+        try {
+            // Aquí implementarás la generación de carta PDF
+            alert("Funcionalidad de generar carta en desarrollo");
+            // TODO: Implementar generación de carta de aceptación
+        } catch (error) {
+            console.error("Error al generar carta:", error);
+            alert("Error al generar la carta");
+        }
+    });
+
+});
+
+// 🆕 Cargar áreas para el modal de envío de solicitud
+async function cargarAreasParaSolicitud() {
+    try {
+        const response = await api.listarAreas();
+        
+        if (response.success) {
+            const selectArea = document.getElementById("areaDestino");
+            if (selectArea) {
+                selectArea.innerHTML = '<option value="">Seleccionar área...</option>';
+                response.data.forEach(area => {
+                    const option = document.createElement('option');
+                    option.value = area.AreaID;
+                    option.textContent = area.NombreArea;
+                    selectArea.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Error al cargar áreas:", error);
+    }
+}
+
+// 🆕 Abrir modal para enviar solicitud a área
+function abrirModalEnviarSolicitud(solicitudID) {
+    document.getElementById("solicitudEnvioID").value = solicitudID;
+    openModal("modalEnviarSolicitud");
+}
+
+// 🆕 Cerrar modal de enviar solicitud
+function cerrarModalEnviarSolicitud() {
+    closeModal("modalEnviarSolicitud");
+    document.getElementById("formEnviarSolicitud").reset();
+}
+
+// 🆕 Enviar solicitud a área
+document.getElementById("formEnviarSolicitud")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const solicitudID = document.getElementById("solicitudEnvioID").value;
+    const destinatarioAreaID = document.getElementById("areaDestino").value;
+    const contenido = document.getElementById("mensajeSolicitud").value;
+
+    console.log(solicitudID);
+    console.log(destinatarioAreaID);
+    console.log(contenido);
+    
+    // Obtener área de RRHH desde sessionStorage (deberías guardarlo en el login)
+    const remitenteAreaID = sessionStorage.getItem('areaID') || 1; // 1 = RRHH por defecto
+    console.log("El remitente de area ID", remitenteAreaID);
+    
+    try {
+        const response = await api.enviarSolicitudArea({
+            solicitudID: parseInt(solicitudID),
+            remitenteAreaID: parseInt(remitenteAreaID),
+            destinatarioAreaID: parseInt(destinatarioAreaID),
+            contenido
+        });
+        
+        if (response.success) {
+            alert('✅ Solicitud enviada correctamente al área');
+            cerrarModalEnviarSolicitud();
+            
+            // Deshabilitar botón después de enviar
+            const btnEnviar = document.getElementById("btnEnviarSolicitudArea");
+            if (btnEnviar) {
+                btnEnviar.disabled = true;
+                btnEnviar.innerHTML = '<i class="fas fa-check"></i> Solicitud Enviada';
+            }
+        } else {
+            alert('Error: ' + response.message);
+        }
+    } catch (error) {
+        console.error('Error al enviar solicitud:', error);
+        alert('❌ Error al enviar la solicitud');
+    }
 });
 
 // 🧩 Funciones auxiliares
 function openModal(id) {
     document.getElementById(id).style.display = "flex";
 }
+
 function closeModal(id) {
     document.getElementById(id).style.display = "none";
 }
+
 async function getDocumentosPorPracticante(id) {
     try {
         const data = await api.obtenerDocumentosPorPracticante(id);
@@ -247,37 +333,32 @@ async function getDocumentosPorPracticante(id) {
     }
 }
 
-
 function descargarArchivo(base64, nombre) {
-    // Detectar tipo MIME por las primeras letras del Base64
-    let tipoMime = "application/octet-stream"; // valor por defecto
+    let tipoMime = "application/octet-stream";
     let extension = "bin";
 
-    if (base64.startsWith("JVBER")) { // PDF
+    if (base64.startsWith("JVBER")) {
         tipoMime = "application/pdf";
         extension = "pdf";
-    } else if (base64.startsWith("UEsDB")) { // DOCX o XLSX o ZIP
+    } else if (base64.startsWith("UEsDB")) {
         tipoMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
         extension = "docx";
-    } else if (base64.startsWith("/9j/")) { // JPG
+    } else if (base64.startsWith("/9j/")) {
         tipoMime = "image/jpeg";
         extension = "jpg";
-    } else if (base64.startsWith("iVBOR")) { // PNG
+    } else if (base64.startsWith("iVBOR")) {
         tipoMime = "image/png";
         extension = "png";
-    } else if (base64.startsWith("0M8R4KGx")) { // DOC antiguo (binario)
+    } else if (base64.startsWith("0M8R4KGx")) {
         tipoMime = "application/msword";
         extension = "doc";
     }
 
-    // Crear enlace de descarga
     const link = document.createElement("a");
     link.href = `data:${tipoMime};base64,${base64}`;
     link.download = `${nombre}.${extension}`;
     link.click();
 }
-
-
 
 function renderDocumentos(documentos) {
     const contenedor = document.getElementById("listaDocumentos");
@@ -287,12 +368,9 @@ function renderDocumentos(documentos) {
         return;
     }
 
-    // Documentos obligatorios
     const obligatorios = ["CV", "DNI", "Carnet_Vacunacion"];
-
-    // Verificar documentos subidos
     const normalizar = str =>
-    str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     const tiposSubidos = documentos.map(doc => normalizar(doc.tipo));
     const faltantes = obligatorios.filter(req =>
@@ -300,8 +378,6 @@ function renderDocumentos(documentos) {
     );
     const todosCompletos = faltantes.length === 0;
 
-
-    // Construcción de tabla
     const tabla = `
         <table class="table table-striped table-hover">
             <thead>
@@ -315,8 +391,7 @@ function renderDocumentos(documentos) {
             <tbody>
                 ${documentos.map(doc => {
                     const obligatorio = obligatorios.some(req =>
-                        req.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") ===
-                        doc.tipo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                        normalizar(req) === normalizar(doc.tipo)
                     );
 
                     return `
@@ -338,9 +413,18 @@ function renderDocumentos(documentos) {
             </tbody>
         </table>
 
-        <div class="enviar-solicitud-container">
-            <button id="btnEnviarSolicitud" class="btn-enviar" ${todosCompletos ? '' : 'disabled'}>
-                <i class="fas fa-paper-plane"></i> Enviar Solicitud
+        <div class="enviar-solicitud-container" style="margin-top: 20px; text-align: center;">
+            <button id="btnEnviarSolicitudArea" 
+                    class="btn-enviar" 
+                    ${todosCompletos ? '' : 'disabled'}
+                    onclick="abrirModalEnviarSolicitud(${solicitudIDActual})">
+                <i class="fas fa-paper-plane"></i> Enviar Solicitud a Área
+            </button>
+            <button id="btnGenerarCarta" 
+                    class="btn-success" 
+                    ${todosCompletos ? '' : 'disabled'}
+                    style="margin-left: 10px;">
+                <i class="fas fa-file-contract"></i> Generar Carta de Aceptación
             </button>
             ${
                 todosCompletos
@@ -351,29 +435,7 @@ function renderDocumentos(documentos) {
     `;
 
     contenedor.innerHTML = tabla;
-
-    // 🔹 Evento para enviar solicitud (solo si está habilitado)
-    const btnEnviar = document.getElementById("btnEnviarSolicitud");
-    if (btnEnviar && todosCompletos) {
-        btnEnviar.addEventListener("click", async () => {
-            const id = document.getElementById("selectPracticanteDoc").value;
-            if (!id) return alert("Seleccione un practicante primero.");
-
-            try {
-                const resp = await fetch(`${BASE_URL}solicitudes/enviarSolicitud`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ practicanteID: id })
-                });
-
-                if (!resp.ok) throw new Error("Error en la solicitud.");
-                const data = await resp.text();
-                console.log("Respuesta de enviarSolicitud:", data);
-                alert("✅ Solicitud enviada con éxito.");
-            } catch (err) {
-                console.error("Error al enviar solicitud:", err);
-                alert("❌ No se pudo enviar la solicitud.");
-            }
-        });
-    }
 }
+
+// 🆕 Hacer solicitudIDActual global para uso en onclick
+let solicitudIDActual = null;

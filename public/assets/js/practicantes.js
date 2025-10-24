@@ -153,13 +153,13 @@ async function cargarPracticantes() {
                     <button class="btn-primary" style="padding: 8px 12px; font-size: 0.8rem;">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-success" style="padding: 8px 12px; font-size: 0.8rem;" >
+                    <button class="btn-success" style="padding: 8px 11.5px; font-size: 0.8rem;" >
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn-warning" style="padding: 8px 12px; font-size: 0.8rem;">
+                    <button class="btn-warning" style="padding: 8.2px 12.2px; font-size: 0.8rem;">
                         <i class="fas fa-check"></i>
                     </button>
-                    <button class="btn-danger" style="padding: 8px 12px; font-size: 0.8rem;">
+                    <button class="btn-danger" style="padding: 8.5px 13px; font-size: 0.8rem;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>

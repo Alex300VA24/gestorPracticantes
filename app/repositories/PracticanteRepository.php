@@ -124,4 +124,44 @@ class PracticanteRepository {
         return "Practicante eliminado correctamente";
     }
 
+    public function filtrarPracticantes($nombre = null, $areaID = null) {
+        try {
+            $stmt = $this->db->prepare("EXEC sp_FiltrarPracticantes ?, ?");
+            $stmt->execute([$nombre, $areaID]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error al filtrar practicantes: " . $e->getMessage());
+            throw new \Exception("Error al filtrar practicantes");
+        }
+    }
+
+    public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $turnosJSON, $mensajeRespuesta) {
+        try {
+            $stmt = $this->db->prepare("EXEC sp_AceptarPracticante ?, ?, ?, ?, ?");
+            $stmt->execute([
+                $practicanteID,
+                $solicitudID,
+                $areaID,
+                $turnosJSON, // JSON string
+                $mensajeRespuesta
+            ]);
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result && $result['Resultado'] == 1;
+        } catch (PDOException $e) {
+            error_log("Error al aceptar practicante: " . $e->getMessage());
+            throw new \Exception("Error al aceptar practicante: " . $e->getMessage());
+        }
+    }
+
+    public function rechazarPracticante($practicanteID, $solicitudID, $mensajeRespuesta) {
+        try {
+            $stmt = $this->db->prepare("EXEC sp_RechazarPracticante ?, ?, ?");
+            return $stmt->execute([$practicanteID, $solicitudID, $mensajeRespuesta]);
+        } catch (PDOException $e) {
+            error_log("Error al rechazar practicante: " . $e->getMessage());
+            throw new \Exception("Error al rechazar practicante");
+        }
+    }
+
 }

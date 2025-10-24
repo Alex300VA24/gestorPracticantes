@@ -79,3 +79,104 @@ Array
         )
 
 )
+Array
+(
+    [practicanteID] => 7
+    [solicitudID] => 7
+    [tipoDocumento] => cv
+    [observacionesDoc] => este es mi curriculum
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Laboral_CV_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php23FC.tmp
+            [error] => 0
+            [size] => 52700
+        )
+
+)
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => carta_presentacion
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Carta de Presentación.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\phpFA0A.tmp
+            [error] => 0
+            [size] => 41334
+        )
+
+)
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => dni
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => DNI_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php39F3.tmp
+            [error] => 0
+            [size] => 318812
+        )
+
+)
+Array
+(
+    [practicanteID] => 7
+    [solicitudID] => 7
+    [tipoDocumento] => carnet_vacunacion
+    [observacionesDoc] => carnet
+
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => MINSA - Carné Vacunación Document.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php9A91.tmp
+            [error] => 0
+            [size] => 614100
+        )
+
+)
+Array
+(
+    [practicanteID] => 7
+    [solicitudID] => 7
+    [tipoDocumento] => dni
+    [observacionesDoc] => dni
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => DNI_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpDCAC.tmp
+            [error] => 0
+            [size] => 318812
+        )
+
+)

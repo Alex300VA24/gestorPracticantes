@@ -101,7 +101,18 @@ class SolicitudRepository {
     }
 
 
+    // Agregar a SolicitudRepository
 
+    public function obtenerSolicitudPorPracticante($practicanteID) {
+        $stmt = $this->conn->prepare("
+            SELECT TOP 1 * 
+            FROM SolicitudPracticas 
+            WHERE PracticanteID = ? 
+            ORDER BY FechaSolicitud DESC
+        ");
+        $stmt->execute([$practicanteID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
 
 

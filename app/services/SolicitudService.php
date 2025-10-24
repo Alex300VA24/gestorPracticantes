@@ -30,4 +30,10 @@ class SolicitudService {
     public function obtenerDocumentoPorTipoYPracticante($practicanteID, $tipoDocumento) {
         return $this->repo->obtenerDocumentoPorTipoYPracticante($practicanteID, $tipoDocumento);
     }
+
+    // Agregar a SolicitudService
+
+    public function obtenerSolicitudPorPracticante($practicanteID) {
+        return $this->repo->obtenerSolicitudPorPracticante($practicanteID);
+    }
 }

@@ -216,6 +216,29 @@ class SolicitudController {
         }
     }
 
+    // Agregar este método a SolicitudController
+
+    public function obtenerSolicitudPorPracticante() {
+        try {
+            if (!isset($_GET['practicanteID'])) {
+                echo json_encode(['success' => false, 'message' => 'Falta practicanteID']);
+                return;
+            }
+            
+            $practicanteID = (int)$_GET['practicanteID'];
+            $solicitud = $this->service->obtenerSolicitudPorPracticante($practicanteID);
+            
+            echo json_encode([
+                'success' => true,
+                'data' => $solicitud
+            ]);
+        } catch (\Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 
 
 

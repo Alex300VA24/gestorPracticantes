@@ -21,8 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mostrar modal de CUI
                 modalCUI.style.display = 'block';
                 sessionStorage.setItem('usuarioID', response.data.usuarioID);
-            } else {
-                window.location.href = '/dashboard';
             }
         } catch (error) {
             alert('Error: ' + error.message);
