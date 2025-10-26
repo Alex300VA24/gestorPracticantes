@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🔹 Al cargar el dashboard, también se puede mostrar el inicio
     await cargarInicio();
 
+
     // Navegación
     window.showPage = function (pageId, element) {
         document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));

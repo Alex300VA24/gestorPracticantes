@@ -17,7 +17,7 @@ class UsuarioRepository {
     
     public function login($nombreUsuario, $password) {
         try {
-            $sql = "EXEC spLoginUsuario @NombreUsuario = :nombreUsuario, @Password = :password";
+            $sql = "EXEC sp_LoginUsuario @NombreUsuario = :nombreUsuario, @Password = :password";
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':nombreUsuario', $nombreUsuario, PDO::PARAM_STR);
             $stmt->bindParam(':password', $password, PDO::PARAM_STR);
@@ -39,7 +39,7 @@ class UsuarioRepository {
     
     public function validarCUI($usuarioID, $cui) {
         try {
-            $sql = "EXEC spValidarCUI @UsuarioID = :usuarioID, @CUI = :cui";
+            $sql = "EXEC sp_ValidarCUI @UsuarioID = :usuarioID, @CUI = :cui";
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':usuarioID', $usuarioID, PDO::PARAM_INT);
             $stmt->bindParam(':cui', $cui, PDO::PARAM_INT);

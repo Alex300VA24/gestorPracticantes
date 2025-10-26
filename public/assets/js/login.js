@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mostrar modal de CUI
                 modalCUI.style.display = 'block';
                 sessionStorage.setItem('usuarioID', response.data.usuarioID);
+                sessionStorage.setItem('areaID', response.data.area.areaID);
             }
         } catch (error) {
             alert('Error: ' + error.message);

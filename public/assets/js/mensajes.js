@@ -1,8 +1,8 @@
 // Cargar áreas para filtro
 async function cargarAreasFiltro() {
     try {
-        const response = await fetch('/api/areas');
-        const data = await response.json();
+        const response = await api.listarAreas();
+        const data = response;
         
         const select = document.getElementById('filtroArea');
         const selectEnvio = document.getElementById('areaDestino');
@@ -21,16 +21,19 @@ async function cargarAreasFiltro() {
 
 // Aplicar filtros
 document.getElementById('btnAplicarFiltros')?.addEventListener('click', async () => {
-    const nombre = document.getElementById('filtroNombre').value;
+    const nombre = document.getElementById('filtroNombre').value || '';
     const areaID = document.getElementById('filtroArea').value;
+    console.log("Nombre del practicante: ", nombre);
+    console.log("Area del practicante: ", areaID);
     
     try {
         const params = new URLSearchParams();
         if(nombre) params.append('nombre', nombre);
         if(areaID) params.append('areaID', areaID);
         
-        const response = await fetch(`/api/practicantes/filtrar?${params}`);
-        const data = await response.json();
+        const response = await api.filtrarPracticantes(nombre, areaID);
+        const data = response;
+        console.log(data);
         
         if(data.success) {
             actualizarTablaPracticantes(data.data);
@@ -43,10 +46,12 @@ document.getElementById('btnAplicarFiltros')?.addEventListener('click', async ()
 // Abrir modal de mensajes
 document.getElementById('btnMensajes')?.addEventListener('click', async () => {
     const areaID = sessionStorage.getItem('areaID'); // Asumiendo que guardas el área del usuario
+    console.log(areaID);
     
     try {
-        const response = await fetch(`/api/mensajes/${areaID}`);
-        const data = await response.json();
+        const response = await api.listarMensajes(areaID);
+        const data = response;
+        console.log(data);
         
         if(data.success) {
             mostrarMensajes(data.data);
@@ -57,22 +62,56 @@ document.getElementById('btnMensajes')?.addEventListener('click', async () => {
     }
 });
 
+async function eliminarMensaje(mensajeID) {
+    if (!confirm('¿Seguro que deseas eliminar este mensaje?')) return;
+
+    try {
+        const respuesta = await api.eliminarMensaje(mensajeID);
+        console.log("Respuesta del servidor:", respuesta);
+
+        if (respuesta.success) {
+            alert(respuesta.message);
+            // 🔄 Refrescar lista de mensajes
+            const areaID = sessionStorage.getItem('areaID');
+            const response = await api.listarMensajes(areaID);
+            if (response.success) mostrarMensajes(response.data);
+        } else {
+            alert(respuesta.message);
+        }
+    } catch (error) {
+        console.error("Error al eliminar mensaje:", error);
+        alert("Error al eliminar el mensaje.");
+    }
+}
+
+
+
+
+
 function mostrarMensajes(mensajes) {
     const container = document.getElementById('listaMensajes');
     container.innerHTML = '';
-    
+
     mensajes.forEach(msg => {
         const div = document.createElement('div');
         div.className = 'mensaje-item';
-        div.style.cssText = 'border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;';
-        
-        const estadoClass = msg.RespuestaEstado === 'aprobado' ? 'badge-success' : 
-                           msg.RespuestaEstado === 'rechazado' ? 'badge-danger' : 'badge-warning';
-        
+        div.style.cssText = 'border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; position: relative;';
+
+        const estadoSolicitud = msg.EstadoSolicitud || 'En revisión';
+        const estadoClass =
+            estadoSolicitud.toLowerCase() === 'aprobado' ? 'badge-success' :
+            estadoSolicitud.toLowerCase() === 'rechazado' ? 'badge-danger' :
+            'badge-warning';
+
         div.innerHTML = `
-            <div style="display: flex; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <strong>${msg.NombrePracticante}</strong>
-                <span class="badge ${estadoClass}">${msg.RespuestaEstado || 'Pendiente'}</span>
+                <div>
+                    <span class="badge ${estadoClass}">${estadoSolicitud}</span>
+                    <button class="btn-eliminar" title="Eliminar mensaje" onclick="eliminarMensaje(${msg.MensajeID})">
+                        🗑️
+                    </button>
+                </div>
             </div>
             <p><strong>De:</strong> ${msg.AreaRemitente} <strong>Para:</strong> ${msg.AreaDestino}</p>
             <p>${msg.Contenido}</p>
@@ -80,13 +119,14 @@ function mostrarMensajes(mensajes) {
             ${msg.TipoMensaje === 'solicitud' && !msg.Leido ? 
                 `<button onclick="responderSolicitud(${msg.MensajeID}, ${msg.SolicitudID})" class="btn-primary">Responder</button>` : ''}
         `;
-        
+
         container.appendChild(div);
     });
 }
 
+
 // Enviar solicitud a área
-document.getElementById('formEnviarSolicitud')?.addEventListener('submit', async (e) => {
+/*document.getElementById('formEnviarSolicitud')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const solicitudID = document.getElementById('solicitudEnvioID').value;
@@ -95,18 +135,14 @@ document.getElementById('formEnviarSolicitud')?.addEventListener('submit', async
     const remitenteAreaID = sessionStorage.getItem('areaID'); // Área de RRHH
     
     try {
-        const response = await fetch('/api/mensajes/enviar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                solicitudID,
-                remitenteAreaID,
-                destinatarioAreaID,
-                contenido
-            })
+        const response = await api.enviarSolicitudArea({
+            solicitudID: parseInt(solicitudID),
+            remitenteAreaID: parseInt(remitenteAreaID),
+            destinatarioAreaID: parseInt(destinatarioAreaID),
+            contenido
         });
         
-        const data = await response.json();
+        const data = response;
         
         if(data.success) {
             alert('Solicitud enviada correctamente');
@@ -120,7 +156,7 @@ document.getElementById('formEnviarSolicitud')?.addEventListener('submit', async
         console.error('Error al enviar solicitud:', error);
         alert('Error al enviar la solicitud');
     }
-});
+});*/
 
 function cerrarModalEnviarSolicitud() {
     document.getElementById('modalEnviarSolicitud').style.display = 'none';
@@ -132,14 +168,19 @@ function cerrarModalMensajes() {
 }
 
 // Abrir modal para aceptar/rechazar practicante
-async function abrirModalAceptar(practicanteID, solicitudID) {
+async function abrirModalAceptar(practicanteID) {
+
+    const response = await api.obtenerSolicitudPorPracticante(practicanteID);
+    const data = response;
+    console.log(data.data.SolicitudID);
+
     document.getElementById('aceptarPracticanteID').value = practicanteID;
-    document.getElementById('aceptarSolicitudID').value = solicitudID;
+    document.getElementById('aceptarSolicitudID').value = data.data.SolicitudID;
     
     // Cargar información del practicante
     try {
-        const response = await fetch(`/api/practicantes/${practicanteID}`);
-        const data = await response.json();
+        const response = await api.getPracticante(practicanteID);
+        const data = response;
         
         if(data.success) {
             const p = data.data;
@@ -160,55 +201,118 @@ async function abrirModalAceptar(practicanteID, solicitudID) {
 }
 
 // Cambiar campos según decisión
-document.getElementById('decisionAceptacion')?.addEventListener('change', function() {
-    const camposAceptacion = document.getElementById('camposAceptacion');
-    if(this.value === 'aceptar') {
-        camposAceptacion.style.display = 'block';
-        document.getElementById('horaEntrada').required = true;
-        document.getElementById('horaSalida').required = true;
-        document.getElementById('diasLaborales').required = true;
-    } else {
-        camposAceptacion.style.display = 'none';
-        document.getElementById('horaEntrada').required = false;
-        document.getElementById('horaSalida').required = false;
-        document.getElementById('diasLaborales').required = false;
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const decision = document.getElementById('decisionAceptacion');
+    if (!decision) return; // Si no existe, no hacemos nada
+
+    decision.addEventListener('change', function() {
+        const camposAceptacion = document.getElementById('camposAceptacion');
+        const horaEntrada = document.getElementById('horaEntrada');
+        const horaSalida = document.getElementById('horaSalida');
+        const diasLaborales = document.getElementById('diasLaborales');
+
+        if (!camposAceptacion || !horaEntrada || !horaSalida || !diasLaborales) {
+            console.warn('⚠️ Algunos campos del formulario no existen aún en el DOM.');
+            return;
+        }
+
+        if (this.value === 'aceptar') {
+            camposAceptacion.style.display = 'block';
+            horaEntrada.required = true;
+            horaSalida.required = true;
+            diasLaborales.required = true;
+        } else {
+            camposAceptacion.style.display = 'none';
+            horaEntrada.required = false;
+            horaSalida.required = false;
+            diasLaborales.required = false;
+        }
+    });
 });
+
 
 // Enviar decisión sobre practicante
 document.getElementById('formAceptarPracticante')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const decision = document.getElementById('decisionAceptacion').value;
-    const practicanteID = document.getElementById('aceptarPracticanteID').value;
-    const solicitudID = document.getElementById('aceptarSolicitudID').value;
-    const mensajeRespuesta = document.getElementById('mensajeRespuesta').value;
-    
-    if(decision === 'aceptar') {
-        const horaEntrada = document.getElementById('horaEntrada').value;
-        const horaSalida = document.getElementById('horaSalida').value;
-        const diasLaborales = document.getElementById('diasLaborales').value;
+
+    const decisionEl = document.getElementById('decisionAceptacion');
+    const practicanteEl = document.getElementById('aceptarPracticanteID');
+    const solicitudEl = document.getElementById('aceptarSolicitudID');
+    const mensajeEl = document.getElementById('mensajeRespuesta');
+
+    if (!decisionEl || !practicanteEl || !solicitudEl || !mensajeEl) {
+        console.error('❌ Faltan elementos del formulario en el DOM.');
+        alert('Error interno: faltan campos en el formulario.');
+        return;
+    }
+
+    const decision = decisionEl.value;
+    const practicanteID = practicanteEl.value;
+    const solicitudID = solicitudEl.value;
+    const mensajeRespuesta = mensajeEl.value;
+
+    if (decision === 'aceptar') {
+        const fechaEntradaEl = document.getElementById('fechaEntrada');
+        const fechaSalidaEl = document.getElementById('fechaSalida');
+
+        if (!fechaEntradaEl || !fechaSalidaEl) {
+            alert('⚠️ Debes ingresar las fechas de entrada y salida.');
+            return;
+        }
+
+        const fechaEntrada = fechaEntradaEl.value;
+        const fechaSalida = fechaSalidaEl.value;
+
+        if (!fechaEntrada || !fechaSalida) {
+            alert('⚠️ Las fechas no pueden estar vacías.');
+            return;
+        }
+
         const areaID = sessionStorage.getItem('areaID');
-        
+
+        // Obtener los turnos dinámicos del contenedor
+        const contenedorTurnos = document.getElementById('contenedorTurnos');
+        console.log(contenedorTurnos);
+        const turnos = [];
+
+        contenedorTurnos.querySelectorAll('.turno-item').forEach(item => {
+            // Seleccionar el <select> del turno
+            const turnoSelect = item.querySelector('.select-turno');
+
+            // Obtener todos los checkboxes de días seleccionados
+            const diasSeleccionados = Array.from(
+                item.querySelectorAll('.dias-checkboxes input[type="checkbox"]:checked')
+            ).map(chk => chk.value);
+
+            if (turnoSelect && turnoSelect.value && diasSeleccionados.length > 0) {
+                turnos.push({
+                    turnoID: parseInt(turnoSelect.value),
+                    dias: diasSeleccionados.join(',') // Ejemplo: "Lunes,Martes,Viernes"
+                });
+            }
+        });
+
+        console.log(turnos);
+
+        if (turnos.length === 0) {
+            alert('⚠️ Debes asignar al menos un turno.');
+            return;
+        }
+
         try {
-            const response = await fetch('/api/practicantes/aceptar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    practicanteID,
-                    solicitudID,
-                    areaID,
-                    horaEntrada,
-                    horaSalida,
-                    diasLaborales,
-                    mensajeRespuesta
-                })
+            const response = await api.aceptarPracticante({
+                practicanteID: parseInt(practicanteID),
+                solicitudID: parseInt(solicitudID),
+                areaID: parseInt(areaID),
+                turnos: turnos,
+                fechaEntrada,
+                fechaSalida,
+                mensajeRespuesta
             });
-            
-            const data = await response.json();
-            
-            if(data.success) {
-                alert('Practicante aceptado correctamente');
+
+            const data = response;
+            if (data.success) {
+                alert('✅ Practicante aceptado correctamente');
                 cerrarModalAceptar();
                 location.reload();
             } else {
@@ -218,21 +322,17 @@ document.getElementById('formAceptarPracticante')?.addEventListener('submit', as
             console.error('Error:', error);
             alert('Error al aceptar practicante');
         }
-    } else if(decision === 'rechazar') {
+
+    } else if (decision === 'rechazar') {
         try {
-            const response = await fetch('/api/practicantes/rechazar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    practicanteID,
-                    solicitudID,
-                    mensajeRespuesta
-                })
+            const response = await api.rechazarPracticante({
+                practicanteID: parseInt(practicanteID),
+                solicitudID: parseInt(solicitudID),
+                mensajeRespuesta
             });
-            
-            const data = await response.json();
-            
-            if(data.success) {
+
+            const data = response;
+            if (data.success) {
                 alert('Practicante rechazado');
                 cerrarModalAceptar();
                 location.reload();
@@ -246,11 +346,6 @@ document.getElementById('formAceptarPracticante')?.addEventListener('submit', as
     }
 });
 
-function cerrarModalAceptar() {
-    document.getElementById('modalAceptarPracticante').style.display = 'none';
-    document.getElementById('formAceptarPracticante').reset();
-    document.getElementById('camposAceptacion').style.display = 'none';
-}
 
 // Actualizar tabla de practicantes con filtros
 function actualizarTablaPracticantes(practicantes) {
@@ -309,7 +404,7 @@ function getBadgeClass(estado) {
 }
 
 // Habilitar botón de enviar solicitud cuando documentos estén completos
-function verificarDocumentosCompletos(practicanteID) {
+/*unction verificarDocumentosCompletos(practicanteID) {
     fetch(`/api/solicitudes/documentos?practicanteID=${practicanteID}`)
         .then(res => res.json())
         .then(documentos => {
@@ -323,10 +418,10 @@ function verificarDocumentosCompletos(practicanteID) {
                 document.getElementById('btnGenerarCarta').disabled = false;
             }
         });
-}
+}*/
 
 // Evento para verificar documentos cuando se selecciona practicante en documentos
-document.getElementById('selectPracticanteDoc')?.addEventListener('change', function() {
+/*document.getElementById('selectPracticanteDoc')?.addEventListener('change', function() {
     const practicanteID = this.value;
     if(practicanteID) {
         verificarDocumentosCompletos(practicanteID);
@@ -343,7 +438,7 @@ document.getElementById('selectPracticanteDoc')?.addEventListener('change', func
         document.getElementById('btnEnviarSolicitudArea').disabled = true;
         document.getElementById('btnGenerarCarta').disabled = true;
     }
-});
+});*/
 
 // Botón para abrir modal de envío de solicitud
 document.getElementById('btnEnviarSolicitudArea')?.addEventListener('click', function() {
@@ -362,8 +457,8 @@ let turnosDisponibles = [];
 // Cargar turnos disponibles
 async function cargarTurnos() {
     try {
-        const response = await fetch('/api/turnos');
-        const data = await response.json();
+        const response = await api.listarTurnos();
+        const data = response;
         
         if(data.success) {
             turnosDisponibles = data.data;
@@ -413,98 +508,6 @@ document.getElementById('decisionAceptacion')?.addEventListener('change', functi
     }
 });
 
-// Modificar el submit del formulario de aceptar practicante
-document.getElementById('formAceptarPracticante')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const decision = document.getElementById('decisionAceptacion').value;
-    const practicanteID = document.getElementById('aceptarPracticanteID').value;
-    const solicitudID = document.getElementById('aceptarSolicitudID').value;
-    const mensajeRespuesta = document.getElementById('mensajeRespuesta').value;
-    
-    if(decision === 'aceptar') {
-        // Recolectar información de turnos
-        const turnosItems = document.querySelectorAll('.turno-item');
-        const turnos = [];
-        
-        let valido = true;
-        turnosItems.forEach(item => {
-            const turnoID = item.querySelector('.select-turno').value;
-            const diasCheckboxes = item.querySelectorAll('.dias-checkboxes input[type="checkbox"]:checked');
-            const dias = Array.from(diasCheckboxes).map(cb => cb.value).join(',');
-            
-            if(!turnoID || !dias) {
-                valido = false;
-                return;
-            }
-            
-            turnos.push({
-                turnoID: parseInt(turnoID),
-                dias: dias
-            });
-        });
-        
-        if(!valido || turnos.length === 0) {
-            alert('Por favor complete todos los turnos y seleccione al menos un día para cada uno');
-            return;
-        }
-        
-        const areaID = sessionStorage.getItem('areaID');
-        
-        try {
-            const response = await fetch('/api/practicantes/aceptar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    practicanteID,
-                    solicitudID,
-                    areaID,
-                    turnos, // Array de objetos {turnoID, dias}
-                    mensajeRespuesta
-                })
-            });
-            
-            const data = await response.json();
-            
-            if(data.success) {
-                alert('Practicante aceptado correctamente');
-                cerrarModalAceptar();
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al aceptar practicante');
-        }
-    } else if(decision === 'rechazar') {
-        // Código de rechazo (sin cambios)
-        try {
-            const response = await fetch('/api/practicantes/rechazar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    practicanteID,
-                    solicitudID,
-                    mensajeRespuesta
-                })
-            });
-            
-            const data = await response.json();
-            
-            if(data.success) {
-                alert('Practicante rechazado');
-                cerrarModalAceptar();
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al rechazar practicante');
-        }
-    }
-});
 
 function cerrarModalAceptar() {
     document.getElementById('modalAceptarPracticante').style.display = 'none';

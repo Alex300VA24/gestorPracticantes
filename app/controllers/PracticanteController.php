@@ -148,6 +148,8 @@ class PracticanteController {
                 $data['solicitudID'],
                 $data['areaID'],
                 $data['turnos'], // Array de objetos turno
+                $data['fechaEntrada'],
+                $data['fechaSalida'],
                 $data['mensajeRespuesta']
             );
             
@@ -162,6 +164,7 @@ class PracticanteController {
             ], 500);
         }
     }
+
 
     public function rechazarPracticante() {
         try {

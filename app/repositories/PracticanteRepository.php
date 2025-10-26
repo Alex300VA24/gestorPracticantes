@@ -135,14 +135,16 @@ class PracticanteRepository {
         }
     }
 
-    public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $turnosJSON, $mensajeRespuesta) {
+    public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $turnosJSON, $fechaEntrada, $fechaSalida, $mensajeRespuesta) {
         try {
-            $stmt = $this->db->prepare("EXEC sp_AceptarPracticante ?, ?, ?, ?, ?");
+            $stmt = $this->db->prepare("EXEC sp_AceptarPracticante ?, ?, ?, ?, ?, ?, ?");
             $stmt->execute([
                 $practicanteID,
                 $solicitudID,
                 $areaID,
-                $turnosJSON, // JSON string
+                $turnosJSON,
+                $fechaEntrada,
+                $fechaSalida,
                 $mensajeRespuesta
             ]);
             
@@ -153,6 +155,7 @@ class PracticanteRepository {
             throw new \Exception("Error al aceptar practicante: " . $e->getMessage());
         }
     }
+
 
     public function rechazarPracticante($practicanteID, $solicitudID, $mensajeRespuesta) {
         try {

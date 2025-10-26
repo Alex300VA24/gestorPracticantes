@@ -121,6 +121,11 @@ switch (true) {
         $controller->obtenerDocumentosPorPracticante();
         break;
 
+    case $path === '/api/solicitudes/crearSolicitud':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->crearSolicitud();
+        break;
+
     case $path === '/api/solicitudes/subirDocumento':
         $controller = new \App\Controllers\SolicitudController();
         $controller->subirDocumento();
@@ -153,6 +158,15 @@ switch (true) {
         $controller = new \App\Controllers\MensajeController();
         $controller->listarMensajes($matches[1]);
         break;
+
+    case preg_match('#^/api/mensajes/(\d+)$#', $path, $matches) && $method === 'DELETE':
+        $controller = new \App\Controllers\MensajeController();
+        $controller->eliminarMensaje($matches[1]);
+        break;
+
+
+
+
 
     // ============================================
     // RUTAS DE ÁREAS

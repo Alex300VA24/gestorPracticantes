@@ -52,6 +52,21 @@ class SolicitudRepository {
         return $fila;
     }
 
+    public function crearSolicitud($practicanteID) {
+        $sql = "EXEC sp_CrearSolicitud ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(1, (int)$practicanteID, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            // Obtener el ID recién creado (asumiendo que el SP hace un SELECT SCOPE_IDENTITY())
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return $row ? $row['SolicitudID'] : null;
+        }
+
+        return null;
+    }
+
+
     public function subirDocumento($id, $tipo, $archivo, $observaciones = null) {
         $sql = "EXEC sp_SubirDocumento ?, ?, ?, ?";
         $stmt = $this->conn->prepare($sql);
@@ -74,10 +89,10 @@ class SolicitudRepository {
     {
         // Si hay archivo, incluimos el parámetro @Archivo
         if ($archivo !== null) {
-            $sql = "EXEC spActualizarDocumento @SolicitudID = ?, @TipoDocumento = ?, @Archivo = ?, @Observaciones = ?";
+            $sql = "EXEC sp_ActualizarDocumento @SolicitudID = ?, @TipoDocumento = ?, @Archivo = ?, @Observaciones = ?";
         } else {
             // Sin archivo, lo excluimos completamente
-            $sql = "EXEC spActualizarDocumento @SolicitudID = ?, @TipoDocumento = ?, @Observaciones = ?";
+            $sql = "EXEC sp_ActualizarDocumento @SolicitudID = ?, @TipoDocumento = ?, @Observaciones = ?";
         }
 
         $stmt = $this->conn->prepare($sql);

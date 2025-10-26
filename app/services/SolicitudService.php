@@ -36,4 +36,9 @@ class SolicitudService {
     public function obtenerSolicitudPorPracticante($practicanteID) {
         return $this->repo->obtenerSolicitudPorPracticante($practicanteID);
     }
+
+    public function crearSolicitud($practicanteID) {
+        return $this->repo->crearSolicitud($practicanteID);
+    }
+
 }

@@ -129,6 +129,16 @@ class API {
         return this.get(`/solicitudes/por-practicante?practicanteID=${practicanteID}`);
     }
 
+    async crearSolicitud(practicanteID) {
+        const response = await fetch(`${this.baseURL}/solicitudes/crearSolicitud`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ practicanteID })
+        });
+        return response;
+    }
+
+
     async subirDocumento(formData) {
         const response = await fetch(`${this.baseURL}/solicitudes/subirDocumento`, {
             method: "POST",
@@ -156,6 +166,16 @@ class API {
     async listarMensajes(areaID) {
         return this.get(`/mensajes/${areaID}`);
     }
+
+    async eliminarMensaje(mensajeID) {
+        const response = await fetch(`${this.baseURL}/mensajes/${mensajeID}`, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    }
+
+
+
 
     // 🆕 --- ÁREAS ---
     async listarAreas() {

@@ -180,3 +180,243 @@ Array
         )
 
 )
+Array
+(
+    [practicanteID] => 3
+    [solicitudID] => 
+    [tipoDocumento] => cv
+    [observacionesDoc] => Este es el curriculum
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Laboral_CV_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php8058.tmp
+            [error] => 0
+            [size] => 52700
+        )
+
+)
+Array
+(
+    [practicanteID] => 3
+    [solicitudID] => 
+    [tipoDocumento] => cv
+    [observacionesDoc] => Este es el curriculum
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Laboral_CV_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php4697.tmp
+            [error] => 0
+            [size] => 52700
+        )
+
+)
+Array
+(
+    [practicanteID] => 3
+    [solicitudID] => 3
+    [tipoDocumento] => cv
+    [observacionesDoc] => el curriculum
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Laboral_CV_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php1F09.tmp
+            [error] => 0
+            [size] => 52700
+        )
+
+)
+Array
+(
+    [practicanteID] => 3
+    [solicitudID] => 3
+    [tipoDocumento] => carnet_vacunacion
+    [observacionesDoc] => carnet de vacunacion
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => MINSA - Carné Vacunación Document.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpA021.tmp
+            [error] => 0
+            [size] => 614100
+        )
+
+)
+Array
+(
+    [practicanteID] => 3
+    [solicitudID] => 3
+    [tipoDocumento] => dni
+    [observacionesDoc] => dni
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => futureinternet-14-00293-v2.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpF49B.tmp
+            [error] => 0
+            [size] => 1176108
+        )
+
+)
+Array
+(
+    [practicanteID] => 4
+    [solicitudID] => 4
+    [tipoDocumento] => cv
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Laboral_CV_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpD2DD.tmp
+            [error] => 0
+            [size] => 52700
+        )
+
+)
+Array
+(
+    [practicanteID] => 4
+    [solicitudID] => 4
+    [tipoDocumento] => carnet_vacunacion
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => MINSA - Carné Vacunación Document.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpF93D.tmp
+            [error] => 0
+            [size] => 614100
+        )
+
+)
+Array
+(
+    [practicanteID] => 4
+    [solicitudID] => 4
+    [tipoDocumento] => dni
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => DNI_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php30D9.tmp
+            [error] => 0
+            [size] => 318812
+        )
+
+)
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => carta_presentacion
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Carta de Presentación.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php6223.tmp
+            [error] => 0
+            [size] => 41334
+        )
+
+)
+Array
+(
+    [practicanteID] => 5
+    [solicitudID] => 5
+    [tipoDocumento] => cv
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => Laboral_CV_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpC227.tmp
+            [error] => 0
+            [size] => 52700
+        )
+
+)
+Array
+(
+    [practicanteID] => 5
+    [solicitudID] => 5
+    [tipoDocumento] => carnet_vacunacion
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => MINSA - Carné Vacunación Document.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpEC16.tmp
+            [error] => 0
+            [size] => 614100
+        )
+
+)
+Array
+(
+    [practicanteID] => 5
+    [solicitudID] => 5
+    [tipoDocumento] => dni
+    [observacionesDoc] => 
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => DNI_Alexander_Vasquez_Alcantara.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php152B.tmp
+            [error] => 0
+            [size] => 318812
+        )
+
+)

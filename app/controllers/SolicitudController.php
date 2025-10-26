@@ -88,6 +88,29 @@ class SolicitudController {
         }
     }
 
+    public function crearSolicitud() {
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+            $practicanteID = $data['practicanteID'] ?? null;
+
+            if (!$practicanteID) {
+                echo json_encode(['success' => false, 'message' => 'PracticanteID no proporcionado']);
+                return;
+            }
+
+            // Crear solicitud desde el servicio
+            $solicitudID = $this->service->crearSolicitud($practicanteID);
+
+            if ($solicitudID) {
+                echo json_encode(['success' => true, 'solicitudID' => $solicitudID]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al crear solicitud']);
+            }
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Excepción: ' . $e->getMessage()]);
+        }
+    }
 
 
     public function subirDocumento() {

@@ -78,6 +78,35 @@ class MensajeController {
             ], 500);
         }
     }
+
+    public function eliminarMensaje($mensajeID) {
+        try {
+            $resultado = $this->service->eliminarMensaje($mensajeID);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Mensaje eliminado correctamente'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'No se encontró el mensaje o no se pudo eliminar.'
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al eliminar mensaje: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+
+
+
     
     protected function jsonResponse($data, $status = 200) {
         header('Content-Type: application/json; charset=utf-8');

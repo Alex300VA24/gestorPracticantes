@@ -165,17 +165,56 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("formSubirDocumento").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        if (window.solicitudActualID) {
-            document.getElementById("solicitudID").value = window.solicitudActualID;
+        // 📍 1️⃣ Obtener el practicante seleccionado
+        const practicanteID = document.getElementById("practicanteDocumento")?.value;
+        if (!practicanteID) {
+            alert("Por favor selecciona un practicante antes de subir documentos.");
+            return;
         }
+
+        // 📍 2️⃣ Verificar si ya existe una solicitud actual
+        let solicitudID = window.solicitudActualID || null;
+
+        if (!solicitudID) {
+            console.log("🟠 No hay solicitud registrada. Creando nueva solicitud para el practicante:", practicanteID);
+
+            try {
+                const crearResponse = await api.crearSolicitud(practicanteID);
+                if (!crearResponse.ok) throw new Error(`Error HTTP: ${crearResponse.status}`);
+
+                const crearResult = await crearResponse.json();
+                console.log("📩 Respuesta crearSolicitud:", crearResult);
+
+                if (!crearResult.success) {
+                    alert("Error al crear solicitud: " + crearResult.message);
+                    return;
+                }
+
+                solicitudID = crearResult.solicitudID;
+                window.solicitudActualID = solicitudID; // guardamos para siguientes documentos
+                console.log("🆕 Solicitud creada con ID:", solicitudID);
+            } catch (err) {
+                console.error("❌ Error al crear solicitud:", err);
+                alert("No se pudo crear la solicitud. Revisa la consola.");
+                return;
+            }
+        }
+
+        // 📍 3️⃣ Asignar solicitudID al formulario antes de enviarlo
+        const inputSolicitud = document.getElementById("solicitudID");
+        if (inputSolicitud) {
+            inputSolicitud.value = solicitudID;
+        } else {
+            console.warn("⚠️ No existe input hidden con id='solicitudID'");
+        }
+
         const formData = new FormData(e.target);
 
         console.log("📦 FormData enviado:", Object.fromEntries(formData.entries()));
         console.log("🧩 existeDocumento =", existeDocumento, "| solicitudID =", formData.get("solicitudID"));
 
-        let response;
-
         try {
+            let response;
             if (existeDocumento) {
                 console.log("🟢 Actualizando documento existente...");
                 response = await api.actualizarDocumento(formData);
@@ -185,9 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-
             const result = await response.json();
-            console.log("📤 Respuesta:", result);
 
             if (!result.success) throw new Error(result.message || "Error desconocido");
 
@@ -195,20 +232,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             closeModal("modalSubirDocumento");
             e.target.reset();
 
-            // 🔄 Actualizar lista de documentos
-            const idSeleccionado = selectPracticante.value;
-            if (idSeleccionado) {
-                const documentos = await getDocumentosPorPracticante(idSeleccionado);
-                renderDocumentos(documentos);
-            }
+            // 🔄 4️⃣ Recargar lista de documentos
+            const documentos = await getDocumentosPorPracticante(practicanteID);
+            renderDocumentos(documentos);
 
             existeDocumento = false;
-
         } catch (err) {
             console.error("❌ Error al guardar documento:", err);
             alert("Error al guardar el documento. Revisa la consola.");
         }
     });
+
 
     // 🆕 Botón para generar carta (cuando documentos completos)
     document.getElementById("btnGenerarCarta")?.addEventListener("click", async () => {

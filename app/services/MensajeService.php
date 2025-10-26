@@ -21,4 +21,8 @@ class MensajeService {
     public function listarMensajesPorArea($areaID) {
         return $this->repository->listarMensajesPorArea($areaID);
     }
+    public function eliminarMensaje($mensajeID) {
+        return $this->repository->eliminarMensaje($mensajeID);
+    }
+
 }

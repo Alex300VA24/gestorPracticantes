@@ -27,4 +27,35 @@ class MensajeRepository {
         $stmt->execute([$areaID]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function eliminarMensaje($mensajeID) {
+        try {
+            $stmt = $this->conn->prepare("EXEC sp_EliminarMensaje :mensajeID");
+            $stmt->bindParam(':mensajeID', $mensajeID, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($resultado && $resultado['Success'] == 1) {
+                return [
+                    'success' => true,
+                    'message' => $resultado['Message']
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => $resultado ? $resultado['Message'] : 'No se pudo eliminar el mensaje.'
+                ];
+            }
+        } catch (\PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'Error en la base de datos: ' . $e->getMessage()
+            ];
+        }
+    }
+
+
+
+
+
 }

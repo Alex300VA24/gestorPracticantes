@@ -74,7 +74,7 @@
 <!-- Modal de Mensajes -->
 <div id="modalMensajes" class="modal" style="display:none;">
     <div class="modal-content">
-        <h3>Mensajes y Solicitudes</h3>
+        <h3>Solicitudes</h3>
         <div id="listaMensajes" style="max-height: 400px; overflow-y: auto;">
             <!-- Se llenará dinámicamente -->
         </div>
@@ -112,8 +112,14 @@
                     <button type="button" class="btn-info btn-sm" id="btnAgregarTurno">
                         <i class="fas fa-plus"></i> Agregar Turno
                     </button>
+                    <label>Fecha de Entrada:</label>
+                    <input type="date" id="fechaEntrada">
+                    <label>Fecha de Salida:</label>
+                    <input type="date" id="fechaSalida">
                 </div>
             </div>
+
+
             
             <div class="form-group">
                 <label>Mensaje:</label>

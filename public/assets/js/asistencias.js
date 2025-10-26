@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
 async function cargarAsistencias() {
     try {
         const response = await api.listarAsistencias();
-        console.log(response);
 
         // Validar estructura del resultado
         if (!response || !response.success || !Array.isArray(response.data)) {

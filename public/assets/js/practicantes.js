@@ -168,6 +168,7 @@ async function cargarPracticantes() {
             fila.querySelector('.btn-primary').addEventListener('click', () => abrirModalEditarPracticante(p.PracticanteID));
             fila.querySelector('.btn-success').addEventListener('click', () => verPracticante(p.PracticanteID));
             fila.querySelector('.btn-danger').addEventListener('click', () => eliminarPracticante(p.PracticanteID));
+            fila.querySelector('.btn-warning').addEventListener('click', () => abrirModalAceptar(p.PracticanteID));
 
         });
 
