@@ -156,13 +156,17 @@ switch (true) {
     
     case preg_match('#^/api/mensajes/(\d+)$#', $path, $matches):
         $controller = new \App\Controllers\MensajeController();
-        $controller->listarMensajes($matches[1]);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $controller->eliminarMensaje($matches[1]);
+        } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $controller->listarMensajes($matches[1]);
+        } else {
+            header('Content-Type: application/json', true, 405);
+            echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
+        }
         break;
 
-    case preg_match('#^/api/mensajes/(\d+)$#', $path, $matches) && $method === 'DELETE':
-        $controller = new \App\Controllers\MensajeController();
-        $controller->eliminarMensaje($matches[1]);
-        break;
 
 
 

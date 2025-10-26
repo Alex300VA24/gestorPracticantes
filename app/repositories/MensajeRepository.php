@@ -28,22 +28,26 @@ class MensajeRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function eliminarMensaje($mensajeID) {
+    public function eliminarMensaje($mensajeID)
+    {
         try {
-            $stmt = $this->conn->prepare("EXEC sp_EliminarMensaje :mensajeID");
+            // 🔹 Preparamos el DELETE directo
+            $sql = "DELETE FROM Mensajes WHERE MensajeID = :mensajeID";
+            $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':mensajeID', $mensajeID, PDO::PARAM_INT);
+            
             $stmt->execute();
 
-            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($resultado && $resultado['Success'] == 1) {
+            // 🔹 Verificamos si realmente eliminó algo
+            if ($stmt->rowCount() > 0) {
                 return [
                     'success' => true,
-                    'message' => $resultado['Message']
+                    'message' => 'Mensaje eliminado correctamente.'
                 ];
             } else {
                 return [
                     'success' => false,
-                    'message' => $resultado ? $resultado['Message'] : 'No se pudo eliminar el mensaje.'
+                    'message' => 'No se encontró el mensaje o ya fue eliminado.'
                 ];
             }
         } catch (\PDOException $e) {
@@ -53,6 +57,8 @@ class MensajeRepository {
             ];
         }
     }
+
+
 
 
 

@@ -167,11 +167,8 @@ class API {
         return this.get(`/mensajes/${areaID}`);
     }
 
-    async eliminarMensaje(mensajeID) {
-        const response = await fetch(`${this.baseURL}/mensajes/${mensajeID}`, {
-            method: 'DELETE'
-        });
-        return await response.json();
+    async eliminarMensaje(id) {
+        return await this.delete(`/mensajes/${id}`);
     }
 
 

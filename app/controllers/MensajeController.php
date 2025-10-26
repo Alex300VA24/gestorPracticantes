@@ -83,28 +83,19 @@ class MensajeController {
         try {
             $resultado = $this->service->eliminarMensaje($mensajeID);
 
-            if ($resultado) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Mensaje eliminado correctamente'
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'No se encontró el mensaje o no se pudo eliminar.'
-                ]);
-            }
-
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'success' => $resultado['success'],
+                'message' => $resultado['message']
+            ]);
         } catch (\Exception $e) {
+            header('Content-Type: application/json; charset=utf-8', true, 500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al eliminar mensaje: ' . $e->getMessage()
+                'message' => 'Error en el servidor: ' . $e->getMessage()
             ]);
         }
     }
-
-
-
 
 
     

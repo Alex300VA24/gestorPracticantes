@@ -66,24 +66,26 @@ async function eliminarMensaje(mensajeID) {
     if (!confirm('¿Seguro que deseas eliminar este mensaje?')) return;
 
     try {
+        console.log("🗑️ Eliminando mensaje:", mensajeID);
         const respuesta = await api.eliminarMensaje(mensajeID);
-        console.log("Respuesta del servidor:", respuesta);
+        console.log("🔎 Respuesta del servidor:", respuesta);
 
         if (respuesta.success) {
             alert(respuesta.message);
-            // 🔄 Refrescar lista de mensajes
+            
+            // 🔄 Refrescar mensajes
             const areaID = sessionStorage.getItem('areaID');
             const response = await api.listarMensajes(areaID);
             if (response.success) mostrarMensajes(response.data);
+
         } else {
-            alert(respuesta.message);
+            alert(respuesta.message || "No se pudo eliminar el mensaje.");
         }
     } catch (error) {
         console.error("Error al eliminar mensaje:", error);
-        alert("Error al eliminar el mensaje.");
+        alert("Error al eliminar mensaje.");
     }
 }
-
 
 
 
