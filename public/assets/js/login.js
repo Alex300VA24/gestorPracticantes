@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 modalCUI.style.display = 'block';
                 sessionStorage.setItem('usuarioID', response.data.usuarioID);
                 sessionStorage.setItem('areaID', response.data.area.areaID);
+                sessionStorage.setItem('nombreArea', response.data.area.nombreArea);
             }
         } catch (error) {
             alert('Error: ' + error.message);
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (modalCUI) {
                 modalCUI.style.display = 'none';
             } else {
-                console.warn('⚠️ No se encontró el modal con id="modalValidarCUI"');
+                console.warn('No se encontró el modal con id="modalValidarCUI"');
             }
             sessionStorage.clear();
             btnLogin.disabled = false;

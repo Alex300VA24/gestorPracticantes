@@ -192,3 +192,99 @@ Array
 
 No hay archivo para actualizar (archivoErr=4 size=0)
 Resultado service.actualizarDocumento: false
+---- INICIO Llamada actualizarDocumento ----
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => carta_presentacion
+    [observacionesDoc] => Nuevo carta presentacion
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => 09.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php8D41.tmp
+            [error] => 0
+            [size] => 602352
+        )
+
+)
+
+Archivo leido, bytes: 602352 FechaSubida: 2025-10-27 20:44:59
+Resultado service.actualizarDocumento: false
+---- INICIO Llamada actualizarDocumento ----
+Array
+(
+    [practicanteID] => 1
+    [solicitudID] => 1
+    [tipoDocumento] => carta_presentacion
+    [observacionesDoc] => nueva carta
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => 8.5.1-lab---configure-dhcpv6_es-XL.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php6E5E.tmp
+            [error] => 0
+            [size] => 241926
+        )
+
+)
+
+Archivo leido, bytes: 241926 FechaSubida: 2025-10-27 21:00:08
+Resultado service.actualizarDocumento: false
+---- INICIO Llamada actualizarDocumento ----
+Array
+(
+    [practicanteID] => 4
+    [solicitudID] => 4
+    [tipoDocumento] => dni
+    [observacionesDoc] => este es mi dni
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => 
+            [type] => 
+            [tmp_name] => 
+            [error] => 4
+            [size] => 0
+        )
+
+)
+
+No hay archivo para actualizar (archivoErr=4 size=0)
+Resultado service.actualizarDocumento: false
+---- INICIO Llamada actualizarDocumento ----
+Array
+(
+    [practicanteID] => 25
+    [solicitudID] => 20
+    [tipoDocumento] => cv
+    [observacionesDoc] => actualizado
+)
+
+Array
+(
+    [archivoDocumento] => Array
+        (
+            [name] => 8.5.1-lab---configure-dhcpv6_es-XL.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php363B.tmp
+            [error] => 0
+            [size] => 241926
+        )
+
+)
+
+Archivo leido, bytes: 241926 FechaSubida: 2025-10-31 04:59:26
+Resultado service.actualizarDocumento: false

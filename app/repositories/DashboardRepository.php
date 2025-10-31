@@ -10,42 +10,89 @@ class DashboardRepository {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function obtenerTotalPracticantes() {
-        $stmt = $this->db->query("SELECT COUNT(*) AS total FROM Practicante");
-        return $stmt->fetch()['total'];
-    }
+    // 🔹 Total de practicantes (filtrado por área si aplica)
+    public function obtenerTotalPracticantes($areaID = null) {
+        if ($areaID) {
+            $sql = "
+                SELECT COUNT(DISTINCT p.PracticanteID) AS total
+                FROM Practicante p
+                INNER JOIN SolicitudPracticas s ON p.PracticanteID = s.PracticanteID
+                WHERE s.AreaID = :areaID
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':areaID', $areaID, \PDO::PARAM_INT);
+        } else {
+            $sql = "SELECT COUNT(*) AS total FROM Practicante";
+            $stmt = $this->db->prepare($sql);
+        }
 
-    public function obtenerPendientesAprobacion() {
-        $stmt = $this->db->query("SELECT COUNT(*) AS total FROM Practicante WHERE EstadoID = 6");
-        return $stmt->fetch()['total'];
-    }
-
-    public function obtenerPracticantesActivos() {
-        $stmt = $this->db->query("SELECT COUNT(*) AS total FROM Practicante WHERE EstadoID = 7");
-        return $stmt->fetch()['total'];
-    }
-
-    public function obtenerAsistenciasHoy() {
-        $stmt = $this->db->prepare("SELECT COUNT(*) AS total FROM Asistencia WHERE CAST(Fecha AS DATE) = CAST(GETDATE() AS DATE)");
         $stmt->execute();
-        return $stmt->fetch()['total'];
+        return $stmt->fetch()['total'] ?? 0;
     }
 
-    /*public function obtenerActividadReciente($limite = 5) {
-        // Aseguramos que sea un número entero válido
-        $limite = (int) $limite;
+    // 🔹 Pendientes de aprobación (EstadoID = 6)
+    public function obtenerPendientesAprobacion($areaID = null) {
+        if ($areaID) {
+            $sql = "
+                SELECT COUNT(DISTINCT p.PracticanteID) AS total
+                FROM Practicante p
+                INNER JOIN SolicitudPracticas s ON p.PracticanteID = s.PracticanteID
+                WHERE p.EstadoID = 6 AND s.AreaID = :areaID
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':areaID', $areaID, \PDO::PARAM_INT);
+        } else {
+            $sql = "SELECT COUNT(*) AS total FROM Practicante WHERE EstadoID = 6";
+            $stmt = $this->db->prepare($sql);
+        }
 
-        $sql = "SELECT TOP $limite 
-                    p.Nombres, p.ApellidoPaterno, p.ApellidoMaterno, 
-                    a.HoraEntrada, a.HoraSalida, a.Fecha
+        $stmt->execute();
+        return $stmt->fetch()['total'] ?? 0;
+    }
+
+    // 🔹 Practicantes activos (EstadoID = 7)
+    public function obtenerPracticantesActivos($areaID = null) {
+        if ($areaID) {
+            $sql = "
+                SELECT COUNT(DISTINCT p.PracticanteID) AS total
+                FROM Practicante p
+                INNER JOIN SolicitudPracticas s ON p.PracticanteID = s.PracticanteID
+                WHERE p.EstadoID = 7 AND s.AreaID = :areaID
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':areaID', $areaID, \PDO::PARAM_INT);
+        } else {
+            $sql = "SELECT COUNT(*) AS total FROM Practicante WHERE EstadoID = 7";
+            $stmt = $this->db->prepare($sql);
+        }
+
+        $stmt->execute();
+        return $stmt->fetch()['total'] ?? 0;
+    }
+
+    // 🔹 Asistencias de hoy
+    public function obtenerAsistenciasHoy($areaID = null) {
+        if ($areaID) {
+            $sql = "
+                SELECT COUNT(DISTINCT a.AsistenciaID) AS total
                 FROM Asistencia a
-                JOIN Practicante p ON a.PracticanteID = p.PracticanteID
-                ORDER BY a.Fecha DESC, a.HoraEntrada DESC";
+                INNER JOIN Practicante p ON a.PracticanteID = p.PracticanteID
+                INNER JOIN SolicitudPracticas s ON p.PracticanteID = s.PracticanteID
+                WHERE CAST(a.Fecha AS DATE) = CAST(GETDATE() AS DATE)
+                AND s.AreaID = :areaID
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':areaID', $areaID, \PDO::PARAM_INT);
+        } else {
+            $sql = "
+                SELECT COUNT(*) AS total
+                FROM Asistencia
+                WHERE CAST(Fecha AS DATE) = CAST(GETDATE() AS DATE)
+            ";
+            $stmt = $this->db->prepare($sql);
+        }
 
-        $stmt = $this->db->prepare($sql);
         $stmt->execute();
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }*/
-
+        return $stmt->fetch()['total'] ?? 0;
+    }
 }

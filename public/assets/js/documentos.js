@@ -1,5 +1,4 @@
 // ===================================== Documentos ====================================================
-
 document.addEventListener("DOMContentLoaded", async () => {
     const selectPracticante = document.getElementById("selectPracticanteDoc");
     const listaDocumentos = document.getElementById("listaDocumentos");
@@ -83,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 campoSolicitud.value = result.data.SolicitudID;
                 window.solicitudActualID = result.data.SolicitudID;
                 solicitudIDActual = result.data.SolicitudID;
-                console.log("✅ Solicitud asociada:", result.data.SolicitudID);
+                console.log("Solicitud asociada:", result.data.SolicitudID);
             }
 
         } catch (error) {
@@ -138,22 +137,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         const id = selectPracticante.value;
         if (!id) {
             listaDocumentos.innerHTML = "<p>Seleccione un practicante...</p>";
+            solicitudIDActual = null;
             return;
         }
 
         // 🆕 Obtener solicitudID del practicante seleccionado
         try {
-            const solicitudData = await api.obtenerSolicitudPorPracticante(id);
-            if (solicitudData.success && solicitudData.data) {
-                solicitudIDActual = solicitudData.data.SolicitudID;
-                console.log("📋 SolicitudID obtenida:", solicitudIDActual);
+            const result = await api.getPracticante(id);
+            console.log("📋 Datos del practicante:", result);
+            
+            if (result.success && result.data && result.data.SolicitudID) {
+                solicitudIDActual = result.data.SolicitudID;
+                console.log("SolicitudID obtenida:", solicitudIDActual);
+            } else {
+                console.log("No hay SolicitudID para este practicante");
+                solicitudIDActual = null;
             }
         } catch (error) {
             console.error("Error al obtener solicitud:", error);
+            solicitudIDActual = null;
         }
 
         const documentos = await getDocumentosPorPracticante(id);
-        renderDocumentos(documentos);
+        await renderDocumentos(documentos, solicitudIDActual);
     });
 
     // 🔹 Botón subir documento
@@ -165,34 +171,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("formSubirDocumento").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // 📍 1️⃣ Obtener el practicante seleccionado
         const practicanteID = document.getElementById("practicanteDocumento")?.value;
         if (!practicanteID) {
             alert("Por favor selecciona un practicante antes de subir documentos.");
             return;
         }
 
-        // 📍 2️⃣ Verificar si ya existe una solicitud actual
         let solicitudID = window.solicitudActualID || null;
 
         if (!solicitudID) {
-            console.log("🟠 No hay solicitud registrada. Creando nueva solicitud para el practicante:", practicanteID);
-
             try {
                 const crearResponse = await api.crearSolicitud(practicanteID);
                 if (!crearResponse.ok) throw new Error(`Error HTTP: ${crearResponse.status}`);
 
                 const crearResult = await crearResponse.json();
-                console.log("📩 Respuesta crearSolicitud:", crearResult);
-
-                if (!crearResult.success) {
-                    alert("Error al crear solicitud: " + crearResult.message);
-                    return;
-                }
+                if (!crearResult.success) throw new Error("Error al crear solicitud: " + crearResult.message);
 
                 solicitudID = crearResult.solicitudID;
-                window.solicitudActualID = solicitudID; // guardamos para siguientes documentos
-                console.log("🆕 Solicitud creada con ID:", solicitudID);
+                window.solicitudActualID = solicitudID;
+                solicitudIDActual = solicitudID;
             } catch (err) {
                 console.error("❌ Error al crear solicitud:", err);
                 alert("No se pudo crear la solicitud. Revisa la consola.");
@@ -200,43 +197,41 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        // 📍 3️⃣ Asignar solicitudID al formulario antes de enviarlo
         const inputSolicitud = document.getElementById("solicitudID");
-        if (inputSolicitud) {
-            inputSolicitud.value = solicitudID;
-        } else {
-            console.warn("⚠️ No existe input hidden con id='solicitudID'");
-        }
+        if (inputSolicitud) inputSolicitud.value = solicitudID;
 
         const formData = new FormData(e.target);
-
-        console.log("📦 FormData enviado:", Object.fromEntries(formData.entries()));
-        console.log("🧩 existeDocumento =", existeDocumento, "| solicitudID =", formData.get("solicitudID"));
+        const btn = document.getElementById("btnSubirDocumento");
 
         try {
-            let response;
-            if (existeDocumento) {
-                console.log("🟢 Actualizando documento existente...");
-                response = await api.actualizarDocumento(formData);
-            } else {
-                console.log("🟡 Subiendo nuevo documento...");
-                response = await api.subirDocumento(formData);
-            }
+            const result = await ejecutarUnaVez(btn, async () => {
+                let response;
 
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-            const result = await response.json();
+                if (existeDocumento) {
+                    console.log("🟢 Actualizando documento existente...");
+                    response = await api.actualizarDocumento(formData);
+                } else {
+                    console.log("🟡 Subiendo nuevo documento...");
+                    response = await api.subirDocumento(formData);
+                }
 
-            if (!result.success) throw new Error(result.message || "Error desconocido");
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                const result = await response.json();
+
+                if (!result.success) throw new Error(result.message || "Error desconocido");
+
+                return result;
+            });
 
             alert(result.message);
             closeModal("modalSubirDocumento");
             e.target.reset();
 
-            // 🔄 4️⃣ Recargar lista de documentos
             const documentos = await getDocumentosPorPracticante(practicanteID);
-            renderDocumentos(documentos);
+            await renderDocumentos(documentos, solicitudIDActual);
 
             existeDocumento = false;
+            
         } catch (err) {
             console.error("❌ Error al guardar documento:", err);
             alert("Error al guardar el documento. Revisa la consola.");
@@ -244,27 +239,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
 
-    // 🆕 Botón para generar carta (cuando documentos completos)
-    document.getElementById("btnGenerarCarta")?.addEventListener("click", async () => {
-        const practicanteID = selectPracticante.value;
-        if (!practicanteID) {
-            alert("Seleccione un practicante primero");
-            return;
-        }
-
-        try {
-            // Aquí implementarás la generación de carta PDF
-            alert("Funcionalidad de generar carta en desarrollo");
-            // TODO: Implementar generación de carta de aceptación
-        } catch (error) {
-            console.error("Error al generar carta:", error);
-            alert("Error al generar la carta");
-        }
-    });
-
 });
 
-// 🆕 Cargar áreas para el modal de envío de solicitud
+// Cargar áreas para el modal de envío de solicitud
 async function cargarAreasParaSolicitud() {
     try {
         const response = await api.listarAreas();
@@ -286,60 +263,64 @@ async function cargarAreasParaSolicitud() {
     }
 }
 
-// 🆕 Abrir modal para enviar solicitud a área
+// Abrir modal para enviar solicitud a área
 function abrirModalEnviarSolicitud(solicitudID) {
+    console.log("🚀 Abriendo modal con SolicitudID:", solicitudID);
     document.getElementById("solicitudEnvioID").value = solicitudID;
     openModal("modalEnviarSolicitud");
 }
 
-// 🆕 Cerrar modal de enviar solicitud
+// Cerrar modal de enviar solicitud
 function cerrarModalEnviarSolicitud() {
     closeModal("modalEnviarSolicitud");
     document.getElementById("formEnviarSolicitud").reset();
 }
 
-// 🆕 Enviar solicitud a área
+// Enviar solicitud a área
 document.getElementById("formEnviarSolicitud")?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
+
+    const btn = document.getElementById("btnEnviarSolicitud"); // botón dentro del form
     const solicitudID = document.getElementById("solicitudEnvioID").value;
     const destinatarioAreaID = document.getElementById("areaDestino").value;
     const contenido = document.getElementById("mensajeSolicitud").value;
+    const remitenteAreaID = sessionStorage.getItem('areaID') || 1;
 
-    console.log(solicitudID);
-    console.log(destinatarioAreaID);
-    console.log(contenido);
-    
-    // Obtener área de RRHH desde sessionStorage (deberías guardarlo en el login)
-    const remitenteAreaID = sessionStorage.getItem('areaID') || 1; // 1 = RRHH por defecto
-    console.log("El remitente de area ID", remitenteAreaID);
-    
+    console.log("📤 Enviando solicitud:", { solicitudID, destinatarioAreaID, contenido });
+    console.log("📍 Remitente AreaID:", remitenteAreaID);
+
     try {
-        const response = await api.enviarSolicitudArea({
-            solicitudID: parseInt(solicitudID),
-            remitenteAreaID: parseInt(remitenteAreaID),
-            destinatarioAreaID: parseInt(destinatarioAreaID),
-            contenido
+        // Todo se ejecuta dentro de ejecutarUnaVez
+        const result = await ejecutarUnaVez(btn, async () => {
+            const response = await api.enviarSolicitudArea({
+                solicitudID: parseInt(solicitudID),
+                remitenteAreaID: parseInt(remitenteAreaID),
+                destinatarioAreaID: parseInt(destinatarioAreaID),
+                contenido
+            });
+
+            if (!response.success) throw new Error(response.message || "Error al enviar solicitud");
+            return response;
         });
-        
-        if (response.success) {
-            alert('✅ Solicitud enviada correctamente al área');
-            cerrarModalEnviarSolicitud();
-            
-            // Deshabilitar botón después de enviar
-            const btnEnviar = document.getElementById("btnEnviarSolicitudArea");
-            if (btnEnviar) {
-                btnEnviar.disabled = true;
-                btnEnviar.innerHTML = '<i class="fas fa-check"></i> Solicitud Enviada';
-            }
-        } else {
-            alert('Error: ' + response.message);
+
+        // Si todo salió bien
+        alert('Solicitud enviada correctamente al área');
+        cerrarModalEnviarSolicitud();
+        location.reload();
+
+        // Recargar documentos para actualizar botones
+        const practicanteID = document.getElementById("selectPracticanteDoc").value;
+        if (practicanteID) {
+            const documentos = await getDocumentosPorPracticante(practicanteID);
+            await renderDocumentos(documentos, solicitudID, true); // true = solicitud enviada
         }
+
     } catch (error) {
-        console.error('Error al enviar solicitud:', error);
-        alert('❌ Error al enviar la solicitud');
+        console.error('❌ Error al enviar solicitud:', error);
+        alert('❌ ' + (error.message || 'Error al enviar la solicitud'));
     }
 });
+
 
 // 🧩 Funciones auxiliares
 function openModal(id) {
@@ -353,10 +334,10 @@ function closeModal(id) {
 async function getDocumentosPorPracticante(id) {
     try {
         const data = await api.obtenerDocumentosPorPracticante(id);
-        console.log("✅ Documentos recibidos:", data);
+        console.log("Documentos recibidos:", data);
 
         if (!data || !Array.isArray(data)) {
-            console.warn("⚠️ La API no devolvió un array de documentos válido:", data);
+            console.warn("La API no devolvió un array de documentos válido:", data);
             return [];
         }
 
@@ -394,7 +375,8 @@ function descargarArchivo(base64, nombre) {
     link.click();
 }
 
-function renderDocumentos(documentos) {
+
+async function renderDocumentos(documentos, solicitudID, forzarEnviada = false) {
     const contenedor = document.getElementById("listaDocumentos");
 
     if (!documentos || !Array.isArray(documentos) || documentos.length === 0) {
@@ -412,8 +394,29 @@ function renderDocumentos(documentos) {
     );
     const todosCompletos = faltantes.length === 0;
 
+    // Verificar si la solicitud ya fue enviada Y su estado de aprobación
+    let solicitudEnviada = forzarEnviada;
+    let solicitudAprobada = false;
+    
+    if (solicitudID) {
+        try {
+            const estadoResponse = await api.verificarEstadoSolicitud(solicitudID);
+            if (estadoResponse.success && estadoResponse.data) {
+                solicitudEnviada = estadoResponse.data.enviada === true || forzarEnviada;
+                solicitudAprobada = estadoResponse.data.aprobada;
+                console.log("Estado de solicitud:", {
+                    enviada: solicitudEnviada,
+                    estado: estadoResponse.data.estado,
+                    aprobada: solicitudAprobada
+                });
+            }
+        } catch (error) {
+            console.warn("No se pudo verificar estado de solicitud:", error);
+        }
+    }
+
     const tabla = `
-        <table class="table table-striped table-hover">
+        <table class="table">
             <thead>
                 <tr>
                     <th>Tipo</th>
@@ -432,7 +435,7 @@ function renderDocumentos(documentos) {
                         <tr>
                             <td>${doc.tipo}</td>
                             <td>
-                                <button class="btn-descargar" 
+                                <button class="btn-primary" 
                                         onclick="descargarArchivo('${doc.archivo}', '${doc.tipo}')">
                                     <i class="fas fa-download"></i> Descargar
                                 </button>
@@ -449,21 +452,27 @@ function renderDocumentos(documentos) {
 
         <div class="enviar-solicitud-container" style="margin-top: 20px; text-align: center;">
             <button id="btnEnviarSolicitudArea" 
-                    class="btn-enviar" 
-                    ${todosCompletos ? '' : 'disabled'}
-                    onclick="abrirModalEnviarSolicitud(${solicitudIDActual})">
-                <i class="fas fa-paper-plane"></i> Enviar Solicitud a Área
+                    class="btn-info" 
+                    ${todosCompletos && !solicitudEnviada ? '' : 'disabled'}
+                    onclick="abrirModalEnviarSolicitud(${solicitudID})">
+                <i class="fas fa-${solicitudEnviada ? 'check' : 'paper-plane'}"></i> 
+                ${solicitudEnviada ? 'Solicitud Enviada' : 'Enviar Solicitud a Área'}
             </button>
             <button id="btnGenerarCarta" 
                     class="btn-success" 
-                    ${todosCompletos ? '' : 'disabled'}
-                    style="margin-left: 10px;">
+                    ${solicitudAprobada ? '' : 'disabled'}
+                    style="margin-left: 10px;"
+                    onclick="generarCartaAceptacion(${solicitudID})">
                 <i class="fas fa-file-contract"></i> Generar Carta de Aceptación
             </button>
             ${
-                todosCompletos
-                ? "<p class='msg-ok'>✅ Todos los documentos obligatorios están completos.</p>"
-                : `<p class='msg-warn'>⚠️ Faltan documentos obligatorios: ${faltantes.join(", ")}</p>`
+                !todosCompletos
+                ? `<p class='msg-warn'>Faltan documentos obligatorios: ${faltantes.join(", ")}</p>`
+                : !solicitudEnviada
+                ? "<p class='msg-ok'>Documentos completos. Ahora puede enviar la solicitud.</p>"
+                : solicitudAprobada
+                ? "<p class='msg-ok'>Solicitud <strong>APROBADA</strong>. Puede generar la carta de aceptación.</p>"
+                : "<p class='msg-info'>Solicitud enviada. Esperando aprobación del área.</p>"
             }
         </div>
     `;
@@ -471,5 +480,12 @@ function renderDocumentos(documentos) {
     contenedor.innerHTML = tabla;
 }
 
-// 🆕 Hacer solicitudIDActual global para uso en onclick
+// Función para generar carta (placeholder)
+function generarCartaAceptacion(solicitudID) {
+    console.log("📄 Generando carta para solicitud:", solicitudID);
+    alert("Funcionalidad de generar carta en desarrollo");
+    // TODO: Implementar generación de carta de aceptación
+}
+
+// Variable global para el ID de solicitud actual
 let solicitudIDActual = null;

@@ -106,46 +106,33 @@ class AsistenciaRepository {
     }
 
 
-    public function obtenerAsistenciasPorFecha($fecha) {
+    public function obtenerAsistenciasPorArea($areaID) {
         try {
-            error_log("===> Entrando a Repository obtenerAsistenciasPorFecha con fecha: $fecha");
+            error_log("===> Entrando a Repository obtenerAsistenciasPorArea con areaID: $areaID");
 
-            $sql = "
-                SELECT 
-                    p.PracticanteID,
-                    CONCAT(p.Nombres, ' ', p.ApellidoPaterno, ' ', p.ApellidoMaterno) AS NombreCompleto,
-                    CONVERT(varchar(8), a.HoraEntrada, 108) AS HoraEntrada,
-                    CONVERT(varchar(8), a.HoraSalida, 108) AS HoraSalida,
-                    t.Descripcion AS Turno,
-                    CASE 
-                        WHEN a.HoraEntrada IS NOT NULL AND a.HoraSalida IS NULL THEN 'Presente'
-                        WHEN a.HoraSalida IS NOT NULL THEN 'Salió'
-                        ELSE 'Ausente'
-                    END AS Estado
-                FROM Practicante p
-                INNER JOIN Estado e ON p.EstadoID = e.EstadoID
-                LEFT JOIN Asistencia a ON a.PracticanteID = p.PracticanteID AND a.Fecha = ?
-                LEFT JOIN Turno t ON a.TurnoID = t.TurnoID
-                WHERE e.Descripcion = 'Vigente'
-                ORDER BY p.ApellidoPaterno, p.ApellidoMaterno
-                ";
-
-
-
-            error_log("SQL Ejecutado: " . $sql);
+            $sql = "EXEC sp_ListarAsistencias :areaID";
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$fecha]);
+            $stmt->bindParam(':areaID', $areaID, \PDO::PARAM_INT);
+
+            $stmt->execute();
 
             $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             error_log("===> Resultado obtenido: " . count($result));
 
-            return $result;
+            return [
+                'success' => true,
+                'data' => $result
+            ];
 
         } catch (\Throwable $e) {
-            error_log("Error en Repository obtenerAsistenciasPorFecha: " . $e->getMessage());
-            throw $e;
+            error_log("❌ Error en Repository obtenerAsistenciasPorArea: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error al obtener asistencias por área: ' . $e->getMessage()
+            ];
         }
     }
+
 
     private function obtenerTurnoPorHora($hora) {
         $sql = "

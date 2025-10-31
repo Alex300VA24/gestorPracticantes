@@ -40,5 +40,24 @@ class SolicitudService {
     public function crearSolicitud($practicanteID) {
         return $this->repo->crearSolicitud($practicanteID);
     }
+    public function obtenerSolicitudPorID($solicitudID) {
+        return $this->repo->obtenerSolicitudPorID($solicitudID);
+    }
+
+    public function verificarEstado($solicitudID) {
+        $solicitud = $this->repo->obtenerSolicitudPorID($solicitudID);
+        $estado = $this->repo->obtenerEstado($solicitudID);
+
+        return [
+            'enviada' => $solicitud ? true : false, // ahora es booleano
+            'estado' => $estado ?? [
+                'abreviatura' => 'REV',
+                'descripcion' => 'En Revisión'
+            ],
+            'aprobada' => isset($estado['abreviatura']) && strtoupper(trim($estado['abreviatura'])) === 'APR'
+
+        ];
+    }
+
 
 }

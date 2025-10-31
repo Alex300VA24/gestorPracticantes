@@ -140,6 +140,19 @@ switch (true) {
         $controller = new \App\Controllers\SolicitudController();
         $controller->obtenerDocumentoPorTipoYPracticante();
         break;
+    
+    case $path === '/api/solicitudes/estado':
+        $controller = new \App\Controllers\SolicitudController();
+        $solicitudID = $_GET['solicitudID'] ?? null; // 👈 obtiene el parámetro de la URL
+        $controller->verificarEstado($solicitudID);
+        break;
+    
+    case $path === '/api/solicitudes/obtenerSolicitud':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->obtenerSolicitudPorID();
+        break;
+
+
 
     // ============================================
     // RUTAS DE MENSAJES
@@ -167,11 +180,6 @@ switch (true) {
         }
         break;
 
-
-
-
-
-
     // ============================================
     // RUTAS DE ÁREAS
     // ============================================
@@ -198,10 +206,11 @@ switch (true) {
     // ============================================
     case $path === '/api/asistencias':
         $controller = new \App\Controllers\AsistenciaController();
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $controller->listarAsistencias();
         }
         break;
+
 
     case $path === '/api/asistencias/entrada':
         $controller = new \App\Controllers\AsistenciaController();

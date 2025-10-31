@@ -239,6 +239,19 @@ class SolicitudController {
         }
     }
 
+    public function obtenerSolicitudPorID() {
+        $id = $_GET['solicitudID'] ?? null;
+
+        if (!$id) {
+            echo json_encode(['success' => false, 'message' => 'Falta solicitudID']);
+            return;
+        }
+
+        $data = $this->service->obtenerSolicitudPorID($id);
+        echo json_encode(['success' => true, 'data' => $data]);
+    }
+
+
     // Agregar este método a SolicitudController
 
     public function obtenerSolicitudPorPracticante() {
@@ -263,7 +276,29 @@ class SolicitudController {
         }
     }
 
+    public function verificarEstado($solicitudID) {
+        header('Content-Type: application/json');
 
+        try {
+            if (!$solicitudID) {
+                echo json_encode(['success' => false, 'message' => 'Falta el parámetro solicitudID']);
+                return;
+            }
+
+            $data = $this->service->verificarEstado($solicitudID);
+
+            echo json_encode([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al verificar estado de solicitud: ' . $e->getMessage()
+            ]);
+        }
+    }
 
 
 

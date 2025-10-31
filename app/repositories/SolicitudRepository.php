@@ -26,7 +26,7 @@ class SolicitudRepository {
 
         $result = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // ✅ Convertir binario a Base64
+            // Convertir binario a Base64
             if (isset($row['Archivo'])) {
                 $row['Archivo'] = base64_encode($row['Archivo']);
             }
@@ -130,7 +130,41 @@ class SolicitudRepository {
     }
 
 
+    public function obtenerSolicitudPorID($id) {
+        $sql = "SELECT s.solicitudID, s.fechaSolicitud, s.estadoID, 
+                    a.NombreArea AS areaNombre, 
+                    p.nombres AS practicanteNombre
+                FROM SolicitudPracticas s
+                INNER JOIN area a ON s.areaID = a.areaID
+                INNER JOIN practicante p ON s.practicanteID = p.practicanteID
+                WHERE s.solicitudID = :id";
 
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+    public function obtenerEstado($solicitudID) {
+        $stmt = $this->conn->prepare("
+            SELECT e.Abreviatura, e.Descripcion
+            FROM SolicitudPracticas sp
+            INNER JOIN Estado e ON sp.EstadoID = e.EstadoID
+            WHERE sp.SolicitudID = ?
+        ");
+        $stmt->execute([$solicitudID]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            // Devolvemos abreviatura y descripción
+            return [
+                'abreviatura' => $row['Abreviatura'],
+                'descripcion' => $row['Descripcion']
+            ];
+        }
+        return null;
+    }
 
 
 

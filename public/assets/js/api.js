@@ -129,6 +129,11 @@ class API {
         return this.get(`/solicitudes/por-practicante?practicanteID=${practicanteID}`);
     }
 
+    // 🆕 Verificar estado de solicitud (NUEVO)
+    async verificarEstadoSolicitud(solicitudID) {
+        return this.get(`/solicitudes/estado?solicitudID=${solicitudID}`);
+    }
+
     async crearSolicitud(practicanteID) {
         const response = await fetch(`${this.baseURL}/solicitudes/crearSolicitud`, {
             method: "POST",
@@ -189,9 +194,10 @@ class API {
     }
 
     // --- ASISTENCIAS ---
-    async listarAsistencias() {
-        return this.get('/asistencias');
+    async listarAsistencias(data) {
+        return this.post('/asistencias', data);
     }
+
 
     async registrarEntrada(data) {
         return this.post('/asistencias/entrada', data);
@@ -202,9 +208,11 @@ class API {
     }
 
     // --- INICIO / DASHBOARD ---
-    async obtenerDatosInicio() {
-        return this.get('/inicio');
+    async obtenerDatosInicio(params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        return this.get(`/inicio${queryString ? '?' + queryString : ''}`);
     }
+
 }
 
 const api = new API();

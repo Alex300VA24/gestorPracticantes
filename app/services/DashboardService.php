@@ -10,13 +10,13 @@ class DashboardService {
         $this->repo = new DashboardRepository();
     }
 
-    public function obtenerDatosInicio() {
-        return [
-            'totalPracticantes' => $this->repo->obtenerTotalPracticantes(),
-            'pendientesAprobacion' => $this->repo->obtenerPendientesAprobacion(),
-            'practicantesActivos' => $this->repo->obtenerPracticantesActivos(),
-            'asistenciaHoy' => $this->repo->obtenerAsistenciasHoy(),
-            //'actividadReciente' => $this->repo->obtenerActividadReciente()
-        ];
-    }
+    public function obtenerDatosInicio($areaID = null) {
+    return [
+        'totalPracticantes' => $this->repo->obtenerTotalPracticantes($areaID),
+        'pendientesAprobacion' => $this->repo->obtenerPendientesAprobacion($areaID),
+        'practicantesActivos' => $this->repo->obtenerPracticantesActivos($areaID),
+        'asistenciaHoy' => $this->repo->obtenerAsistenciasHoy($areaID)
+    ];
+}
+
 }

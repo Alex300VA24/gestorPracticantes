@@ -4,15 +4,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarAsistencias() {
     try {
-        const response = await api.listarAsistencias();
+        // 🔹 Obtener el área del usuario logueado
+        const areaID = sessionStorage.getItem('areaID');
+        if (!areaID) {
+            console.warn("⚠️ No se encontró área del usuario.");
+            return;
+        }
+        console.log("este es el valor de area id: ", areaID);
 
-        // Validar estructura del resultado
-        if (!response || !response.success || !Array.isArray(response.data)) {
+        // 🔹 Llamar al endpoint pasando el areaID
+        const response = await api.listarAsistencias({ areaID: parseInt(areaID) });
+        console.log(response);
+
+        if (!response || !response.success || !Array.isArray(response.data.data)) {
             console.error("Error: formato de datos inválido", response);
             return;
         }
 
-        const asistencias = response.data; // Arreglo real
+        const asistencias = response.data.data;
         const tbody = document.getElementById('tableAsistenciasBody');
         tbody.innerHTML = '';
 
@@ -38,11 +47,11 @@ async function cargarAsistencias() {
                 <td>${duracion}</td>
                 <td>${row.Estado}</td>
                 <td>
-                    <button class="btn btn-success btn-sm" onclick="registrarEntrada(${row.PracticanteID})">
-                        <i class="fas fa-sign-in-alt"></i>
+                    <button class="btn-success" onclick="registrarEntrada(${row.PracticanteID})" id="btnEntrada">
+                        Entrada <i class="fas fa-sign-in-alt"></i>
                     </button>
-                    <button class="btn btn-warning btn-sm" onclick="registrarSalida(${row.PracticanteID})">
-                        <i class="fas fa-sign-out-alt"></i>
+                    <button class="btn-warning" onclick="registrarSalida(${row.PracticanteID})" id="btnSalida">
+                        Salida <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </td>
             `;
@@ -50,14 +59,14 @@ async function cargarAsistencias() {
             tbody.appendChild(tr);
         });
 
-
-        // Llamar a las estadísticas con el arreglo correcto
+        // Actualizar estadísticas
         actualizarStats(asistencias);
 
     } catch (err) {
         console.error("Error al cargar asistencias:", err);
     }
 }
+
 
 
 async function registrarEntrada(practicanteID) {

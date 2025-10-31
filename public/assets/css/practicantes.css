@@ -1,244 +1,927 @@
-/* === MODAL DE NUEVO PRACTICANTE === */
+
+
+/* ============================================
+   PRACTICANTES
+   ============================================ */
+:root {
+    /* Paleta de Colores Principal */
+    --primary-50: #f0f4ff;
+    --primary-100: #e0e9ff;
+    --primary-500: #667eea;
+    --primary-600: #5568d3;
+    --primary-700: #4451b8;
+    
+    --success-500: #10b981;
+    --success-600: #059669;
+    --success-700: #047857;
+    
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+    
+    --danger-500: #ef4444;
+    --danger-600: #dc2626;
+    
+    --info-500: #06b6d4;
+    --info-600: #0891b2;
+    
+    --secondary-500: #8b5cf6;
+    --secondary-600: #7c3aed;
+    
+    /* Escala de Grises */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Sombras Profesionales */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    /* Bordes y Radios */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+    
+    /* Transiciones */
+    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Espaciado */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Tipografía */
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+}
+
+/* ============================================
+   RESET Y BASE
+   ============================================ */
+* {
+    box-sizing: border-box;
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.practicantes-container {
+    width: 100%;
+    padding: var(--spacing-xl);
+    max-width: 1440px;
+    margin: 0 auto;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    line-height: 1.6;
+}
+
+/* ============================================
+   SISTEMA DE BOTONES
+   ============================================ */
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Base para todos los botones */
+.btn-primary,
+.btn-success,
+.btn-warning,
+.btn-danger,
+.btn-info {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition-base);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.btn-primary::before,
+.btn-success::before,
+.btn-warning::before,
+.btn-info::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: var(--transition-base);
+}
+
+.btn-primary:hover::before,
+.btn-success:hover::before,
+.btn-warning:hover::before,
+.btn-info:hover::before {
+    opacity: 1;
+}
+
+/* Estilos específicos por tipo */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-500) 0%, var(--success-600) 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--success-600) 0%, var(--success-700) 100%);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--warning-500) 0%, var(--warning-600) 100%);
+    color: white;
+}
+
+.btn-warning:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-danger {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.btn-danger:hover {
+    background: var(--gray-200);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, var(--info-500) 0%, var(--info-600) 100%);
+    color: white;
+}
+
+.btn-info:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Tamaño pequeño */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Estado activo */
+.btn-primary:active,
+.btn-success:active,
+.btn-warning:active,
+.btn-danger:active,
+.btn-info:active {
+    transform: translateY(0);
+}
+
+/* Estado deshabilitado */
+.btn-primary:disabled,
+.btn-success:disabled,
+.btn-warning:disabled,
+.btn-danger:disabled,
+.btn-info:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   TARJETAS DE CONTENIDO
+   ============================================ */
+.content-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-xl);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition-smooth);
+}
+
+.content-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-title {
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-900);
+    margin: 0 0 var(--spacing-lg) 0;
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--gray-200);
+    letter-spacing: -0.01em;
+}
+
+/* ============================================
+   SISTEMA DE FILTROS
+   ============================================ */
+.content-card label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    letter-spacing: 0.01em;
+}
+
+.content-card input[type="text"],
+.content-card select {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    transition: var(--transition-base);
+}
+
+.content-card input[type="text"]:hover,
+.content-card select:hover {
+    border-color: var(--gray-400);
+}
+
+.content-card input[type="text"]:focus,
+.content-card select:focus {
+    border-color: var(--primary-500);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.content-card input[type="text"]::placeholder {
+    color: var(--gray-400);
+}
+
+/* ============================================
+   SISTEMA DE TABLAS
+   ============================================ */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 0;
+    min-width: 900px;
+}
+
+.table th,
+.table td {
+    padding: 0.875rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+    word-wrap: break-word;
+    white-space: normal;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+/* Anchos específicos por columna */
+.table th:nth-child(1), .table td:nth-child(1) { width: 5%; }
+.table th:nth-child(2), .table td:nth-child(2) { width: 8%; }
+.table th:nth-child(3), .table td:nth-child(3) { width: 12%; }
+.table th:nth-child(4), .table td:nth-child(4) { width: 12%; }
+.table th:nth-child(5), .table td:nth-child(5) { width: 10%; }
+.table th:nth-child(6), .table td:nth-child(6) { width: 10%; }
+.table th:nth-child(7), .table td:nth-child(7) { width: 20%; }
+.table th:nth-child(8), .table td:nth-child(8) { width: 12%; }
+.table th:nth-child(9), .table td:nth-child(9) { width: 10%; }
+
+.table th {
+    background: var(--gray-50);
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-700);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table tbody tr {
+    transition: var(--transition-base);
+}
+
+.table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ============================================
+   BADGES DE ESTADO
+   ============================================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-full);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-xs);
+}
+
+.status-pendiente { 
+    background: linear-gradient(135deg, var(--warning-500) 0%, var(--warning-600) 100%);
+}
+
+.status-vigente { 
+    background: linear-gradient(135deg, var(--info-500) 0%, var(--info-600) 100%);
+}
+
+.status-finalizado { 
+    background: linear-gradient(135deg, var(--success-500) 0%, var(--success-600) 100%);
+}
+
+.status-rechazado { 
+    background: linear-gradient(135deg, var(--danger-500) 0%, var(--danger-600) 100%);
+}
+
+.status-activo { 
+    background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+}
+
+/* ============================================
+   SISTEMA DE MODALES
+   ============================================ */
 .modal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.55);
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(4px);
     z-index: 1000;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.3s ease;
+    padding: var(--spacing-md);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .modal-content {
-    background: #ffffff;
-    width: 600px;
-    border-radius: 12px;
-    padding: 25px 35px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    animation: fadeInUp 0.4s ease;
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-2xl);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--gray-200);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modal-content h3 {
     text-align: center;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-size: 22px;
-    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 var(--spacing-xl) 0;
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
 }
 
-#formPracticante {
+/* Scrollbar personalizado para modales */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: var(--radius-full);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+#formPracticante,
+#formAceptarPracticante {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px 20px;
+    gap: var(--spacing-md) var(--spacing-lg);
 }
 
-#formPracticante input {
+#formPracticante input,
+#formAceptarPracticante input:not([type="checkbox"]),
+#formAceptarPracticante select,
+#formAceptarPracticante textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-}
-
-#formPracticante input:focus {
-    border-color: #0078D7;
-    outline: none;
-}
-
-#formPracticante button[type="submit"] {
-    grid-column: 1 / 2;
-    background: #0078D7;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    font-weight: 500;
-}
-
-#formPracticante button[type="submit"]:hover {
-    background: #005fa3;
-}
-
-#formPracticante button[type="button"] {
-    background: #ccc;
-    border: none;
-    color: #333;
-    padding: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    font-weight: 500;
-}
-
-#formPracticante button[type="button"]:hover {
-    background: #b5b5b5;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* === BOTONES DE ACCIÓN === */
-.action-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-warning {
-    background: linear-gradient(135deg, #ffc107, #fd7e14);
-    color: #212529;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #f0f0f0, #f0f0f0);
-    color: black;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-
-}
-
-.btn-info {
-    background: linear-gradient(135deg, #17a2b8, #138496);
-}
-
-.btn-primary:hover, .btn-success:hover, .btn-warning:hover, .btn-info:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-/* === TARJETAS DE CONTENIDO === */
-.content-card {
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
     background: white;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+    transition: var(--transition-base);
 }
 
-.card-title {
-    font-size: 18px;
-    color: #2c3e50;
-    margin-bottom: 15px;
+#formPracticante input::placeholder,
+#formAceptarPracticante input::placeholder,
+#formAceptarPracticante textarea::placeholder {
+    color: var(--gray-400);
 }
 
-/* === TABLAS === */
-.table-container {
-    width: 100%;
-    overflow-x: auto;           /* ✅ Agrega barra de desplazamiento horizontal si se desborda */
-    -webkit-overflow-scrolling: touch; /* ✅ Desplazamiento suave en móviles */
+#formPracticante input:hover,
+#formAceptarPracticante input:hover,
+#formAceptarPracticante select:hover,
+#formAceptarPracticante textarea:hover {
+    border-color: var(--gray-400);
 }
 
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    min-width: 900px;           /* ✅ Evita que las columnas se amontonen en pantallas pequeñas */
+#formPracticante input:focus,
+#formAceptarPracticante input:focus,
+#formAceptarPracticante select:focus,
+#formAceptarPracticante textarea:focus {
+    border-color: var(--primary-500);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.table th, .table td {
-    padding: 12px 10px;
-    text-align: left;
-    border-bottom: 1px solid #e9ecef;
-    word-wrap: break-word;  /* ✅ Permite saltos de línea dentro de las celdas */
-    white-space: normal;    /* ✅ Permite el salto de línea automático */
-    vertical-align: top;    /* ✅ Alinea el texto arriba si hay varias líneas */
-    font-size: 0.95rem;
-}
-
-/* Ajustes de ancho por columna (puedes modificarlos según tu gusto) */
-.table th:nth-child(1),
-.table td:nth-child(1) { width: 5%; }   /* ID */
-.table th:nth-child(2),
-.table td:nth-child(2) { width: 8%; }  /* DNI */
-.table th:nth-child(3),
-.table td:nth-child(3) { width: 12%; }  /* Nombre Completo */
-.table th:nth-child(4),
-.table td:nth-child(4) { width: 12%; }  /* Carrera */
-.table th:nth-child(5),
-.table td:nth-child(5) { width: 10%; }  /* Universidad */
-.table th:nth-child(6),
-.table td:nth-child(6) { width: 10%; }  /* Fecha Registro */
-.table th:nth-child(7),
-.table td:nth-child(7) { width: 20%; }  /* Área */
-.table th:nth-child(8),
-.table td:nth-child(8) { width: 12%; }  /* Estado */
-.table th:nth-child(9),
-.table td:nth-child(9) { width: 10%; }  /* Acciones */
-
-.table th {
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #555;
-}
-
-.table tr:hover {
-    background: #f8f9fa;
-}
-
-
-.status-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
+/* Botones de formulario */
+#formPracticante button[type="submit"],
+#formAceptarPracticante button[type="submit"] {
+    grid-column: 1 / 2;
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
     color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-weight: var(--font-weight-medium);
+    font-size: 0.9375rem;
+    box-shadow: var(--shadow-sm);
 }
 
-.status-pendiente { background: #ffc107; }
-.status-vigente { background: #17a2b8; }
-.status-finalizado { background: #28a745; }
-.status-rechazado { background: #dc3545; }
-.status-activo { background: #6f42c1; }
+#formPracticante button[type="submit"]:hover,
+#formAceptarPracticante button[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+#formPracticante button[type="button"],
+#formAceptarPracticante button[type="button"] {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-weight: var(--font-weight-medium);
+    font-size: 0.9375rem;
+}
+
+#formPracticante button[type="button"]:hover,
+#formAceptarPracticante button[type="button"]:hover {
+    background: var(--gray-200);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   GRUPOS DE FORMULARIO
+   ============================================ */
+.form-group {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.form-group label {
+    font-weight: var(--font-weight-medium);
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    letter-spacing: 0.01em;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: var(--font-sans);
+    line-height: 1.5;
+}
+
+/* ============================================
+   INFORMACIÓN DEL PRACTICANTE
+   ============================================ */
+/* Asegurar que el contenedor del modal permita el centrado */
+#modalAceptarPracticante .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#modalAceptarPracticante form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#infoPracticante {
+    width: 90%;
+    max-width: 650px;
+    margin: 20px auto;
+    padding: 24px 32px;
+    background: linear-gradient(135deg, #f9fafb 0%, #e0f2fe 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    color: #1e293b;
+    transition: all 0.3s ease-in-out;
+}
+
+#infoPracticante:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+#infoPracticante h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #3b82f6;
+    display: inline-block;
+    padding-bottom: 4px;
+}
+
+#infoPracticante p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+#infoPracticante strong {
+    color: #1e40af;
+    font-weight: 600;
+}
+
+/* Asegurar que los demás elementos del form también se vean bien */
+#modalAceptarPracticante .form-group {
+    width: 90%;
+    max-width: 650px;
+}
+
+
+
+/* ============================================
+   GESTIÓN DE TURNOS
+   ============================================ */
+#contenedorTurnos {
+    margin-bottom: var(--spacing-lg);
+}
+
+.turno-item {
+    border: 1px solid var(--gray-200);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    background: white;
+    transition: var(--transition-base);
+}
+
+.turno-item:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-500);
+}
+
+.turno-item label {
+    display: block;
+    font-weight: var(--font-weight-medium);
+    color: var(--gray-700);
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.875rem;
+}
+
+.turno-item .select-turno {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    transition: var(--transition-base);
+}
+
+.turno-item .select-turno:focus {
+    border-color: var(--primary-500);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.dias-checkboxes {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+    margin-top: var(--spacing-xs);
+}
+
+.dias-checkboxes label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-size: 0.8125rem;
+    font-weight: var(--font-weight-normal);
+    background: white;
+    user-select: none;
+}
+
+.dias-checkboxes label:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+}
+
+.dias-checkboxes input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-500);
+}
+
+.dias-checkboxes label:has(input[type="checkbox"]:checked) {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    color: white;
+    border-color: var(--primary-500);
+    font-weight: var(--font-weight-medium);
+}
+
+.btn-eliminar-turno {
+    padding: 0.5rem 0.75rem;
+    min-width: 40px;
+}
+
+/* ============================================
+   LISTA DE MENSAJES
+   ============================================ */
+#listaMensajes {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+}
+
+#listaMensajes::-webkit-scrollbar {
+    width: 8px;
+}
+
+#listaMensajes::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: var(--radius-full);
+}
+
+#listaMensajes::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
+}
+
+#listaMensajes::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* ============================================
+   CAMPOS CONDICIONALES
+   ============================================ */
+#camposAceptacion {
+    grid-column: 1 / -1;
+}
+
+#camposAceptacion input[type="date"] {
+    width: 100%;
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+.text-center {
+    text-align: center;
+}
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--spacing-xs); }
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+
+/* ============================================
+   DISEÑO RESPONSIVO
+   ============================================ */
+@media (max-width: 1024px) {
+    .practicantes-container {
+        padding: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .practicantes-container {
+        padding: var(--spacing-md);
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .content-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .content-card > div[style*="display: flex"] {
+        flex-direction: column !important;
+    }
+    
+    #formPracticante,
+    #formAceptarPracticante {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: var(--spacing-lg);
+        max-height: 85vh;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+    
+    .dias-checkboxes {
+        gap: 0.375rem;
+    }
+    
+    .dias-checkboxes label {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .practicantes-container {
+        padding: var(--spacing-sm);
+    }
+    
+    .btn-primary,
+    .btn-success,
+    .btn-warning,
+    .btn-danger,
+    .btn-info {
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .modal-content {
+        padding: var(--spacing-md);
+    }
+    
+    .modal-content h3 {
+        font-size: 1.25rem;
+    }
+}
+
+/* ============================================
+   ANIMACIONES Y EFECTOS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+   MODO IMPRESIÓN
+   ============================================ */
+@media print {
+    .action-buttons,
+    .modal,
+    button {
+        display: none !important;
+    }
+    
+    .content-card {
+        box-shadow: none;
+        border: 1px solid var(--gray-300);
+    }
+    
+    .table {
+        page-break-inside: auto;
+    }
+    
+    .table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+}
+
+
+
+

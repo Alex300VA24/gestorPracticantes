@@ -7,7 +7,7 @@ class AsistenciaService {
     private $repository;
 
     public function __construct() {
-        date_default_timezone_set('America/Lima'); // ✅ Ajustar zona horaria
+        date_default_timezone_set('America/Lima'); // Ajustar zona horaria
         $this->repository = new AsistenciaRepository();
     }
 
@@ -61,14 +61,19 @@ class AsistenciaService {
         }
     }
 
-    public function listarAsistencias() {
+    public function listarAsistencias($areaID) {
         try {
-            $fecha = date('Y-m-d');
-            $asistencias = $this->repository->obtenerAsistenciasPorFecha($fecha);
+            if (!$areaID) {
+                throw new \Exception("El área del usuario no está definida.");
+            }
+
+            $asistencias = $this->repository->obtenerAsistenciasPorArea($areaID);
             return $asistencias;
+
         } catch (\Throwable $e) {
-            error_log("Error en Service listarAsistencias: " . $e->getMessage());
+            error_log("❌ Error en Service listarAsistencias: " . $e->getMessage());
             throw $e;
         }
     }
+
 }
