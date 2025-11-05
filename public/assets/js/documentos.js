@@ -1,117 +1,16 @@
 // ===================================== Documentos ====================================================
 document.addEventListener("DOMContentLoaded", async () => {
-    const selectPracticante = document.getElementById("selectPracticanteDoc");
-    const listaDocumentos = document.getElementById("listaDocumentos");
+    const selectPracticanteDoc = document.getElementById("selectPracticanteDoc");
     const selectPracticanteModal = document.getElementById("practicanteDocumento");
-    const selectTipoDocumento = document.getElementById("tipoDocumento");
-    const inputArchivo = document.getElementById("archivoDocumento");
-    const textareaObs = document.getElementById("observacionesDoc");
-    const contenedorArchivoActual = document.createElement("div");
-    inputArchivo.parentElement.appendChild(contenedorArchivoActual);
+    const listaDocumentos = document.getElementById("listaDocumentos");
+    const contenedorDocumentos = document.getElementById("contenedorDocumentos");
+    const btnGuardar = document.getElementById("btnGuardarDocumentos");
 
-    let archivoExistente = null;
-    let existeDocumento = false;
+    let solicitudIDActual = null;
+    const tiposDocumento = ['cv', 'dni', 'carnet_vacunacion', 'carta_presentacion'];
 
     // 🆕 Cargar áreas para el modal de envío de solicitud
-    await cargarAreasParaSolicitud();
-
-    // 🔹 Verificar si existe documento previo
-    async function verificarDocumentoExistente() {
-        const practicanteID = document.getElementById("practicanteDocumento").value;
-        const tipoDocumento = document.getElementById("tipoDocumento").value;
-        const contenedorArchivoActual = document.getElementById("contenedorArchivoActual");
-        const textareaObs = document.getElementById("observacionesDoc");
-
-        if (!practicanteID || !tipoDocumento) return;
-
-        try {
-            const result = await api.obtenerDocumentoPorTipoYPracticante(practicanteID, tipoDocumento);
-            console.log("📁 Documento existente:", result);
-
-            if (result.success && result.data) {
-                existeDocumento = true;
-                document.getElementById("solicitudID").value = result.data.SolicitudID;
-                textareaObs.value = result.data.Observaciones || "";
-
-                contenedorArchivoActual.innerHTML = `
-                    <div class="archivo-actual">
-                        <p><strong>Documento actual:</strong> ${tipoDocumento.toUpperCase()} (${result.data.FechaSubida})</p>
-                        <button type="button" class="btn-view" id="btnVerDocumento">
-                            <i class="fas fa-eye"></i> Ver Documento
-                        </button>
-                    </div>
-                `;
-
-                document.getElementById("btnVerDocumento").addEventListener("click", () => {
-                    const base64 = result.data.Archivo;
-                    const tipoMime = base64.startsWith("JVBER") ? "application/pdf"
-                                    : base64.startsWith("/9j/") ? "image/jpeg"
-                                    : base64.startsWith("iVBOR") ? "image/png"
-                                    : "application/octet-stream";
-                    const blob = b64toBlob(base64, tipoMime);
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, "_blank");
-                });
-
-            } else {
-                existeDocumento = false;
-                textareaObs.value = "";
-                contenedorArchivoActual.innerHTML = "";
-                console.log("ℹ️ No hay documento previo");
-            }
-
-        } catch (err) {
-            console.error("❌ Error al verificar documento existente:", err);
-        }
-    }
-
-    // 🔹 Detectar cambios
-    selectPracticanteModal.addEventListener("change", async (e) => {
-        const practicanteID = e.target.value;
-        if (!practicanteID) return;
-
-        // Obtener datos del practicante y su solicitud
-        try {
-            const result = await api.getPracticante(practicanteID);
-            console.log("🧾 Datos completos recibidos:", result);
-
-            const campoSolicitud = document.getElementById("solicitudID");
-
-            if ((!campoSolicitud.value || campoSolicitud.value === "undefined") &&
-                result.success && result.data && result.data.SolicitudID) {
-                campoSolicitud.value = result.data.SolicitudID;
-                window.solicitudActualID = result.data.SolicitudID;
-                solicitudIDActual = result.data.SolicitudID;
-                console.log("Solicitud asociada:", result.data.SolicitudID);
-            }
-
-        } catch (error) {
-            console.error("❌ Error al obtener datos del practicante:", error);
-        }
-
-        verificarDocumentoExistente();
-    });
-
-    selectTipoDocumento.addEventListener("change", verificarDocumentoExistente);
-
-    // 🔹 Si se selecciona un nuevo archivo
-    inputArchivo.addEventListener("change", () => {
-        if (inputArchivo.files.length > 0) {
-            contenedorArchivoActual.innerHTML = `
-                <p style="color:orange;">Se reemplazará el documento existente al subir uno nuevo.</p>
-            `;
-        } else if (archivoExistente) {
-            verificarDocumentoExistente();
-        }
-    });
-
-    // 🔹 Utilidad: convertir Base64 a Blob
-    function b64toBlob(base64, type) {
-        const byteCharacters = atob(base64);
-        const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
-        const byteArray = new Uint8Array(byteNumbers);
-        return new Blob([byteArray], { type });
-    }
+    //await cargarAreasParaSolicitud();
 
     // 🔹 Cargar practicantes en ambos select
     try {
@@ -123,34 +22,217 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         practicantes.forEach(p => {
-            const option = new Option(p.NombreCompleto, p.PracticanteID);
-            selectPracticante.add(option.cloneNode(true));
-            selectPracticanteModal.add(option);
+            const option1 = new Option(p.NombreCompleto, p.PracticanteID);
+            const option2 = new Option(p.NombreCompleto, p.PracticanteID);
+            selectPracticanteDoc.add(option1);
+            selectPracticanteModal.add(option2);
         });
 
     } catch (err) {
         console.error("Error cargando practicantes:", err);
     }
 
-    // 🔹 Cuando se selecciona un practicante en la vista principal
-    selectPracticante.addEventListener("change", async () => {
-        const id = selectPracticante.value;
+    // 🔹 Botón abrir modal
+    document.getElementById("btnSubirDocumento").addEventListener("click", () => {
+        openModal("modalSubirDocumento");
+    });
+
+    // 🔹 Cuando se selecciona practicante en el modal
+    selectPracticanteModal.addEventListener("change", async (e) => {
+        const practicanteID = e.target.value;
+        
+        if (!practicanteID) {
+            contenedorDocumentos.style.display = "none";
+            btnGuardar.style.display = "none";
+            return;
+        }
+
+        // Obtener o crear solicitud
+        try {
+            const result = await api.getPracticante(practicanteID);
+            
+            if (result.success && result.data && result.data.SolicitudID) {
+                solicitudIDActual = result.data.SolicitudID;
+            } else {
+                // Crear nueva solicitud
+                const crearResponse = await api.crearSolicitud(practicanteID);
+                if (!crearResponse.ok) throw new Error(`Error HTTP: ${crearResponse.status}`);
+
+                const crearResult = await crearResponse.json();
+                if (!crearResult.success) throw new Error("Error al crear solicitud");
+
+                solicitudIDActual = crearResult.solicitudID;
+            }
+
+            document.getElementById("solicitudID").value = solicitudIDActual;
+            window.solicitudActualID = solicitudIDActual;
+            
+            // Cargar documentos existentes
+            await cargarDocumentosExistentes(practicanteID);
+            
+            contenedorDocumentos.style.display = "block";
+            btnGuardar.style.display = "inline-block";
+
+        } catch (error) {
+            console.error("❌ Error al obtener/crear solicitud:", error);
+            alert("Error al procesar la solicitud del practicante");
+        }
+    });
+
+    // 🔹 Cargar documentos existentes en los previews
+    async function cargarDocumentosExistentes(practicanteID) {
+        for (const tipo of tiposDocumento) {
+            try {
+                const result = await api.obtenerDocumentoPorTipoYPracticante(practicanteID, tipo);
+                const previewDiv = document.getElementById(`preview_${tipo}`);
+                
+                if (result.success && result.data) {
+                    previewDiv.innerHTML = `
+                        <div class="archivo-actual">
+                            <span>
+                                <i class="fas fa-check-circle" style="color: green;"></i>
+                                Documento subido (${result.data.FechaSubida})
+                            </span>
+                            <div class="btn-group">
+                                <button type="button" class="btn-view" onclick="verDocumento('${result.data.Archivo}')">
+                                    <i class="fas fa-eye"></i> Ver
+                                </button>
+                                <button type="button" class="btn-delete" onclick="eliminarDocumentoModal(${result.data.DocumentoID}, '${tipo}', ${practicanteID})">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    previewDiv.innerHTML = "";
+                }
+            } catch (err) {
+                console.error(`Error al cargar documento ${tipo}:`, err);
+            }
+        }
+    }
+
+    // 🔹 Detectar cambios en archivos
+    tiposDocumento.forEach(tipo => {
+        const input = document.getElementById(`archivo_${tipo}`);
+        const preview = document.getElementById(`preview_${tipo}`);
+        
+        if (input) {
+            input.addEventListener("change", () => {
+                if (input.files.length > 0) {
+                    const fileName = input.files[0].name;
+                    const existingPreview = preview.querySelector('.archivo-actual');
+                    
+                    if (existingPreview) {
+                        preview.innerHTML = `
+                            ${existingPreview.outerHTML}
+                            <div style="color: orange; padding: 5px; margin-top: 5px;">
+                                <i class="fas fa-file"></i> Se reemplazará con: ${fileName}
+                            </div>
+                        `;
+                    } else {
+                        preview.innerHTML = `
+                            <div style="color: #4CAF50; padding: 5px;">
+                                <i class="fas fa-file"></i> Nuevo archivo: ${fileName}
+                            </div>
+                        `;
+                    }
+                }
+            });
+        }
+    });
+
+    // 🔹 Enviar formulario de documentos
+    document.getElementById("formSubirDocumentos").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const practicanteID = selectPracticanteModal.value;
+        if (!practicanteID) {
+            alert("Por favor selecciona un practicante");
+            return;
+        }
+
+        const btn = document.getElementById("btnGuardarDocumentos");
+        
+        try {
+            await ejecutarUnaVez(btn, async () => {
+                const observaciones = document.getElementById("observacionesGenerales").value;
+                let documentosSubidos = 0;
+                
+                // Subir cada documento que tenga archivo seleccionado
+                for (const tipo of tiposDocumento) {
+                    const input = document.getElementById(`archivo_${tipo}`);
+                    
+                    if (input && input.files.length > 0) {
+                        const formData = new FormData();
+                        formData.append('solicitudID', solicitudIDActual);
+                        formData.append('tipoDocumento', tipo);
+                        formData.append('archivoDocumento', input.files[0]);
+                        formData.append('observacionesDoc', observaciones);
+                        formData.append('practicanteID', practicanteID);
+
+                        // Verificar si existe documento previo
+                        const existente = await api.obtenerDocumentoPorTipoYPracticante(practicanteID, tipo);
+                        
+                        let response;
+                        if (existente.success && existente.data) {
+                            response = await api.actualizarDocumento(formData);
+                        } else {
+                            response = await api.subirDocumento(formData);
+                        }
+
+                        if (!response.ok) {
+                            throw new Error(`Error al subir ${tipo}`);
+                        }
+                        
+                        documentosSubidos++;
+                    }
+                }
+                
+                if (documentosSubidos === 0) {
+                    throw new Error("No se seleccionó ningún documento para subir");
+                }
+            });
+
+            alert("Documentos guardados correctamente");
+            
+            // Recargar previews y limpiar inputs
+            await cargarDocumentosExistentes(practicanteID);
+            
+            tiposDocumento.forEach(tipo => {
+                const input = document.getElementById(`archivo_${tipo}`);
+                if (input) input.value = "";
+            });
+            document.getElementById("observacionesGenerales").value = "";
+
+            // Actualizar lista si está seleccionado el mismo practicante
+            if (selectPracticanteDoc.value === practicanteID) {
+                const documentos = await getDocumentosPorPracticante(practicanteID);
+                await renderDocumentos(documentos, solicitudIDActual);
+            }
+            closeModal("modalSubirDocumento");
+
+        } catch (err) {
+            console.error("❌ Error al guardar documentos:", err);
+            alert("Error al guardar los documentos: " + err.message);
+        }
+    });
+
+    // 🔹 Cuando se selecciona practicante en la vista de lista
+    selectPracticanteDoc.addEventListener("change", async () => {
+        const id = selectPracticanteDoc.value;
         if (!id) {
             listaDocumentos.innerHTML = "<p>Seleccione un practicante...</p>";
             solicitudIDActual = null;
             return;
         }
 
-        // 🆕 Obtener solicitudID del practicante seleccionado
         try {
             const result = await api.getPracticante(id);
-            console.log("📋 Datos del practicante:", result);
             
             if (result.success && result.data && result.data.SolicitudID) {
                 solicitudIDActual = result.data.SolicitudID;
-                console.log("SolicitudID obtenida:", solicitudIDActual);
             } else {
-                console.log("No hay SolicitudID para este practicante");
                 solicitudIDActual = null;
             }
         } catch (error) {
@@ -161,87 +243,81 @@ document.addEventListener("DOMContentLoaded", async () => {
         const documentos = await getDocumentosPorPracticante(id);
         await renderDocumentos(documentos, solicitudIDActual);
     });
-
-    // 🔹 Botón subir documento
-    document.getElementById("btnSubirDocumento").addEventListener("click", () => {
-        openModal("modalSubirDocumento");
-    });
-
-    // 🔹 Subir documento 
-    document.getElementById("formSubirDocumento").addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const practicanteID = document.getElementById("practicanteDocumento")?.value;
-        if (!practicanteID) {
-            alert("Por favor selecciona un practicante antes de subir documentos.");
-            return;
-        }
-
-        let solicitudID = window.solicitudActualID || null;
-
-        if (!solicitudID) {
-            try {
-                const crearResponse = await api.crearSolicitud(practicanteID);
-                if (!crearResponse.ok) throw new Error(`Error HTTP: ${crearResponse.status}`);
-
-                const crearResult = await crearResponse.json();
-                if (!crearResult.success) throw new Error("Error al crear solicitud: " + crearResult.message);
-
-                solicitudID = crearResult.solicitudID;
-                window.solicitudActualID = solicitudID;
-                solicitudIDActual = solicitudID;
-            } catch (err) {
-                console.error("❌ Error al crear solicitud:", err);
-                alert("No se pudo crear la solicitud. Revisa la consola.");
-                return;
-            }
-        }
-
-        const inputSolicitud = document.getElementById("solicitudID");
-        if (inputSolicitud) inputSolicitud.value = solicitudID;
-
-        const formData = new FormData(e.target);
-        const btn = document.getElementById("btnSubirDocumento");
-
-        try {
-            const result = await ejecutarUnaVez(btn, async () => {
-                let response;
-
-                if (existeDocumento) {
-                    console.log("🟢 Actualizando documento existente...");
-                    response = await api.actualizarDocumento(formData);
-                } else {
-                    console.log("🟡 Subiendo nuevo documento...");
-                    response = await api.subirDocumento(formData);
-                }
-
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                const result = await response.json();
-
-                if (!result.success) throw new Error(result.message || "Error desconocido");
-
-                return result;
-            });
-
-            alert(result.message);
-            closeModal("modalSubirDocumento");
-            e.target.reset();
-
-            const documentos = await getDocumentosPorPracticante(practicanteID);
-            await renderDocumentos(documentos, solicitudIDActual);
-
-            existeDocumento = false;
-            
-        } catch (err) {
-            console.error("❌ Error al guardar documento:", err);
-            alert("Error al guardar el documento. Revisa la consola.");
-        }
-    });
-
-
 });
 
-// Cargar áreas para el modal de envío de solicitud
+// 🔹 Ver documento
+window.verDocumento = function(base64) {
+    const tipoMime = base64.startsWith("JVBER") ? "application/pdf"
+                    : base64.startsWith("/9j/") ? "image/jpeg"
+                    : base64.startsWith("iVBOR") ? "image/png"
+                    : "application/octet-stream";
+    
+    const blob = b64toBlob(base64, tipoMime);
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+};
+
+// 🔹 Eliminar documento desde el modal
+window.eliminarDocumentoModal = async function(documentoID, tipo, practicanteID) {
+    if (!confirm("¿Está seguro de eliminar este documento?")) return;
+    
+    try {
+        const response = await api.eliminarDocumento(documentoID);
+        
+        if (response.success) {
+            alert("Documento eliminado correctamente");
+            
+            // Recargar preview en el modal
+            const previewDiv = document.getElementById(`preview_${tipo}`);
+            if (previewDiv) previewDiv.innerHTML = "";
+            
+            // Si está en la lista, recargar
+            if (document.getElementById("selectPracticanteDoc").value == practicanteID) {
+                const documentos = await getDocumentosPorPracticante(practicanteID);
+                await renderDocumentos(documentos, window.solicitudActualID);
+            }
+        } else {
+            alert("Error al eliminar: " + response.message);
+        }
+    } catch (error) {
+        console.error("Error al eliminar documento:", error);
+        alert("Error al eliminar el documento");
+    }
+};
+
+// 🔹 Eliminar documento desde la tabla
+window.eliminarDocumento = async function(documentoID, tipo) {
+    if (!confirm("¿Está seguro de eliminar este documento?")) return;
+    
+    try {
+        const response = await api.eliminarDocumento(documentoID);
+        
+        if (response.success) {
+            alert("Documento eliminado correctamente");
+            
+            // Recargar la lista
+            const practicanteID = document.getElementById("selectPracticanteDoc").value;
+            if (practicanteID) {
+                const documentos = await getDocumentosPorPracticante(practicanteID);
+                await renderDocumentos(documentos, window.solicitudActualID);
+            }
+        } else {
+            alert("Error al eliminar: " + response.message);
+        }
+    } catch (error) {
+        console.error("Error al eliminar documento:", error);
+        alert("Error al eliminar el documento");
+    }
+};
+
+// Utilidades
+function b64toBlob(base64, type) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type });
+}
+
 async function cargarAreasParaSolicitud() {
     try {
         const response = await api.listarAreas();
@@ -263,34 +339,26 @@ async function cargarAreasParaSolicitud() {
     }
 }
 
-// Abrir modal para enviar solicitud a área
 function abrirModalEnviarSolicitud(solicitudID) {
-    console.log("🚀 Abriendo modal con SolicitudID:", solicitudID);
     document.getElementById("solicitudEnvioID").value = solicitudID;
     openModal("modalEnviarSolicitud");
 }
 
-// Cerrar modal de enviar solicitud
 function cerrarModalEnviarSolicitud() {
     closeModal("modalEnviarSolicitud");
     document.getElementById("formEnviarSolicitud").reset();
 }
 
-// Enviar solicitud a área
 document.getElementById("formEnviarSolicitud")?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const btn = document.getElementById("btnEnviarSolicitud"); // botón dentro del form
+    const btn = document.getElementById("btnEnviarSolicitud");
     const solicitudID = document.getElementById("solicitudEnvioID").value;
     const destinatarioAreaID = document.getElementById("areaDestino").value;
     const contenido = document.getElementById("mensajeSolicitud").value;
     const remitenteAreaID = sessionStorage.getItem('areaID') || 1;
 
-    console.log("📤 Enviando solicitud:", { solicitudID, destinatarioAreaID, contenido });
-    console.log("📍 Remitente AreaID:", remitenteAreaID);
-
     try {
-        // Todo se ejecuta dentro de ejecutarUnaVez
         const result = await ejecutarUnaVez(btn, async () => {
             const response = await api.enviarSolicitudArea({
                 solicitudID: parseInt(solicitudID),
@@ -299,21 +367,13 @@ document.getElementById("formEnviarSolicitud")?.addEventListener("submit", async
                 contenido
             });
 
-            if (!response.success) throw new Error(response.message || "Error al enviar solicitud");
+            if (!response.success) throw new Error(response.message);
             return response;
         });
 
-        // Si todo salió bien
         alert('Solicitud enviada correctamente al área');
         cerrarModalEnviarSolicitud();
         location.reload();
-
-        // Recargar documentos para actualizar botones
-        const practicanteID = document.getElementById("selectPracticanteDoc").value;
-        if (practicanteID) {
-            const documentos = await getDocumentosPorPracticante(practicanteID);
-            await renderDocumentos(documentos, solicitudID, true); // true = solicitud enviada
-        }
 
     } catch (error) {
         console.error('❌ Error al enviar solicitud:', error);
@@ -321,23 +381,43 @@ document.getElementById("formEnviarSolicitud")?.addEventListener("submit", async
     }
 });
 
-
-// 🧩 Funciones auxiliares
 function openModal(id) {
-    document.getElementById(id).style.display = "flex";
+    const modal = document.getElementById(id);
+    if (modal) {
+        modal.style.display = "flex";
+        
+        // Resetear el modal de documentos cuando se abre
+        if (id === "modalSubirDocumento") {
+            document.getElementById("practicanteDocumento").value = "";
+            document.getElementById("contenedorDocumentos").style.display = "none";
+            document.getElementById("btnGuardarDocumentos").style.display = "none";
+            
+            // Limpiar previews
+            const tiposDocumento = ['cv', 'dni', 'carnet_vacunacion', 'carta_presentacion'];
+            tiposDocumento.forEach(tipo => {
+                const input = document.getElementById(`archivo_${tipo}`);
+                const preview = document.getElementById(`preview_${tipo}`);
+                if (input) input.value = "";
+                if (preview) preview.innerHTML = "";
+            });
+            
+            document.getElementById("observacionesGenerales").value = "";
+        }
+    }
 }
 
 function closeModal(id) {
-    document.getElementById(id).style.display = "none";
+    const modal = document.getElementById(id);
+    if (modal) {
+        modal.style.display = "none";
+    }
 }
 
 async function getDocumentosPorPracticante(id) {
     try {
         const data = await api.obtenerDocumentosPorPracticante(id);
-        console.log("Documentos recibidos:", data);
-
+        
         if (!data || !Array.isArray(data)) {
-            console.warn("La API no devolvió un array de documentos válido:", data);
             return [];
         }
 
@@ -364,9 +444,6 @@ function descargarArchivo(base64, nombre) {
     } else if (base64.startsWith("iVBOR")) {
         tipoMime = "image/png";
         extension = "png";
-    } else if (base64.startsWith("0M8R4KGx")) {
-        tipoMime = "application/msword";
-        extension = "doc";
     }
 
     const link = document.createElement("a");
@@ -374,7 +451,6 @@ function descargarArchivo(base64, nombre) {
     link.download = `${nombre}.${extension}`;
     link.click();
 }
-
 
 async function renderDocumentos(documentos, solicitudID, forzarEnviada = false) {
     const contenedor = document.getElementById("listaDocumentos");
@@ -394,7 +470,6 @@ async function renderDocumentos(documentos, solicitudID, forzarEnviada = false) 
     );
     const todosCompletos = faltantes.length === 0;
 
-    // Verificar si la solicitud ya fue enviada Y su estado de aprobación
     let solicitudEnviada = forzarEnviada;
     let solicitudAprobada = false;
     
@@ -404,11 +479,6 @@ async function renderDocumentos(documentos, solicitudID, forzarEnviada = false) 
             if (estadoResponse.success && estadoResponse.data) {
                 solicitudEnviada = estadoResponse.data.enviada === true || forzarEnviada;
                 solicitudAprobada = estadoResponse.data.aprobada;
-                console.log("Estado de solicitud:", {
-                    enviada: solicitudEnviada,
-                    estado: estadoResponse.data.estado,
-                    aprobada: solicitudAprobada
-                });
             }
         } catch (error) {
             console.warn("No se pudo verificar estado de solicitud:", error);
@@ -423,6 +493,7 @@ async function renderDocumentos(documentos, solicitudID, forzarEnviada = false) 
                     <th>Archivo</th>
                     <th>Importancia</th>
                     <th>Observaciones</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -444,6 +515,11 @@ async function renderDocumentos(documentos, solicitudID, forzarEnviada = false) 
                                 ${obligatorio ? 'Obligatorio' : 'Opcional'}
                             </td>
                             <td>${doc.observaciones ? doc.observaciones : '-'}</td>
+                            <td>
+                                <button class="btn-delete" onclick="eliminarDocumento(${doc.documentoID}, '${normalizar(doc.tipo)}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }).join("")}
@@ -480,12 +556,7 @@ async function renderDocumentos(documentos, solicitudID, forzarEnviada = false) 
     contenedor.innerHTML = tabla;
 }
 
-// Función para generar carta (placeholder)
 function generarCartaAceptacion(solicitudID) {
     console.log("📄 Generando carta para solicitud:", solicitudID);
     alert("Funcionalidad de generar carta en desarrollo");
-    // TODO: Implementar generación de carta de aceptación
 }
-
-// Variable global para el ID de solicitud actual
-let solicitudIDActual = null;

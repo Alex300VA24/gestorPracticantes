@@ -147,7 +147,6 @@ class PracticanteController {
                 $data['practicanteID'],
                 $data['solicitudID'],
                 $data['areaID'],
-                $data['turnos'], // Array de objetos turno
                 $data['fechaEntrada'],
                 $data['fechaSalida'],
                 $data['mensajeRespuesta']

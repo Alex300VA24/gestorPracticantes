@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (isset($_SESSION['authenticated']) && $_SESSION['authenticated']) {
-    header('Location: /dashboard');
+    header('Location: ' . BASE_URL . 'dashboard');
     exit;
 }
 ?>

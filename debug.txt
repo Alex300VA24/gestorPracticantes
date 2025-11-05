@@ -516,3 +516,571 @@ Array
     [request_uri] => /gestorPracticantes/public/api/inicio
 )
 
+Array
+(
+    [timestamp] => 2025-10-31 15:09:07
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 15:09:09
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 15:09:54
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:02:36
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:07:23
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:09:20
+    [areaID_recibido] => 3
+    [query_string] => areaID=3
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=3
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:09:34
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:10:10
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:10:11
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:15:04
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:15:16
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-10-31 19:15:17
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 23:11:51
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 23:11:52
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 23:11:52
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 23:48:05
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 00:09:18
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:23:00
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:32:42
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:32:59
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 13:45:05
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:48:41
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:48:43
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:49:33
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:22:32
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:39:15
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:39:26
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:39:27
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:39:27
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:39:38
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:42:10
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:45:16
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:45:37
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 22:45:40
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 02:21:32
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 02:22:15
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 02:23:48
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 02:24:03
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:04:46
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:05:19
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:31:23
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:31:45
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:33:21
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:33:35
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:42:00
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:42:03
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 03:42:40
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 04:06:20
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 04:06:44
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 04:06:57
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 04:07:14
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 04:07:33
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 04:10:08
+    [areaID_recibido] => 3
+    [query_string] => areaID=3
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=3
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 04:10:10
+    [areaID_recibido] => 3
+    [query_string] => areaID=3
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=3
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 14:54:11
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 14:56:05
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:13:01
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-01 19:13:02
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 05:18:01
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 05:18:02
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 05:18:09
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-02 17:57:30
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-03 23:15:12
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-03 23:16:06
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-03 23:19:03
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-04 23:57:39
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-05 00:03:26
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+
+Array
+(
+    [timestamp] => 2025-11-05 00:04:12
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-05 00:04:55
+    [areaID_recibido] => 2
+    [query_string] => areaID=2
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=2
+)
+
+Array
+(
+    [timestamp] => 2025-11-05 00:07:17
+    [areaID_recibido] => 3
+    [query_string] => areaID=3
+    [request_uri] => /gestorPracticantes/public/api/inicio?areaID=3
+)
+
+Array
+(
+    [timestamp] => 2025-11-05 00:07:53
+    [areaID_recibido] => 
+    [query_string] => 
+    [request_uri] => /gestorPracticantes/public/api/inicio
+)
+

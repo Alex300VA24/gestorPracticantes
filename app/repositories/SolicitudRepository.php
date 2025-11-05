@@ -145,6 +145,13 @@ class SolicitudRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Agregar a SolicitudRepository
+
+    public function eliminarDocumento($documentoID) {
+        $stmt = $this->conn->prepare("DELETE FROM DocumentoSolicitud WHERE DocumentoID = ?");
+        return $stmt->execute([$documentoID]);
+    }
+
 
     public function obtenerEstado($solicitudID) {
         $stmt = $this->conn->prepare("
@@ -165,9 +172,4 @@ class SolicitudRepository {
         }
         return null;
     }
-
-
-
-
-
 }

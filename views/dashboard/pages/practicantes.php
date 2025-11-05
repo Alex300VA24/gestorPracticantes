@@ -74,7 +74,7 @@
       <input type="text" id="Direccion" name="Direccion" placeholder="Dirección">
       <input type="text" id="Universidad" name="Universidad" placeholder="Universidad">
       <button type="submit">Guardar</button>
-      <button type="button" onclick="cerrarModal()">Cancelar</button>
+      <button type="button" onclick="cerrarModalPracticante()">Cancelar</button>
     </form>
   </div>
 </div>
@@ -82,87 +82,110 @@
 <!-- Modal de Mensajes -->
 <div id="modalMensajes" class="modal" style="display:none;">
     <div class="modal-content">
-        <h3>Solicitudes</h3>
-        <div id="listaMensajes" style="max-height: 400px; overflow-y: auto;">
-            <!-- Se llenará dinámicamente -->
+        <h3><i class="fas fa-inbox"></i> Solicitudes Recibidas</h3>
+        
+        <div id="listaMensajes" style="max-height: 450px; overflow-y: auto;">
+            <!-- Se llenará dinámicamente con este formato:
+            
+            <div class="mensaje-card nuevo" onclick="abrirSolicitud(1)">
+                <div class="mensaje-header">
+                    <span class="mensaje-titulo">
+                        <i class="fas fa-user-graduate"></i> Juan Pérez García
+                    </span>
+                    <span class="mensaje-fecha">
+                        <i class="far fa-clock"></i> Hace 2 horas
+                    </span>
+                </div>
+                <div class="mensaje-contenido">
+                    Solicita prácticas para el área de Sistemas. Universidad Nacional...
+                </div>
+                <div class="mensaje-footer">
+                    <span class="badge badge-info">Pendiente</span>
+                </div>
+            </div>
+            
+            -->
         </div>
-        <button type="button" onclick="cerrarModalMensajes()">Cerrar</button>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="cerrarModalMensajes()" class="btn-cancel">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Modal para Aceptar/Rechazar Practicante -->
 <div id="modalAceptarPracticante" class="modal" style="display:none;">
-    <div class="modal-content" style="max-width: 700px;">
-        <h3>Gestionar Practicante</h3>
+    <div class="modal-content" style="max-width: 750px;">
+        <h3><i class="fas fa-user-check"></i> Gestionar Solicitud de Practicante</h3>
+        
         <form id="formAceptarPracticante">
             <input type="hidden" id="aceptarPracticanteID">
             <input type="hidden" id="aceptarSolicitudID">
             
+            <!-- Información del Practicante -->
             <div id="infoPracticante">
-                <!-- Información del practicante -->
+                <!-- Se llenará dinámicamente -->
+                
             </div>
             
+            <!-- Decisión -->
             <div class="form-group">
-                <label>Decisión:</label>
+                <label>
+                    <i class="fas fa-tasks"></i> Decisión sobre la Solicitud
+                </label>
                 <select id="decisionAceptacion" required>
-                    <option value="">Seleccionar...</option>
-                    <option value="aceptar">Aceptar</option>
-                    <option value="rechazar">Rechazar</option>
+                    <option value="">-- Seleccionar decisión --</option>
+                    <option value="aceptar">✓ Aceptar Practicante</option>
+                    <option value="rechazar">✗ Rechazar Solicitud</option>
                 </select>
             </div>
             
+            <!-- Campos de Aceptación (aparecen cuando se selecciona "aceptar") -->
             <div id="camposAceptacion" style="display:none;">
+                <h4 style="margin: 0 0 15px 0; color: #667eea;">
+                    <i class="fas fa-calendar-check"></i> Periodo de Prácticas
+                </h4>
+                
                 <div class="form-group">
-                    <label>Turnos Asignados:</label>
-                    <div id="contenedorTurnos">
-                        <!-- Se llenará dinámicamente -->
-                    </div>
-                    <button type="button" class="btn-info btn-sm" id="btnAgregarTurno">
-                        <i class="fas fa-plus"></i> Agregar Turno
-                    </button>
-                    <label>Fecha de Entrada:</label>
-                    <input type="date" id="fechaEntrada">
-                    <label>Fecha de Salida:</label>
-                    <input type="date" id="fechaSalida">
+                    <label>
+                        <i class="fas fa-calendar-plus"></i> Fecha de Entrada
+                    </label>
+                    <input type="date" id="fechaEntrada" min="">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-calendar-minus"></i> Fecha de Salida
+                    </label>
+                    <input type="date" id="fechaSalida" min="">
                 </div>
             </div>
-
-
             
+            <!-- Mensaje de Respuesta -->
             <div class="form-group">
-                <label>Mensaje:</label>
-                <textarea id="mensajeRespuesta" rows="4" required></textarea>
+                <label>
+                    <i class="fas fa-comment-dots"></i> Mensaje de Respuesta
+                </label>
+                <textarea 
+                    id="mensajeRespuesta" 
+                    rows="4" 
+                    placeholder="Escriba un mensaje para el practicante explicando su decisión..."
+                    required
+                ></textarea>
             </div>
             
-            <button type="submit" class="btn-success" id="btnEnviarRespuesta">Enviar Respuesta</button>
-            <button type="button" onclick="cerrarModalAceptar()">Cancelar</button>
+            <!-- Botones de Acción -->
+            <div class="modal-footer">
+                <button type="button" onclick="cerrarModalAceptar()" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn-success" id="btnEnviarRespuesta">
+                    <i class="fas fa-paper-plane"></i> Enviar Respuesta
+                </button>
+            </div>
         </form>
     </div>
 </div>
 
-<!-- Template para turno (oculto) -->
-<template id="templateTurno">
-    <div class="turno-item" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-        <div style="display: flex; gap: 10px; align-items: flex-start;">
-            <div style="flex: 1;">
-                <label>Turno:</label>
-                <select class="select-turno" required>
-                    <option value="">Seleccionar turno...</option>
-                </select>
-            </div>
-            <div style="flex: 2;">
-                <label>Días:</label>
-                <div class="dias-checkboxes" style="display: flex; gap: 5px; flex-wrap: wrap;">
-                    <label><input type="checkbox" value="Lunes"> Lun</label>
-                    <label><input type="checkbox" value="Martes"> Mar</label>
-                    <label><input type="checkbox" value="Miércoles"> Mié</label>
-                    <label><input type="checkbox" value="Jueves"> Jue</label>
-                    <label><input type="checkbox" value="Viernes"> Vie</label>
-                </div>
-            </div>
-            <button type="button" class="btn-danger btn-sm btn-eliminar-turno" style="margin-top: 20px;">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    </div>
-</template>

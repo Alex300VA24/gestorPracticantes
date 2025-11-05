@@ -151,7 +151,19 @@ switch (true) {
         $controller = new \App\Controllers\SolicitudController();
         $controller->obtenerSolicitudPorID();
         break;
+    
+    case $path === '/api/solicitudes/eliminarDocumento':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->eliminarDocumento();
+        break;
 
+    // Agregar esta ruta en la sección de ASISTENCIAS
+    case $path === '/api/asistencias/obtener':
+        $controller = new \App\Controllers\AsistenciaController();
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $controller->obtenerAsistenciaCompleta();
+        }
+        break;
 
 
     // ============================================
@@ -202,7 +214,7 @@ switch (true) {
         break;
 
     // ============================================
-    // RUTAS DE ASISTENCIAS
+    // RUTAS DE ASISTENCIAS (Reemplazar la sección existente)
     // ============================================
     case $path === '/api/asistencias':
         $controller = new \App\Controllers\AsistenciaController();
@@ -210,7 +222,6 @@ switch (true) {
             $controller->listarAsistencias();
         }
         break;
-
 
     case $path === '/api/asistencias/entrada':
         $controller = new \App\Controllers\AsistenciaController();
@@ -223,6 +234,20 @@ switch (true) {
         $controller = new \App\Controllers\AsistenciaController();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $controller->registrarSalida();
+        }
+        break;
+
+    case $path === '/api/asistencias/pausa/iniciar':
+        $controller = new \App\Controllers\AsistenciaController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->iniciarPausa();
+        }
+        break;
+
+    case $path === '/api/asistencias/pausa/finalizar':
+        $controller = new \App\Controllers\AsistenciaController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->finalizarPausa();
         }
         break;
 

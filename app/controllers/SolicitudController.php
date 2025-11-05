@@ -276,6 +276,43 @@ class SolicitudController {
         }
     }
 
+    public function eliminarDocumento() {
+        header('Content-Type: application/json; charset=utf-8');
+        
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+            $documentoID = $data['documentoID'] ?? null;
+
+            if (!$documentoID) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'DocumentoID no proporcionado'
+                ]);
+                return;
+            }
+
+            $resultado = $this->service->eliminarDocumento($documentoID);
+
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Documento eliminado correctamente'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'No se pudo eliminar el documento'
+                ]);
+            }
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     public function verificarEstado($solicitudID) {
         header('Content-Type: application/json');
 

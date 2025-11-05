@@ -26,7 +26,7 @@ function abrirModal() {
     document.getElementById("PracticanteModal").style.display = "flex";
 }
 
-function cerrarModal() {
+function cerrarModalPracticante() {
     document.getElementById("PracticanteModal").style.display = "none";
     document.getElementById("formPracticante").reset();
 }
@@ -220,7 +220,7 @@ document.getElementById("formPracticante").addEventListener("submit", async (e) 
         if (res.success) {
             alert(modoEdicion ? "Practicante actualizado correctamente" : "Practicante creado con éxito");
 
-            cerrarModal();
+            cerrarModalPracticante();
             await cargarPracticantes();
 
             location.reload();

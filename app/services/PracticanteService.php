@@ -92,9 +92,8 @@ class PracticanteService {
         return $this->repo->filtrarPracticantes($nombre, $areaID);
     }
 
-    public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $turnos, $fechaEntrada, $fechaSalida, $mensajeRespuesta) {
-        $turnosJSON = json_encode($turnos);
-        return $this->repo->aceptarPracticante($practicanteID, $solicitudID, $areaID, $turnosJSON, $fechaEntrada, $fechaSalida, $mensajeRespuesta);
+    public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $fechaEntrada, $fechaSalida, $mensajeRespuesta) {
+        return $this->repo->aceptarPracticante($practicanteID, $solicitudID, $areaID, $fechaEntrada, $fechaSalida, $mensajeRespuesta);
     }
 
 

@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function inicializarModulo() {
     await cargarAreasFiltro();
-    await cargarTurnos();
 }
 
 // ===================================== MENSAJES ====================================
@@ -241,81 +240,10 @@ function cerrarModalAceptar() {
     closeModal('modalAceptarPracticante');
     document.getElementById('formAceptarPracticante')?.reset();
     document.getElementById('camposAceptacion').style.display = 'none';
-    document.getElementById('contenedorTurnos').innerHTML = '';
 }
 
 // ===================================== TURNOS ====================================
 
-// 🔹 Cargar turnos disponibles
-async function cargarTurnos() {
-    try {
-        const response = await api.listarTurnos();
-        
-        if (response.success) {
-            turnosDisponibles = response.data;
-            console.log("Turnos cargados:", turnosDisponibles.length);
-        } else {
-            console.warn('No se pudieron cargar los turnos');
-        }
-    } catch (error) {
-        console.error('Error al cargar turnos:', error);
-    }
-}
-
-// 🔹 Agregar turno al formulario
-function agregarTurno() {
-    const contenedor = document.getElementById('contenedorTurnos');
-    const template = document.getElementById('templateTurno');
-    
-    if (!contenedor || !template) {
-        console.error('❌ No se encontró el contenedor de turnos o el template');
-        return;
-    }
-    
-    const clone = template.content.cloneNode(true);
-    
-    // Llenar select de turnos
-    const select = clone.querySelector('.select-turno');
-    turnosDisponibles.forEach(turno => {
-        const option = document.createElement('option');
-        option.value = turno.TurnoID;
-        option.textContent = `${turno.Descripcion} (${turno.RangoHorario})`;
-        select.appendChild(option);
-    });
-    
-    // Agregar evento para eliminar
-    const btnEliminar = clone.querySelector('.btn-eliminar-turno');
-    if (btnEliminar) {
-        btnEliminar.addEventListener('click', function() {
-            this.closest('.turno-item').remove();
-        });
-    }
-    
-    contenedor.appendChild(clone);
-    console.log("➕ Turno agregado. Total turnos:", contenedor.children.length);
-}
-
-// 🔹 Obtener turnos seleccionados del formulario
-function obtenerTurnosSeleccionados() {
-    const contenedorTurnos = document.getElementById('contenedorTurnos');
-    const turnos = [];
-
-    contenedorTurnos.querySelectorAll('.turno-item').forEach(item => {
-        const turnoSelect = item.querySelector('.select-turno');
-        const diasSeleccionados = Array.from(
-            item.querySelectorAll('.dias-checkboxes input[type="checkbox"]:checked')
-        ).map(chk => chk.value);
-
-        if (turnoSelect && turnoSelect.value && diasSeleccionados.length > 0) {
-            turnos.push({
-                turnoID: parseInt(turnoSelect.value),
-                dias: diasSeleccionados.join(',')
-            });
-        }
-    });
-
-    return turnos;
-}
 
 // ===================================== FORMULARIO ACEPTAR/RECHAZAR ====================================
 
@@ -323,7 +251,6 @@ function obtenerTurnosSeleccionados() {
 function manejarCambioDecision() {
     const decision = document.getElementById('decisionAceptacion');
     const camposAceptacion = document.getElementById('camposAceptacion');
-    const contenedorTurnos = document.getElementById('contenedorTurnos');
     
     if (!decision || !camposAceptacion) return;
 
@@ -336,10 +263,6 @@ function manejarCambioDecision() {
             if (campo) campo.required = true;
         });
         
-        // Agregar un turno por defecto si no hay ninguno
-        if (contenedorTurnos && contenedorTurnos.children.length === 0) {
-            agregarTurno();
-        }
     } else {
         camposAceptacion.style.display = 'none';
         
@@ -366,17 +289,9 @@ async function procesarAceptacion(practicanteID, solicitudID, mensajeRespuesta) 
         return false;
     }
 
-    const turnos = obtenerTurnosSeleccionados();
-
-    if (turnos.length === 0) {
-        alert('Debes asignar al menos un turno.');
-        return false;
-    }
-
-    console.log("📤 Datos de aceptación:", {
+    console.log("Datos de aceptación:", {
         practicanteID,
         solicitudID,
-        turnos,
         fechaEntrada,
         fechaSalida
     });
@@ -389,7 +304,6 @@ async function procesarAceptacion(practicanteID, solicitudID, mensajeRespuesta) 
                 practicanteID: parseInt(practicanteID),
                 solicitudID: parseInt(solicitudID),
                 areaID: parseInt(areaID()),
-                turnos: turnos,
                 fechaEntrada,
                 fechaSalida,
                 mensajeRespuesta

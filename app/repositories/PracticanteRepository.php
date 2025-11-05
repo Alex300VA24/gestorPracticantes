@@ -135,14 +135,13 @@ class PracticanteRepository {
         }
     }
 
-    public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $turnosJSON, $fechaEntrada, $fechaSalida, $mensajeRespuesta) {
+    public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $fechaEntrada, $fechaSalida, $mensajeRespuesta) {
         try {
-            $stmt = $this->db->prepare("EXEC sp_AceptarPracticante ?, ?, ?, ?, ?, ?, ?");
+            $stmt = $this->db->prepare("EXEC sp_AceptarPracticante ?, ?, ?, ?, ?, ?");
             $stmt->execute([
                 $practicanteID,
                 $solicitudID,
                 $areaID,
-                $turnosJSON,
                 $fechaEntrada,
                 $fechaSalida,
                 $mensajeRespuesta

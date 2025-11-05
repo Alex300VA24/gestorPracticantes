@@ -44,6 +44,14 @@ class SolicitudService {
         return $this->repo->obtenerSolicitudPorID($solicitudID);
     }
 
+
+    // Agregar a SolicitudService
+
+    public function eliminarDocumento($documentoID) {
+        return $this->repo->eliminarDocumento($documentoID);
+    }
+
+
     public function verificarEstado($solicitudID) {
         $solicitud = $this->repo->obtenerSolicitudPorID($solicitudID);
         $estado = $this->repo->obtenerEstado($solicitudID);
@@ -58,6 +66,4 @@ class SolicitudService {
 
         ];
     }
-
-
 }

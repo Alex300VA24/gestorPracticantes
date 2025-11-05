@@ -164,6 +164,11 @@ class API {
         return this.post('/mensajes/enviar', data);
     }
 
+    // En tu archivo api.js, agregar:
+    async eliminarDocumento(documentoID) {
+        return this.post('/solicitudes/eliminarDocumento', { documentoID });
+    }
+
     async responderSolicitud(data) {
         return this.post('/mensajes/responder', data);
     }
@@ -184,7 +189,7 @@ class API {
         return this.get('/areas');
     }
 
-    // 🆕 --- TURNOS ---
+    // --- TURNOS ---
     async listarTurnos() {
         return this.get('/turnos');
     }
@@ -198,13 +203,24 @@ class API {
         return this.post('/asistencias', data);
     }
 
-
     async registrarEntrada(data) {
         return this.post('/asistencias/entrada', data);
     }
 
     async registrarSalida(data) {
         return this.post('/asistencias/salida', data);
+    }
+
+    async iniciarPausa(data) {
+        return this.post('/asistencias/pausa/iniciar', data);
+    }
+
+    async finalizarPausa(data) {
+        return this.post('/asistencias/pausa/finalizar', data);
+    }
+
+    async obtenerAsistenciaCompleta(practicanteID) {
+        return this.get(`/asistencias/obtener?practicanteID=${practicanteID}`);
     }
 
     // --- INICIO / DASHBOARD ---

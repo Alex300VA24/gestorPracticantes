@@ -9,6 +9,9 @@
         <button class="btn-info" onclick="generarReporte()">
             <i class="fas fa-file-export"></i> Generar Reporte
         </button>
+        <button class="btn-primary" onclick="cargarAsistencias()">
+            <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
     </div>
 
     <div class="stats-grid">
@@ -35,18 +38,24 @@
                 <thead>
                     <tr>
                         <th>Practicante</th>
-                        <th>Turno</th>
+                        <th>Turno(s)</th>
                         <th>Hora Entrada</th>
                         <th>Hora Salida</th>
-                        <th>Tiempo</th>
+                        <th>Tiempo Efectivo</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tableAsistenciasBody">
-                    <!-- Datos dinámicos -->
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 20px;">
+                            <i class="fas fa-spinner fa-spin"></i> Cargando datos...
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<!-- El modal se genera dinámicamente desde JavaScript -->
