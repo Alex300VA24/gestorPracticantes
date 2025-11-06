@@ -6,7 +6,7 @@
         <h1>Gestión de Practicantes</h1>
         <p class="page-subtitle">Administrar solicitudes y estados de practicantes</p>
     </div>
-    
+
     <div class="action-buttons">
         <button class="btn-primary" id="btnNuevoPracticante"><i class="fas fa-plus"></i> Nuevo Practicante</button>
         <button class="btn-success" id="btnExportarPracticantes"><i class="fas fa-download"></i> Exportar Lista</button>
@@ -85,26 +85,7 @@
         <h3><i class="fas fa-inbox"></i> Solicitudes Recibidas</h3>
         
         <div id="listaMensajes" style="max-height: 450px; overflow-y: auto;">
-            <!-- Se llenará dinámicamente con este formato:
-            
-            <div class="mensaje-card nuevo" onclick="abrirSolicitud(1)">
-                <div class="mensaje-header">
-                    <span class="mensaje-titulo">
-                        <i class="fas fa-user-graduate"></i> Juan Pérez García
-                    </span>
-                    <span class="mensaje-fecha">
-                        <i class="far fa-clock"></i> Hace 2 horas
-                    </span>
-                </div>
-                <div class="mensaje-contenido">
-                    Solicita prácticas para el área de Sistemas. Universidad Nacional...
-                </div>
-                <div class="mensaje-footer">
-                    <span class="badge badge-info">Pendiente</span>
-                </div>
-            </div>
-            
-            -->
+            <!-- Se llenará dinámicamente -->
         </div>
         
         <div class="modal-footer">
