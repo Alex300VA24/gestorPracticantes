@@ -110,8 +110,6 @@ class SolicitudController {
 
     public function subirDocumento() {
         try {
-            // Log rápido para depuración
-            file_put_contents("debug_subida.txt", print_r($_POST, true) . "\n" . print_r($_FILES, true), FILE_APPEND);
 
             $solicitudID   = $_POST['solicitudID'] ?? null;
             $tipoDocumento = $_POST['tipoDocumento'] ?? null;
@@ -160,7 +158,6 @@ class SolicitudController {
                 echo json_encode(['success' => false, 'message' => 'Error al subir el documento en el servicio']); 
             }
         } catch (\Throwable $e) {
-            file_put_contents("error_subida.txt", $e->getMessage());
             http_response_code(500);
             echo json_encode(['error' => 'Excepción: ' . $e->getMessage()]);
         }
@@ -168,10 +165,7 @@ class SolicitudController {
 
     public function actualizarDocumento(){
         try {
-            // debug pre
-            file_put_contents("debug_actualizar.txt", "---- INICIO Llamada actualizarDocumento ----\n", FILE_APPEND);
-            file_put_contents("debug_actualizar.txt", print_r($_POST, true) . "\n" . print_r($_FILES, true) . "\n", FILE_APPEND);
-
+            
             $solicitudID   = $_POST['solicitudID'] ?? null;
             $tipoDocumento = $_POST['tipoDocumento'] ?? null;
             $observaciones = $_POST['observacionesDoc'] ?? null;

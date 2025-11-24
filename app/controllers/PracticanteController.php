@@ -137,7 +137,6 @@ class PracticanteController {
 
             $nombre = $input['nombre'] ?? null;
             $areaID = $input['areaID'] ?? null;
-            file_put_contents('debug_filtrado_controller.txt', "Nombre: $nombre | Área: $areaID\n", FILE_APPEND);
             
             $practicantes = $this->practicanteService->filtrarPracticantes($nombre, $areaID);
             $this->jsonResponse([
