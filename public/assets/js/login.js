@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 sessionStorage.setItem('nombreArea', response.data.area.nombreArea);
             }
         } catch (error) {
-            alert('Error: ' + error.message);
+            mostrarAlerta({tipo:'error', titulo: 'Error', mensaje:error.message });
             btnLogin.disabled = false;
             btnLogin.textContent = 'Ingresar';
         }
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const cui = document.getElementById('cui').value;
         if (!cui || cui.length < 1) {
-            alert('Por favor ingrese un CUI válido');
+            mostrarAlerta({tipo:'info', mensaje:'Por favor ingrese un CUI válido'});
             return;
         }
 
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'dashboard';
             }
         } catch (error) {
-            alert('Error: ' + error.message);
+            mostrarAlerta({tipo:'error', titulo: 'Error', mensaje:error.message });
             const btnConfirmar = document.getElementById('btnConfirmarCUI');
             btnConfirmar.disabled = false;
             btnConfirmar.value = 'Confirmar';
@@ -72,3 +72,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function mostrarAlerta({
+    tipo = "info",
+    titulo = "",
+    mensaje = "",
+    showConfirmButton = true,
+    showCancelButton = false,
+    confirmText = "Aceptar",
+    cancelText = "Cancelar",
+    input = null,
+    inputPlaceholder = "",
+    inputValue = "",
+    callback = null
+}) {
+    
+    Swal.fire({
+        icon: tipo,
+        title: titulo,
+        text: mensaje,
+        position: "center",  // siempre centrado
+        showConfirmButton,
+        showCancelButton,
+        confirmButtonText: confirmText,
+        cancelButtonText: cancelText,
+        input,
+        inputPlaceholder,
+        inputValue,
+        
+        // Esto garantiza que esté encima de cualquier modal
+        backdrop: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+    }).then((result) => {
+        if (callback) callback(result);
+    });
+}

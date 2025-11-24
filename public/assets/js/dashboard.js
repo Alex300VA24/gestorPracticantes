@@ -17,14 +17,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.option').forEach(o => o.classList.remove('active'));
         if (optionEl) optionEl.classList.add('active');
 
-        // 🔹 Guarda la sección actual en localStorage
-        localStorage.setItem('currentPage', pageId);
+        const initFunctions = {
+            inicio: cargarInicio,
+            practicantes: window.initPracticantes,
+            documentos: window.initDocumentos,
+            asistencias: window.initAsistencias,
+            reportes: window.initReportes,
+            certificados: window.initCertificados,
+            usuarios: window.initUsuarios,
+            mensajes: window.initMensajes
+        };
+
+        // Ejecutar init asociado solo si existe
+        if (initFunctions[pageId]) {
+            initFunctions[pageId]();
+        }
+
 
         // 🔹 Si el usuario va al inicio, cargamos los datos
         if (pageId === 'inicio') {
             cargarInicio();
         }
+        const paginaActual = localStorage.getItem("currentPage");
+
+        if (paginaActual !== pageId) {
+            localStorage.setItem("currentPage", pageId);
+            return;
+        }
+
     };
+
+    
 
 
     function capitalize(str) {
@@ -50,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 document.querySelector(`#btnInicio`);
             showPage('inicio', defaultOption);
         }
+
     })();
 
     // Logout
@@ -72,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.removeItem('currentPage');
             window.location.href = BASE_URL + 'login';
         } catch (error) {
-            alert('Error al cerrar sesión');
+            mostrarAlerta({tipo: 'error', titulo:'Error', mensaje: 'Error al cerrar sesión'});
         }
     });
 
@@ -81,21 +105,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
+// Reemplazar la función cargarInicio() completa:
+
 async function cargarInicio() {
     try {
         // Recuperar área del usuario logueado
         const areaID = sessionStorage.getItem('areaID');
         const nombreArea = sessionStorage.getItem('nombreArea');
-        console.log(areaID, nombreArea);
 
         // Si RRHH, no se envía áreaID (deja ver todo)
         const params = (nombreArea === 'Gerencia de Recursos Humanos' || !areaID) 
             ? {} 
             : { areaID: areaID };
 
-        // Llamada al backend con parámetro (usa tu helper API o fetch)
+        // Llamada al backend
         const response = await api.obtenerDatosInicio(params);
-        console.log("Datos del dashboard:", response);
 
         if (!response.success || !response.data) {
             console.error("Formato inválido en la respuesta del backend:", response);
@@ -118,19 +142,69 @@ async function cargarInicio() {
             data.actividadReciente.forEach(act => {
                 const div = document.createElement('div');
                 div.classList.add('actividad-item');
+                
+                // Formatear tiempo
+                const tiempo = formatearTiempo(act.MinutosTranscurridos);
+                
+                // Clase de color según tipo
+                const colorClass = obtenerClaseColor(act.TipoActividad);
+                
                 div.innerHTML = `
-                    <strong>${act.Practicante}</strong> - ${act.Accion}
-                    <span class="fecha">${act.Fecha}</span>
+                    <div class="d-flex align-items-start">
+                        <div class="activity-icon me-3 ${colorClass}">
+                            <i class="fas fa-${act.Icono || 'circle'} fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-1">${escapeHtml(act.Descripcion)}</p>
+                            <small class="text-muted">
+                                <i class="far fa-clock"></i> Hace ${tiempo}
+                            </small>
+                        </div>
+                    </div>
                 `;
                 actividadDiv.appendChild(div);
             });
         } else {
-            actividadDiv.innerHTML = '<p>No hay actividad reciente.</p>';
+            actividadDiv.innerHTML = '<p class="text-muted text-center py-3">No hay actividad reciente.</p>';
         }
 
     } catch (error) {
         console.error('❌ Error al cargar el inicio:', error);
+        mostrarAlerta({
+            tipo: 'error',
+            titulo: 'Error',
+            mensaje: 'No se pudieron cargar los datos del dashboard'
+        });
     }
+}
+
+// Función para formatear tiempo transcurrido
+function formatearTiempo(minutos) {
+    if (minutos < 1) return "justo ahora";
+    if (minutos < 60) return `${minutos} minuto${minutos > 1 ? 's' : ''}`;
+    
+    const horas = Math.floor(minutos / 60);
+    if (horas < 24) return `${horas} hora${horas > 1 ? 's' : ''}`;
+    
+    const dias = Math.floor(horas / 24);
+    return `${dias} día${dias > 1 ? 's' : ''}`;
+}
+
+// Función para obtener clase de color según tipo de actividad
+function obtenerClaseColor(tipo) {
+    switch(tipo) {
+        case 'INSERT': return 'text-success';
+        case 'UPDATE': return 'text-warning';
+        case 'DELETE': return 'text-danger';
+        default: return 'text-info';
+    }
+}
+
+// Función para escapar HTML y prevenir XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 async function ejecutarUnaVez(boton, accionAsync) {
@@ -154,6 +228,41 @@ async function ejecutarUnaVez(boton, accionAsync) {
         boton.innerHTML = textoOriginal;
     }
 }
+function mostrarAlerta({
+        tipo = "info",
+        titulo = "",
+        mensaje = "",
+        showConfirmButton = true,
+        showCancelButton = false,
+        confirmText = "Aceptar",
+        cancelText = "Cancelar",
+        input = null,
+        inputPlaceholder = "",
+        inputValue = "",
+        callback = null
+    }) {
+        
+        // IMPORTANTE: devolver la promesa
+        return Swal.fire({
+            icon: tipo,
+            title: titulo,
+            text: mensaje,
+            position: "center",
+            showConfirmButton,
+            showCancelButton,
+            confirmButtonText: confirmText,
+            cancelButtonText: cancelText,
+            input,
+            inputPlaceholder,
+            inputValue,
+            backdrop: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+        }).then((result) => {
+            if (callback) callback(result);
+            return result; // También devolver el resultado
+        });
+    }
 
 
 

@@ -10,10 +10,6 @@ class SolicitudController {
         $this->service = new SolicitudService();
     }
 
-    public function listarPracticantes() {
-        $data = $this->service->listarNombresPracticantes();
-        echo json_encode($data);
-    }
 
     public function obtenerDocumentosPorPracticante() {
         if (!isset($_GET['practicanteID'])) {
@@ -90,8 +86,7 @@ class SolicitudController {
 
     public function crearSolicitud() {
         try {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $practicanteID = $data['practicanteID'] ?? null;
+            $practicanteID = $_GET['practicanteID'] ?? null;
 
             if (!$practicanteID) {
                 echo json_encode(['success' => false, 'message' => 'PracticanteID no proporcionado']);
@@ -333,6 +328,157 @@ class SolicitudController {
             echo json_encode([
                 'success' => false,
                 'message' => 'Error al verificar estado de solicitud: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Generar carta de aceptación
+     */
+    public function generarCartaAceptacion() {
+        header('Content-Type: application/json');
+        error_log("=== INICIO generarCartaAceptacion ===");
+        
+        try {
+            // Obtener datos del request
+            $rawInput = file_get_contents('php://input');
+            error_log("Raw input recibido: " . $rawInput);
+            
+            $data = json_decode($rawInput, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log("Error al decodificar JSON: " . json_last_error_msg());
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'JSON inválido: ' . json_last_error_msg()
+                ]);
+                return;
+            }
+            
+            error_log("Datos decodificados: " . print_r($data, true));
+            
+            // Validar parámetros
+            if (!isset($data['solicitudID'])) {
+                error_log("Falta solicitudID");
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Falta parámetro: solicitudID'
+                ]);
+                return;
+            }
+            
+            if (!isset($data['numeroExpediente'])) {
+                error_log("Falta numeroExpediente");
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Falta parámetro: numeroExpediente'
+                ]);
+                return;
+            }
+            
+            if (!isset($data['formato'])) {
+                error_log("Falta formato");
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Falta parámetro: formato'
+                ]);
+                return;
+            }
+
+            $solicitudID = $data['solicitudID'];
+            $numeroExpediente = $data['numeroExpediente'];
+            $formato = strtolower($data['formato']);
+            
+            error_log("Parámetros validados - SolicitudID: $solicitudID, Expediente: $numeroExpediente, Formato: $formato");
+
+            if (!in_array($formato, ['word', 'pdf'])) {
+                error_log("Formato inválido: $formato");
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Formato inválido. Use "word" o "pdf"'
+                ]);
+                return;
+            }
+
+            error_log("Llamando al service...");
+            $resultado = $this->service->generarCartaAceptacion($solicitudID, $numeroExpediente, $formato);
+            error_log("Resultado del service: " . print_r($resultado, true));
+            
+            if ($resultado['success']) {
+                http_response_code(200);
+                echo json_encode($resultado);
+            } else {
+                http_response_code(400);
+                echo json_encode($resultado);
+            }
+            
+            error_log("=== FIN generarCartaAceptacion ===");
+            
+        } catch (\Exception $e) {
+            error_log("EXCEPCIÓN en generarCartaAceptacion: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al generar carta: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * Verificar si una solicitud puede generar carta de aceptación
+     */
+    public function verificarSolicitudParaCarta() {
+        header('Content-Type: application/json');
+        
+        try {
+            $solicitudID = $_GET['solicitudID'] ?? null;
+            
+            if (!$solicitudID) {
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'ID de solicitud no proporcionado'
+                ]);
+                return;
+            }
+
+            $resultado = $this->service->verificarSolicitud($solicitudID);
+            echo json_encode($resultado);
+            
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al verificar solicitud: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Listar solicitudes aprobadas que pueden generar carta
+     */
+    public function listarSolicitudesAprobadas() {
+        header('Content-Type: application/json');
+        
+        try {
+            $resultado = $this->service->listarSolicitudesAprobadas();
+            echo json_encode([
+                'success' => true,
+                'data' => $resultado
+            ]);
+            
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al listar solicitudes: ' . $e->getMessage()
             ]);
         }
     }

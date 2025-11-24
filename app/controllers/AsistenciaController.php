@@ -122,16 +122,18 @@ class AsistenciaController {
     /**
      * Listar asistencias por área
      */
+
     public function listarAsistencias() {
         try {
             $input = json_decode(file_get_contents('php://input'), true);
             $areaID = $input['areaID'] ?? null;
+            $fecha = $input['fecha'] ?? null;
 
             if (!$areaID) {
                 throw new \Exception("El parámetro areaID es requerido.");
             }
 
-            $response = $this->service->listarAsistencias($areaID);
+            $response = $this->service->listarAsistencias($areaID, $fecha);
 
             $this->jsonResponse([
                 'success' => true,

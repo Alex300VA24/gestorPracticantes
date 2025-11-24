@@ -1,10 +1,11 @@
 <?php
-require_once __DIR__ . '/../autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Para no mostrar los errores
 error_reporting(0);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
+date_default_timezone_set('America/Lima');
 
 // Iniciar la sesion
 session_start();
@@ -65,7 +66,7 @@ switch (true) {
     // ============================================
     // RUTAS DE PRACTICANTES
     // ============================================
-    case $path === '/api/practicantes/filtrar':
+    case preg_match('#^/api/practicantes/filtrar$#', $path):
         $controller = new \App\Controllers\PracticanteController();
         $controller->filtrarPracticantes();
         break;
@@ -105,9 +106,9 @@ switch (true) {
     // ============================================
     // RUTAS DE SOLICITUDES / DOCUMENTOS
     // ============================================
-    case $path === '/api/solicitudes/listarPracticantes':
-        $controller = new \App\Controllers\SolicitudController();
-        $controller->listarPracticantes();
+    case $path === '/api/practicantes/listar-nombres':
+        $controller = new \App\Controllers\PracticanteController();
+        $controller->listarNombresPracticantes();
         break;
 
     case $path === '/api/solicitudes/por-practicante':
@@ -164,7 +165,21 @@ switch (true) {
             $controller->obtenerAsistenciaCompleta();
         }
         break;
+    
+    case $path === '/api/solicitudes/generarCartaAceptacion':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->generarCartaAceptacion();
+        break;
 
+    case $path === '/api/solicitudes/verificarSolicitudParaCarta':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->verificarSolicitudParaCarta();
+        break;
+
+    case $path === '/api/solicitudes/listarSolicitudesAprobadas':
+        $controller = new \App\Controllers\SolicitudController();
+        $controller->listarSolicitudesAprobadas();
+        break;
 
     // ============================================
     // RUTAS DE MENSAJES
@@ -250,20 +265,165 @@ switch (true) {
             $controller->finalizarPausa();
         }
         break;
+    
+    // ============================================
+    // RUTAS DE REPORTES
+    // ============================================
+    case $path === '/api/reportes/practicantes-activos':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->practicantesActivos();
+        break;
+
+    case $path === '/api/reportes/practicantes-completados':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->practicantesCompletados();
+        break;
+
+    case $path === '/api/reportes/por-area':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->practicantesPorArea();
+        break;
+
+    case $path === '/api/reportes/por-universidad':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->practicantesPorUniversidad();
+        break;
+
+    case $path === '/api/reportes/asistencia-practicante':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->asistenciaPorPracticante();
+        break;
+
+    case $path === '/api/reportes/asistencia-dia':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->asistenciaDelDia();
+        break;
+
+    case $path === '/api/reportes/asistencia-mensual':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->asistenciaMensual();
+        break;
+    
+    case $path === '/api/reportes/asistencia-anual':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->asistenciaAnual();
+        break;
+
+    case $path === '/api/reportes/horas-acumuladas':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->horasAcumuladas();
+        break;
+
+    case $path === '/api/reportes/estadisticas-generales':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->estadisticasGenerales();
+        break;
+
+    case $path === '/api/reportes/promedio-horas':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->promedioHoras();
+        break;
+
+    case $path === '/api/reportes/comparativo-areas':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->comparativoAreas();
+        break;
+
+    case $path === '/api/reportes/completo':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->reporteCompleto();
+        break;
+
+    // Exportaciones
+    case $path === '/api/reportes/exportar-pdf':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->exportarPDF();
+        break;
+
+    case $path === '/api/reportes/exportar-excel':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->exportarExcel();
+        break;
+
+    case $path === '/api/reportes/exportar-word':
+        $controller = new \App\Controllers\ReportesController();
+        $controller->exportarWord();
+        break;
+    
+    // ============================================
+    // RUTAS DE USUARIOS
+    // ============================================
+    case $path === '/api/usuarios':
+        $controller = new \App\Controllers\UsuarioController();
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $controller->listar();
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->crear();
+        }
+        break;
+
+    case preg_match('#^/api/usuarios/(\d+)$#', $path, $matches):
+        $controller = new \App\Controllers\UsuarioController();
+        $usuarioID = $matches[1];
+
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $controller->obtener($usuarioID);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+            $controller->actualizar($usuarioID);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $controller->eliminar($usuarioID);
+        }
+        break;
+
+    case preg_match('#^/api/usuarios/(\d+)/password$#', $path, $matches):
+        $controller = new \App\Controllers\UsuarioController();
+        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+            $controller->cambiarPassword($matches[1]);
+        }
+        break;
+
+    case $path === '/api/usuarios/filtrar':
+        $controller = new \App\Controllers\UsuarioController();
+        $controller->filtrar();
+        break;
+    
+
+    // ============================================
+    // RUTAS DE CERTIFICADOS
+    // ============================================
+    case $path === '/api/certificados/estadisticas':
+        $controller = new \App\Controllers\CertificadoController();
+        $controller->obtenerEstadisticas();
+        break;
+
+    case $path === '/api/certificados/listar-practicantes':
+        $controller = new \App\Controllers\CertificadoController();
+        $controller->listarPracticantesParaCertificado();
+        break;
+
+    case preg_match('#^/api/certificados/informacion/(\d+)$#', $path, $matches):
+        $controller = new \App\Controllers\CertificadoController();
+        $controller->obtenerInformacionCertificado($matches[1]);
+        break;
+
+    case $path === '/api/certificados/generar':
+        $controller = new \App\Controllers\CertificadoController();
+        $controller->generarCertificado();
+        break;
 
     // ============================================
     // RUTAS DE VISTAS
     // ============================================
     case $path === '/' || $path === '/login':
-        require __DIR__ . '/../views/login.php';
+        require __DIR__ . '/../app/views/login.php';
         break;
         
     case $path === '/dashboard':
         if (!isset($_SESSION['authenticated']) || !$_SESSION['authenticated']) {
-            require __DIR__ . '/../views/login.php';
+            require __DIR__ . '/../app/views/login.php';
             exit;
         }
-        require __DIR__ . '/../views/dashboard/index.php';
+        require __DIR__ . '/../app/views/dashboard/index.php';
         break;
     
     // ============================================

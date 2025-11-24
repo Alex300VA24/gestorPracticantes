@@ -1,325 +1,101 @@
-let modoEdicion = false;
-let idEdicion = null;
+
+window.initPracticantes = function() {
+    console.log("Practicantes iniciado");
+    // TODO: aquí va tu código que antes se ejecutaba automáticamente
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    // 🔹 Aquí defines el área del usuario logueado (puede venir del backend o sesión)
-    const nombreAreaUsuario = sessionStorage.getItem('nombreArea'); 
-    // Ejemplo: "RRHH", "Sistemas", "Contabilidad", etc.
+    let modoEdicion = false;
+    let idEdicion = null;
 
-    // 🔹 Obtenemos el div del filtro de área
-    const filtroAreaDiv = document.getElementById('filtroArea').closest('div');
+    const inicializar = async () => {
+        // Aquí defines el área del usuario logueado (puede venir del backend o sesión)
+        const nombreAreaUsuario = sessionStorage.getItem('nombreArea'); 
+        // Ejemplo: "RRHH", "Sistemas", "Contabilidad", etc.
 
-    // 🔹 Si el usuario NO es de RRHH, ocultamos el filtro de área
-    if (nombreAreaUsuario !== 'Gerencia de Recursos Humanos') {
-        filtroAreaDiv.style.display = 'none';
-    }
+        // Obtenemos el div del filtro de área
+        const filtroAreaDiv = document.getElementById('filtroArea').closest('div');
+        const btnNuevoPracticante = document.getElementById('btnNuevoPracticante');
 
-    // (Opcional) Puedes imprimir para verificar
-    console.log('Área del usuario:', nombreAreaUsuario);
-});
-
-
-
-// --- FUNCIONES MODALES ---
-function abrirModal() {
-    document.getElementById("PracticanteModal").style.display = "flex";
-}
-
-function cerrarModalPracticante() {
-    document.getElementById("PracticanteModal").style.display = "none";
-    document.getElementById("formPracticante").reset();
-}
-
-// 🔹 Abrir modal para NUEVO
-function abrirModalNuevoPracticante() {
-    modoEdicion = false;
-    document.getElementById("tituloModalPracticante").textContent = "Nuevo Practicante";
-    document.getElementById("formPracticante").reset();
-    document.getElementById("practicanteID").value = "";
-    abrirModal();
-}
-
-// Cargar áreas para filtro
-async function cargarAreasFiltro() {
-    try {
-        const response = await api.listarAreas();
-        const data = response;
-        console.log("Esta es la data: ", data);
-        const select = document.getElementById('filtroArea');
-        const selectEnvio = document.getElementById('areaDestino');
-        
-        data.data.forEach(area => {
-            const option = document.createElement('option');
-            option.value = area.AreaID;
-            option.textContent = area.NombreArea;
-            select.appendChild(option.cloneNode(true));
-            if(selectEnvio) selectEnvio.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error al cargar áreas:', error);
-    }
-}
-
-// Aplicar filtros
-document.getElementById('btnAplicarFiltros')?.addEventListener('click', async () => {
-    const nombre = document.getElementById('filtroNombre').value || '';
-    const areaID = document.getElementById('filtroArea').value;
-    console.log("Nombre del practicante: ", nombre);
-    console.log("Area del practicante: ", areaID);
-    
-    try {
-        const params = new URLSearchParams();
-        if(nombre) params.append('nombre', nombre);
-        if(areaID) params.append('areaID', areaID);
-        
-        const response = await api.filtrarPracticantes(nombre, areaID);
-        const data = response;
-        console.log(data);
-        
-        if(data.success) {
-            actualizarTablaPracticantes(data.data);
+        // Si el usuario NO es de RRHH, ocultamos el filtro de área
+        if (nombreAreaUsuario !== 'Gerencia de Recursos Humanos') {
+            filtroAreaDiv.style.display = 'none';
+            btnNuevoPracticante.style.display = 'none';
         }
-    } catch (error) {
-        console.error('Error al filtrar:', error);
-    }
-});
+        await inicializarModulo();
+        configurarEventListeners();
+        
 
-// Actualizar tabla de practicantes con el mismo filtrado que cargarPracticantes
-function actualizarTablaPracticantes(practicantes) {
-    const tbody = document.querySelector('#tablaPracticantes tbody');
-    if (!tbody) {
-        console.error('❌ No se encontró el tbody de la tabla de practicantes.');
-        return;
-    }
-
-    tbody.innerHTML = '';
-
-    if (!practicantes || practicantes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center">No hay practicantes registrados</td></tr>`;
-        return;
+    };
+    // Verificar si el DOM ya está cargado o esperar al evento
+    if (document.readyState === 'loading') {
+        // DOM aún no está listo, esperar al evento
+        document.addEventListener('DOMContentLoaded', inicializar);
+    } else {
+        // DOM ya está listo, ejecutar inmediatamente
+        inicializar();
     }
 
-    // Obtener datos del usuario
-    const nombreAreaUsuario = sessionStorage.getItem('nombreArea');
-    const esRRHH = nombreAreaUsuario === 'Gerencia de Recursos Humanos';
 
-    // Filtrar practicantes según el área si NO es RRHH
-    const practicantesFiltrados = esRRHH
-        ? practicantes
-        : practicantes.filter(p => {
-            const areaPracticante = p.NombreArea || p.Area;
-            return areaPracticante === nombreAreaUsuario;
-        });
-
-    if (practicantesFiltrados.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center">No hay practicantes registrados para tu área</td></tr>`;
-        return;
+    // --- FUNCIONES MODALES ---
+    function abrirModal() {
+        document.getElementById("PracticanteModal").style.display = "flex";
     }
 
-    practicantesFiltrados.forEach(p => {
-        const fila = document.createElement('tr');
+    function cerrarModalPracticante() {
+        document.getElementById("PracticanteModal").style.display = "none";
+        document.getElementById("formPracticante").reset();
+    }
 
-        // Normalizar nombres y propiedades
-        const estadoDescripcion = p.EstadoDescripcion || p.Estado || 'Pendiente';
-        const areaNombre = p.NombreArea || p.Area || '-';
-        const nombreCompleto = p.NombreCompleto || `${p.Nombres || ''} ${p.ApellidoPaterno || ''} ${p.ApellidoMaterno || ''}`.trim();
+    // 🔹 Abrir modal para NUEVO
+    function abrirModalNuevoPracticante() {
+        modoEdicion = false;
+        document.getElementById("tituloModalPracticante").textContent = "Nuevo Practicante";
+        document.getElementById("formPracticante").reset();
+        document.getElementById("practicanteID").value = "";
+        abrirModal();
+    }
 
-        // Badge de estado
-        const estadoClass = estadoDescripcion.toLowerCase();
-        const estadoBadge = `<span class="status-badge status-${estadoClass}">${estadoDescripcion.toUpperCase()}</span>`;
+    // Cargar áreas para filtro
+    async function cargarAreasFiltro() {
+        try {
+            const response = await api.listarAreas();
+            const data = response;
+            const select = document.getElementById('filtroArea');
+            const selectEnvio = document.getElementById('areaDestino');
+            
+            data.data.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area.AreaID;
+                option.textContent = area.NombreArea;
+                select.appendChild(option.cloneNode(true));
+                if(selectEnvio) selectEnvio.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar áreas:', error);
+        }
+    }
 
-        // Mostrar botón de aceptar solo si pertenece al área del usuario y es “Pendiente”
-        const mostrarBotonAceptar = !esRRHH && areaNombre === nombreAreaUsuario && estadoDescripcion === 'Pendiente';
+    /* Captura evento del boton Aplicar filtros a la tabla de Practicantes */
+    document.getElementById('btnAplicarFiltros')?.addEventListener('click', async () => {
+        const nombre = document.getElementById('filtroNombre').value || '';
+        const areaID = document.getElementById('filtroArea').value;
 
-        // Construir fila
-        fila.innerHTML = `
-            <td>${p.PracticanteID}</td>
-            <td>${p.DNI}</td>
-            <td>${nombreCompleto}</td>
-            <td>${p.Carrera || '-'}</td>
-            <td>${p.Universidad || '-'}</td>
-            <td>${p.FechaRegistro ? new Date(p.FechaRegistro).toLocaleDateString() : '-'}</td>
-            <td>${areaNombre}</td>
-            <td>${estadoBadge}</td>
-            <td>
-                <button class="btn-primary" title="Editar">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-success" title="Ver">
-                    <i class="fas fa-eye"></i>
-                </button>
-                ${mostrarBotonAceptar ? `
-                    <button class="btn-warning" title="Aceptar">
-                        <i class="fas fa-check"></i>
-                    </button>` : ''}
-                <button class="btn-danger" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-
-        tbody.appendChild(fila);
-
-        // Asignar eventos
-        fila.querySelector('.btn-primary').addEventListener('click', () => abrirModalEditarPracticante(p.PracticanteID));
-        fila.querySelector('.btn-success').addEventListener('click', () => verPracticante(p.PracticanteID));
-        fila.querySelector('.btn-danger').addEventListener('click', () => eliminarPracticante(p.PracticanteID));
-        if (mostrarBotonAceptar) {
-            fila.querySelector('.btn-warning').addEventListener('click', () => abrirModalAceptar(p.PracticanteID));
+        const filtros = { nombre: nombre || null,
+                        areaID: areaID || null };
+        
+        try {
+            const response = await api.filtrarPracticantes(filtros);
+            
+            if(response.success) {
+                actualizarTablaPracticantes(response.data);
+            }
+        } catch (error) {
+            console.error('Error al filtrar:', error);
         }
     });
-}
 
-
-
-// 🔹 Abrir modal para EDITAR
-async function abrirModalEditarPracticante(id) {
-    try {
-        modoEdicion = true;
-        document.getElementById("tituloModalPracticante").textContent = "Editar Practicante";
-
-        const res = await api.getPracticante(id);
-        idEdicion = id;
-        const p = res.data;
-
-        // Rellenar campos del formulario
-        document.getElementById("practicanteID").value = p.ID || "";
-        document.getElementById("Nombres").value = p.Nombres || "";
-        document.getElementById("ApellidoPaterno").value = p.ApellidoPaterno || "";
-        document.getElementById("ApellidoMaterno").value = p.ApellidoMaterno || "";
-        document.getElementById("DNI").value = p.DNI || "";
-        document.getElementById("Carrera").value = p.Carrera || "";
-        document.getElementById("Universidad").value = p.Universidad || "";
-        document.getElementById("Direccion").value = p.Direccion || "";
-        document.getElementById("Telefono").value = p.Telefono || "";
-        document.getElementById("Email").value = p.Email || "";
-
-        abrirModal();
-    } catch (err) {
-        alert("❌ Error al obtener datos del practicante: " + err.message);
-    }
-}
-
-
-// --- EVENTOS PRINCIPALES ---
-document.getElementById("btnNuevoPracticante").addEventListener("click", abrirModalNuevoPracticante);
-
-document.getElementById("formPracticante").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target).entries());
-    let res;
-
-    try {
-        if (modoEdicion) {
-            res = await api.actualizarPracticante(idEdicion, formData);
-        } else {
-            res = await api.crearPracticante(formData);
-        }
-
-        if (res.success) {
-            alert(modoEdicion ? "Practicante actualizado correctamente" : "Practicante creado con éxito");
-
-            cerrarModalPracticante();
-            await cargarPracticantes();
-
-            location.reload();
-
-        } else {
-            alert("❌ Error: " + res.message);
-        }
-    } catch (error) {
-        console.error("Error en formulario:", error);
-        alert("Error en la operación");
-    }
-});
-
-
-
-// Metodo para ver informacion del Practicante
-async function verPracticante(id) {
-    try {
-        const res = await api.getPracticante(id);
-        const p = res.data;
-
-        // Crear un modal personalizado
-        const modalHTML = `
-            <div id="modalVerPracticante" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999;">
-                <div style="background: white; border-radius: 16px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 20px; border-radius: 16px 16px 0 0; color: white;">
-                        <h3 style="margin: 0; font-size: 1.5rem;">Detalles del Practicante</h3>
-                    </div>
-                    
-                    <div style="padding: 30px;">
-                        <h4 style="text-align: center; color: #0f172a; font-size: 1.3rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #3b82f6;">
-                            ${p.Nombres} ${p.ApellidoPaterno} ${p.ApellidoMaterno}
-                        </h4>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">DNI:</strong> ${p.DNI}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Carrera:</strong> ${p.Carrera}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Universidad:</strong> ${p.Universidad}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Área:</strong> ${p.Area}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Dirección:</strong> ${p.Direccion}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Teléfono:</strong> ${p.Telefono}</p>
-                            <p style="margin: 8px 0; grid-column: 1 / -1;"><strong style="color: #1e40af;">Email:</strong> ${p.Email}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Fecha Registro:</strong> ${p.FechaRegistro}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Fecha Entrada:</strong> ${p.FechaEntrada}</p>
-                            <p style="margin: 8px 0;"><strong style="color: #1e40af;">Fecha Salida:</strong> ${p.FechaSalida}</p>
-                            <p style="margin: 8px 0; grid-column: 1 / -1; text-align: center;">
-                                <strong style="color: #1e40af;">Estado:</strong> 
-                                <span style="padding: 6px 16px; border-radius: 20px; background: ${p.Estado === 'Activo' ? '#dcfce7' : '#fee2e2'}; color: ${p.Estado === 'Activo' ? '#166534' : '#991b1b'}; font-weight: 600; display: inline-block; margin-left: 8px;">
-                                    ${p.Estado}
-                                </span>
-                            </p>
-                        </div>
-                        
-                        <div style="text-align: center; margin-top: 25px;">
-                            <button onclick="document.getElementById('modalVerPracticante').remove()" style="background: #3b82f6; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background 0.3s;">
-                                Cerrar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Insertar el modal en el body
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-        // Cerrar al hacer clic fuera del modal
-        document.getElementById('modalVerPracticante').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.remove();
-            }
-        });
-
-    } catch (err) {
-        alert("Error al obtener practicante: " + err.message);
-    }
-}
-
-
-async function eliminarPracticante(id) {
-    if (!confirm("¿Seguro que deseas eliminar este practicante?")) return;
-
-    try {
-        const res = await api.delete(`/practicantes/${id}`);
-        alert(res.message);
-        location.reload();
-    } catch (err) {
-        alert("Error al eliminar practicante: " + err.message);
-    }
-}
-
-// --- FUNCIÓN PARA CARGAR LA TABLA ---
-// Cargar practicantes desde el backend y renderizar tabla
-async function cargarPracticantes() {
-    try {
-        const response = await api.getPracticantes();
-        const practicantes = response.data || [];
-        console.log('Data de practicantes: ', response.data);
-
+    // Actualizar tabla de practicantes con el mismo filtrado que cargarPracticantes
+    function actualizarTablaPracticantes(practicantes) {
         const tbody = document.querySelector('#tablaPracticantes tbody');
         if (!tbody) {
             console.error('❌ No se encontró el tbody de la tabla de practicantes.');
@@ -328,12 +104,12 @@ async function cargarPracticantes() {
 
         tbody.innerHTML = '';
 
-        if (practicantes.length === 0) {
+        if (!practicantes || practicantes.length === 0) {
             tbody.innerHTML = `<tr><td colspan="8" class="text-center">No hay practicantes registrados</td></tr>`;
             return;
         }
 
-        // Obtener datos del usuario en sesión
+        // Obtener datos del usuario
         const nombreAreaUsuario = sessionStorage.getItem('nombreArea');
         const esRRHH = nombreAreaUsuario === 'Gerencia de Recursos Humanos';
 
@@ -362,17 +138,9 @@ async function cargarPracticantes() {
             const estadoClass = estadoDescripcion.toLowerCase();
             const estadoBadge = `<span class="status-badge status-${estadoClass}">${estadoDescripcion.toUpperCase()}</span>`;
 
-            console.log(esRRHH,
-                         areaNombre, 
-                         nombreAreaUsuario,
-                         estadoDescripcion);
             // Mostrar botón de aceptar solo si pertenece al área del usuario y es “Pendiente”
-            let mostrarBotonAceptar;
-            if (esRRHH) {
-                mostrarBotonAceptar = esRRHH && areaNombre === nombreAreaUsuario && estadoDescripcion === 'Pendiente';
-            } else {
-                mostrarBotonAceptar = areaNombre === nombreAreaUsuario && estadoDescripcion === 'Pendiente';
-            }
+            const mostrarBotonAceptar = !esRRHH && areaNombre === nombreAreaUsuario && estadoDescripcion === 'Pendiente';
+
             // Construir fila
             fila.innerHTML = `
                 <td>${p.PracticanteID}</td>
@@ -410,15 +178,945 @@ async function cargarPracticantes() {
                 fila.querySelector('.btn-warning').addEventListener('click', () => abrirModalAceptar(p.PracticanteID));
             }
         });
+    }
 
-    } catch (error) {
-        console.error('❌ Error al listar practicantes:', error);
-        const tbody = document.querySelector('#tablaPracticantes tbody');
-        if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error al cargar los practicantes</td></tr>`;
+
+
+    // 🔹 Abrir modal para EDITAR
+    async function abrirModalEditarPracticante(id) {
+        try {
+            console.log('Este es el id: ', id);
+            modoEdicion = true;
+            document.getElementById("tituloModalPracticante").textContent = "Editar Practicante";
+
+            const res = await api.getPracticante(id);
+            idEdicion = id;
+            const p = res.data;
+
+            // Rellenar campos del formulario
+            document.getElementById("practicanteID").value = p.ID || "";
+            document.getElementById("Nombres").value = p.Nombres || "";
+            document.getElementById("ApellidoPaterno").value = p.ApellidoPaterno || "";
+            document.getElementById("ApellidoMaterno").value = p.ApellidoMaterno || "";
+            document.getElementById("DNI").value = p.DNI || "";
+            document.getElementById("Carrera").value = p.Carrera || "";
+            document.getElementById("Universidad").value = p.Universidad || "";
+            document.getElementById("Direccion").value = p.Direccion || "";
+            document.getElementById("Telefono").value = p.Telefono || "";
+            document.getElementById("Email").value = p.Email || "";
+
+            abrirModal();
+        } catch (err) {
+            mostrarAlerta({tipo:'error', titulo: 'Error', 
+                    mensaje: "Error al obtener datos del practicante"});
         }
     }
-}
+
+    // Metodo para ver informacion del Practicante
+    async function verPracticante(id) {
+        try {
+            const res = await api.getPracticante(id);
+            const p = res.data;
+
+            let genero = p.Genero === 'M' ? 'Masculino' : 'Femenino';
+
+            // Crear un modal personalizado
+            const fecha = (v) => v && v !== "0000-00-00" ? v : "-";
+
+            const modalHTML = `
+            <style>
+                #modalVerPracticante {
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(0,0,0,0.45);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                    padding: 20px;
+                    backdrop-filter: blur(2px);
+                }
+
+                #modalVerPracticante .modal-container {
+                    background: white;
+                    border-radius: 14px;
+                    width: 90%;
+                    max-width: 700px;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 15px 45px rgba(0,0,0,0.25);
+                    animation: fadeIn 0.25s ease-out;
+                }
+
+                #modalVerPracticante .modal-header {
+                    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+                    padding: 20px;
+                    border-radius: 14px 14px 0 0;
+                    color: white;
+                }
+
+                #modalVerPracticante .modal-header h3 {
+                    margin: 0;
+                    font-size: 1.6rem;
+                }
+
+                #modalVerPracticante .modal-body {
+                    padding: 30px;
+                }
+
+                #modalVerPracticante .modal-nombre {
+                    text-align: center;
+                    color: #1e293b;
+                    font-size: 1.4rem;
+                    margin-bottom: 20px;
+                    padding-bottom: 12px;
+                    border-bottom: 2px solid #2563eb;
+                }
+
+                #modalVerPracticante .modal-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 14px 20px;
+                }
+
+                #modalVerPracticante .modal-grid p {
+                    margin: 0;
+                    color: #334155;
+                }
+
+                #modalVerPracticante .col-span {
+                    grid-column: 1 / -1;
+                }
+
+                #modalVerPracticante .estado {
+                    text-align: center;
+                }
+
+                #modalVerPracticante .badge {
+                    padding: 6px 16px;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    margin-left: 6px;
+                    display: inline-block;
+                }
+
+                #modalVerPracticante .badge.activo {
+                    background: #dcfce7;
+                    color: #166534;
+                }
+
+                #modalVerPracticante .badge.inactivo {
+                    background: #fee2e2;
+                    color: #991b1b;
+                }
+
+                #modalVerPracticante .modal-footer {
+                    text-align: center;
+                    margin-top: 25px;
+                }
+
+                #modalVerPracticante .btn-cerrar {
+                    background: #2563eb;
+                    color: white;
+                    border: none;
+                    padding: 12px 30px;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: background .25s;
+                }
+
+                #modalVerPracticante .btn-cerrar:hover {
+                    background: #1d4ed8;
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: scale(.95); }
+                    to { opacity: 1; transform: scale(1); }
+                }
+            </style>
+
+            <div id="modalVerPracticante">
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h3>Detalles del Practicante</h3>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <h4 class="modal-nombre">
+                            ${p.Nombres} ${p.ApellidoPaterno} ${p.ApellidoMaterno}
+                        </h4>
+
+                        <div class="modal-grid">
+                            <p><strong>Género:</strong> ${genero}</p>
+                            <p><strong>DNI:</strong> ${p.DNI}</p>
+                            <p><strong>Carrera:</strong> ${p.Carrera}</p>
+                            <p><strong>Universidad:</strong> ${p.Universidad}</p>
+                            <p><strong>Área:</strong> ${p.Area}</p>
+                            <p><strong>Dirección:</strong> ${p.Direccion}</p>
+                            <p><strong>Teléfono:</strong> ${p.Telefono}</p>
+                            <p class="col-span"><strong>Email:</strong> ${p.Email}</p>
+                            <p><strong>Fecha Registro:</strong> ${fecha(p.FechaRegistro)}</p>
+                            <p><strong>Fecha Entrada:</strong> ${fecha(p.FechaEntrada)}</p>
+                            <p><strong>Fecha Salida:</strong> ${fecha(p.FechaSalida)}</p>
+
+                            <p class="col-span estado">
+                                <strong>Estado:</strong>
+                                <span class="badge ${p.Estado === 'Activo' ? 'activo' : 'inactivo'}">
+                                    ${p.Estado}
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn-cerrar" onclick="document.getElementById('modalVerPracticante').remove()">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
 
 
-cargarPracticantes();
+            // Insertar el modal en el body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+            // Cerrar al hacer clic fuera del modal
+            document.getElementById('modalVerPracticante').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.remove();
+                }
+            });
+
+        } catch (err) {
+            mostrarAlerta({tipo:'error', titulo: 'Error', 
+                    mensaje: "Error al obtener practicante: " + err.message});
+        }
+    }
+
+
+    async function eliminarPracticante(id) {
+
+        if (!(await mostrarAlerta({
+            tipo: 'warning',
+            titulo: '¿Estás seguro?',
+            mensaje: "¿Seguro que deseas eliminar este practicante?",
+            showCancelButton: true
+        })).isConfirmed) {
+            return; // CANCELADO → salir sin continuar
+        }
+
+        // 🟢 CONFIRMADO → seguimos con el flujo
+        try {
+            const res = await api.delete(`/practicantes/${id}`);
+            cargarPracticantes();
+            mostrarAlerta({
+                tipo: 'success',
+                titulo: 'Eliminado',
+                mensaje: res.message
+            });
+        } catch (err) {
+            mostrarAlerta({
+                tipo: 'error',
+                titulo: 'Error',
+                mensaje: "Error al eliminar: " + err.message
+            });
+        }
+    }
+
+
+    // --- FUNCIÓN PARA CARGAR LA TABLA ---
+    // Cargar practicantes desde el backend y renderizar tabla
+    async function cargarPracticantes() {
+        try {
+            const response = await api.getPracticantes();
+            const practicantes = response.data || [];
+
+            const tbody = document.querySelector('#tablaPracticantes tbody');
+            if (!tbody) {
+                console.error('❌ No se encontró el tbody de la tabla de practicantes.');
+                return;
+            }
+
+            tbody.innerHTML = '';
+
+            if (practicantes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center">No hay practicantes registrados</td></tr>`;
+                return;
+            }
+
+            // Obtener datos del usuario en sesión
+            const nombreAreaUsuario = sessionStorage.getItem('nombreArea');
+            const esRRHH = nombreAreaUsuario === 'Gerencia de Recursos Humanos';
+
+            // Filtrar practicantes según el área si NO es RRHH
+            const practicantesFiltrados = esRRHH
+                ? practicantes
+                : practicantes.filter(p => {
+                    const areaPracticante = p.NombreArea || p.Area;
+                    return areaPracticante === nombreAreaUsuario;
+                });
+
+            if (practicantesFiltrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center">No hay practicantes registrados para tu área</td></tr>`;
+                return;
+            }
+
+            practicantesFiltrados.forEach(p => {
+                const fila = document.createElement('tr');
+
+                // Normalizar nombres y propiedades
+                const estadoDescripcion = p.EstadoDescripcion || p.Estado || 'Pendiente';
+                const areaNombre = p.NombreArea || p.Area || '-';
+                const nombreCompleto = p.NombreCompleto || `${p.Nombres || ''} ${p.ApellidoPaterno || ''} ${p.ApellidoMaterno || ''}`.trim();
+
+                // Badge de estado
+                const estadoClass = estadoDescripcion.toLowerCase();
+                const estadoBadge = `<span class="status-badge status-${estadoClass}">${estadoDescripcion.toUpperCase()}</span>`;
+
+                // Mostrar botón de aceptar solo si pertenece al área del usuario y es “Pendiente”
+                let mostrarBotonAceptar;
+                if (esRRHH) {
+                    mostrarBotonAceptar = esRRHH && areaNombre === nombreAreaUsuario && estadoDescripcion === 'Pendiente';
+                } else {
+                    mostrarBotonAceptar = areaNombre === nombreAreaUsuario && estadoDescripcion === 'Pendiente';
+                }
+                // Construir fila
+                fila.innerHTML = `
+                    <td>${p.PracticanteID}</td>
+                    <td>${p.DNI}</td>
+                    <td>${nombreCompleto}</td>
+                    <td>${p.Carrera || '-'}</td>
+                    <td>${p.Universidad || '-'}</td>
+                    <td>${p.FechaRegistro ? new Date(p.FechaRegistro).toLocaleDateString() : '-'}</td>
+                    <td>${areaNombre}</td>
+                    <td>${estadoBadge}</td>
+                    <td>
+                        <button class="btn-primary" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-success" title="Ver">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${mostrarBotonAceptar ? `
+                            <button class="btn-warning" title="Aceptar">
+                                <i class="fas fa-check"></i>
+                            </button>` : ''}
+                        <button class="btn-danger" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+
+                tbody.appendChild(fila);
+
+                // Asignar eventos
+                fila.querySelector('.btn-primary').addEventListener('click', () => abrirModalEditarPracticante(p.PracticanteID));
+                fila.querySelector('.btn-success').addEventListener('click', () => verPracticante(p.PracticanteID));
+                fila.querySelector('.btn-danger').addEventListener('click', () => eliminarPracticante(p.PracticanteID));
+                if (mostrarBotonAceptar) {
+                    fila.querySelector('.btn-warning').addEventListener('click', () => abrirModalAceptar(p.PracticanteID));
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Error al listar practicantes:', error);
+            const tbody = document.querySelector('#tablaPracticantes tbody');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Error al cargar los practicantes</td></tr>`;
+            }
+        }
+    }
+    // ===================================== MENSAJES Y PRACTICANTES ====================================
+
+    // 🔹 Variables globales
+    let turnosDisponibles = [];
+    const areaID = () => sessionStorage.getItem('areaID');
+    const esRRHH = () => sessionStorage.getItem('rolArea') === 'RRHH';
+
+
+    async function inicializarModulo() {
+        await cargarAreasFiltro();
+    }
+
+    // ===================================== MENSAJES ====================================
+
+    // 🔹 Abrir modal de mensajes
+    document.getElementById('btnMensajes')?.addEventListener('click', async () => {
+        try {
+            const areaUsuario = areaID();
+            
+            const response = await api.listarMensajes(areaUsuario);
+            
+            if (response.success) {
+                mostrarMensajes(response.data);
+                openModal('modalMensajes');
+            } else {
+                mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                    mensaje: 'Error al cargar mensajes: ' + response.message});
+
+            }
+        } catch (error) {
+            mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                    mensaje: 'No se pudieron cargar los mensajes'});
+        }
+    });
+
+    // 🔹 Mostrar lista de mensajes
+    function mostrarMensajes(mensajes) {
+        const container = document.getElementById('listaMensajes');
+        
+        if (!mensajes || mensajes.length === 0) {
+            container.innerHTML = '<p class="empty-message">No hay mensajes disponibles</p>';
+            return;
+        }
+        
+        container.innerHTML = mensajes.map(msg => crearMensajeHTML(msg)).join('');
+    }
+
+    // 🔹 Crear HTML de un mensaje
+    function crearMensajeHTML(msg) {
+        const estadoSolicitud = msg.EstadoSolicitud || 'En revisión';
+        const estadoClass = obtenerClaseEstado(estadoSolicitud);
+        
+        return `
+            <div class="mensaje-item" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong>${msg.NombrePracticante}</strong>
+                    <div>
+                        <span class="badge ${estadoClass}">${estadoSolicitud}</span>
+                        <button class="btn-eliminar" 
+                                title="Eliminar mensaje" 
+                                onclick="eliminarMensaje(${msg.MensajeID})"
+                                style="margin-left: 10px;">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+                <p><strong>De:</strong> ${msg.AreaRemitente} <strong>Para:</strong> ${msg.AreaDestino}</p>
+                <p>${msg.Contenido}</p>
+                <small>${new Date(msg.FechaEnvio).toLocaleString()}</small>
+                ${msg.TipoMensaje === 'solicitud' && !msg.Leido ? 
+                    `<button onclick="responderSolicitud(${msg.MensajeID}, ${msg.SolicitudID})" 
+                            class="btn-primary" 
+                            style="margin-top: 10px;">
+                        Responder
+                    </button>` : ''}
+            </div>
+        `;
+    }
+
+    // 🔹 Eliminar mensaje
+    async function eliminarMensaje(mensajeID) {
+        if (!(await mostrarAlerta({
+            tipo: 'warning',
+            titulo: '¿Estás seguro?',
+            mensaje: "¿Seguro que deseas eliminar este mensaje?",
+            showCancelButton: true
+        })).isConfirmed) {
+            return; // CANCELADO → salir sin continuar
+        }
+
+        try {
+            const respuesta = await api.eliminarMensaje(mensajeID);
+            
+            if (respuesta.success) {
+                mostrarAlerta({tipo: 'success', titulo: 'Eliminado', 
+                    mensaje: respuesta.message});
+                
+                
+                // Recargar mensajes
+                const response = await api.listarMensajes(areaID());
+                if (response.success) {
+                    mostrarMensajes(response.data);
+                }
+            } else {
+                mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                    mensaje: respuesta.message || "No se pudo eliminar el mensaje."});
+            }
+        } catch (error) {
+            mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                    mensaje: "Error al eliminar mensaje."});
+        }
+    }
+
+    // 🔹 Cerrar modal de mensajes
+    function cerrarModalMensajes() {
+        closeModal('modalMensajes');
+    }
+
+    // ===================================== PRACTICANTES ====================================
+
+    // 🔹 Actualizar tabla de practicantes
+    function actualizarTablaPracticantes(practicantes) {
+        const tbody = document.querySelector('#tablaPracticantes tbody');
+        
+        if (!tbody) {
+            console.warn('No se encontró el tbody de la tabla de practicantes');
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        
+        if (!practicantes || practicantes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay practicantes registrados</td></tr>';
+            return;
+        }
+        
+        const areaUsuario = areaID();
+        const esAreaRRHH = esRRHH();
+        
+        practicantes.forEach(p => {
+            const tr = document.createElement('tr');
+            const mostrarBotonAceptar = !esAreaRRHH && 
+                                    p.AreaID == areaUsuario && 
+                                    p.EstadoDescripcion === 'Pendiente';
+            
+            tr.innerHTML = crearFilaPracticante(p, mostrarBotonAceptar);
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 🔹 Crear HTML de fila de practicante
+    function crearFilaPracticante(p, mostrarBotonAceptar) {
+        return `
+            <td>${p.PracticanteID}</td>
+            <td>${p.DNI}</td>
+            <td>${p.Nombres} ${p.ApellidoPaterno} ${p.ApellidoMaterno}</td>
+            <td>${p.Carrera}</td>
+            <td>${p.Universidad}</td>
+            <td>${p.FechaRegistro ? new Date(p.FechaRegistro).toLocaleDateString() : '-'}</td>
+            <td>${p.NombreArea || '-'}</td>
+            <td><span class="badge ${obtenerClaseEstado(p.EstadoDescripcion)}">${p.EstadoDescripcion || 'Pendiente'}</span></td>
+            <td>
+                <button onclick="verPracticante(${p.PracticanteID})" 
+                        class="btn-info btn-sm" 
+                        title="Ver">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button onclick="editarPracticante(${p.PracticanteID})" 
+                        class="btn-warning btn-sm" 
+                        title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="eliminarPracticante(${p.PracticanteID})" 
+                        class="btn-danger btn-sm" 
+                        title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+                ${mostrarBotonAceptar ? `
+                    <button onclick="abrirModalAceptar(${p.PracticanteID})" 
+                            class="btn-success btn-sm" 
+                            title="Aceptar/Rechazar">
+                        <i class="fas fa-check"></i>
+                    </button>
+                ` : ''}
+            </td>
+        `;
+    }
+
+    // ===================================== MODAL ACEPTAR/RECHAZAR ====================================
+
+    // 🔹 Abrir modal para aceptar/rechazar practicante
+    async function abrirModalAceptar(practicanteID) {
+        try {
+            // Obtener solicitud del practicante
+            const responseSolicitud = await api.obtenerSolicitudPorPracticante(practicanteID);
+            
+            if (!responseSolicitud.success || !responseSolicitud.data) {
+                mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                    mensaje: "No se pudo obtener la solicitud del practicante."});
+                return;
+            }
+            
+            const solicitudID = responseSolicitud.data.SolicitudID;
+            
+            // Asignar valores a los campos ocultos
+            document.getElementById('aceptarPracticanteID').value = practicanteID;
+            document.getElementById('aceptarSolicitudID').value = solicitudID;
+            
+            // Cargar información del practicante
+            const responsePracticante = await api.getPracticante(practicanteID);
+            
+            if (responsePracticante.success) {
+                mostrarInfoPracticante(responsePracticante.data);
+            }
+            
+            // Abrir modal
+            openModal('modalAceptarPracticante');
+            
+        } catch (error) {
+            mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                    mensaje: "Error al cargar información del practicante"});
+        }
+    }
+
+    // 🔹 Mostrar información del practicante
+    function mostrarInfoPracticante(p) {
+        const infoContainer = document.getElementById('infoPracticante');
+        
+        if (!infoContainer) {
+            console.warn('No se encontró el contenedor de información del practicante');
+            return;
+        }
+        
+        infoContainer.innerHTML = `
+            <h4>${p.Nombres} ${p.ApellidoPaterno} ${p.ApellidoMaterno}</h4>
+            <p><strong>DNI:</strong> ${p.DNI}</p>
+            <p><strong>Carrera:</strong> ${p.Carrera}</p>
+            <p><strong>Universidad:</strong> ${p.Universidad}</p>
+            <p><strong>Email:</strong> ${p.Email}</p>
+            <p><strong>Teléfono:</strong> ${p.Telefono}</p>
+        `;
+    }
+
+    // 🔹 Cerrar modal de aceptar
+    function cerrarModalAceptar() {
+        closeModal('modalAceptarPracticante');
+        document.getElementById('formAceptarPracticante')?.reset();
+        document.getElementById('camposAceptacion').style.display = 'none';
+    }
+
+    // ===================================== TURNOS ====================================
+
+
+    // ===================================== FORMULARIO ACEPTAR/RECHAZAR ====================================
+
+    // 🔹 Manejar cambio de decisión (aceptar/rechazar)
+    function manejarCambioDecision() {
+        const decision = document.getElementById('decisionAceptacion');
+        const camposAceptacion = document.getElementById('camposAceptacion');
+        
+        if (!decision || !camposAceptacion) return;
+
+        if (decision.value === 'aceptar') {
+            camposAceptacion.style.display = 'block';
+            
+            // Establecer campos como requeridos
+            ['fechaEntrada', 'fechaSalida'].forEach(id => {
+                const campo = document.getElementById(id);
+                if (campo) campo.required = true;
+            });
+            
+        } else {
+            camposAceptacion.style.display = 'none';
+            
+            // Quitar campos requeridos
+            ['fechaEntrada', 'fechaSalida'].forEach(id => {
+                const campo = document.getElementById(id);
+                if (campo) campo.required = false;
+            });
+            
+            // Limpiar turnos
+            if (contenedorTurnos) {
+                contenedorTurnos.innerHTML = '';
+            }
+        }
+    }
+
+    // 🔹 Procesar aceptación de practicante
+    async function procesarAceptacion(practicanteID, solicitudID, mensajeRespuesta) {
+        const fechaEntradaVal = document.getElementById('fechaEntrada')?.value;
+        const fechaSalidaVal  = document.getElementById('fechaSalida')?.value;
+
+        if (!fechaEntradaVal || !fechaSalidaVal) {
+            mostrarAlerta({tipo:'info', mensaje:'Debes ingresar las fechas de entrada y salida.'});
+            return false;
+        }
+
+        // Helper: parsear "YYYY-MM-DD" a Date local (evita offset UTC)
+        function parseFechaInput(dateStr) {
+            const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!m) return new Date(NaN);
+            const year  = Number(m[1]);
+            const month = Number(m[2]) - 1; // months 0-11
+            const day   = Number(m[3]);
+            return new Date(year, month, day);
+        }
+
+        const entrada = parseFechaInput(fechaEntradaVal);
+        const salida  = parseFechaInput(fechaSalidaVal);
+
+        // Validar que las fechas sean válidas
+        if (isNaN(entrada) || isNaN(salida)) {
+            mostrarAlerta({tipo:'error', mensaje:'Formato de fecha inválido.'});
+            return false;
+        }
+
+        // Fecha "hoy" sin hora
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        // Validaciones requeridas:
+        // 1) fechaEntrada no puede ser anterior a hoy
+        if (entrada < hoy) {
+            mostrarAlerta({tipo:'warning', mensaje:'La fecha de entrada no puede ser anterior a hoy.'});
+            return false;
+        }
+
+        // 2) fechaSalida no puede ser menor que fechaEntrada
+        if (salida < entrada) {
+            mostrarAlerta({tipo:'warning', mensaje:'La fecha de salida no puede ser anterior a la fecha de entrada.'});
+            return false;
+        }
+
+        // (Opcional) 3) si quieres evitar reservas de 0 noches, exigir salida > entrada:
+        if (salida <= entrada) {
+            mostrarAlerta({tipo:'warning', mensaje:'La fecha de salida debe ser posterior a la fecha de entrada.'});
+            return false;
+        }
+
+
+
+
+        const btn = document.getElementById("btnEnviarRespuesta");
+
+        try {
+            const result = await ejecutarUnaVez(btn, async () => {
+                console.log(
+                    'Se envia: ', {
+                        practicanteID,
+                        solicitudID,
+                        fechaEntradaVal,
+                        fechaSalidaVal
+                    }
+                );
+                console.log(entrada, salida);
+                const response = await api.aceptarPracticante({
+                    practicanteID: parseInt(practicanteID),
+                    solicitudID: parseInt(solicitudID),
+                    areaID: parseInt(areaID()),
+                    fechaEntradaVal,
+                    fechaSalidaVal,
+                    mensajeRespuesta
+                });
+                console.log(response);
+                if (!response.success) throw new Error(response.message || "Error al aceptar solicitud");
+                return response;
+            });
+
+            if (result.success) {
+                mostrarAlerta({tipo:'success', titulo:'Aceptado', mensaje:'Practicante aceptado correctamente'});
+                cargarPracticantes();
+                cerrarModalAceptar();
+                return true;
+            } else {
+                mostrarAlerta({tipo:'error', titulo:'Error', mensaje:response.message});
+                return false;
+            }
+        } catch (error) {
+            mostrarAlerta({tipo:'error', titulo:'Error', mensaje:'Error al aceptar practicante' + error});
+            return false;
+        }
+    }
+
+    // 🔹 Procesar rechazo de practicante
+    async function procesarRechazo(practicanteID, solicitudID, mensajeRespuesta) {
+        const btn = document.getElementById("btnEnviarRespuesta");
+        try {
+            const result = await ejecutarUnaVez(btn, async () => {
+                const response = await api.rechazarPracticante({
+                    practicanteID: parseInt(practicanteID),
+                    solicitudID: parseInt(solicitudID),
+                    mensajeRespuesta
+                });
+                if (!response.success) throw new Error(response.message || "Error al recharzar solicitud");
+                return response;
+            });
+
+            if (result.success) {
+                mostrarAlerta({tipo:'info', mensaje:'Practicante rechazado correctamente'});
+                cerrarModalAceptar();
+                return true;
+            } else {
+                mostrarAlerta({tipo:'error', titulo:'Error', mensaje:response.message});
+                return false;
+            }
+        } catch (error) {
+            mostrarAlerta({tipo:'error', titulo:'Error', mensaje:'Error al rechazar practicante'});
+            return false;
+        }
+    }
+
+    // ===================================== EVENT LISTENERS ====================================
+
+    function configurarEventListeners() {
+        console.log('Configurando event listeners');
+        
+        // Botón nuevo practicante
+        const btnNuevo = document.getElementById("btnNuevoPracticante");
+        if (btnNuevo) {
+            // Primero remueve cualquier listener previo (opcional pero recomendado)
+            btnNuevo.removeEventListener("click", abrirModalNuevoPracticante);
+            btnNuevo.addEventListener("click", abrirModalNuevoPracticante);
+        }
+
+        // Formulario practicante
+        const formPracticante = document.getElementById("formPracticante");
+        if (formPracticante) {
+            // Remueve listeners previos para evitar duplicados
+            const nuevoForm = formPracticante.cloneNode(true);
+            formPracticante.parentNode.replaceChild(nuevoForm, formPracticante);
+            
+            // Ahora registra el listener una sola vez
+            nuevoForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const formData = Object.fromEntries(new FormData(e.target).entries());
+                console.log(formData);
+                let res;
+
+                try {
+                    if (modoEdicion) {
+                        res = await api.actualizarPracticante(idEdicion, formData);
+                    } else {
+                        res = await api.crearPracticante(formData);
+                    }
+
+                    if (res.success) {
+                        message = modoEdicion ? "Practicante actualizado correctamente" : "Practicante registrado con éxito"
+                        titulo = modoEdicion ? "Actualizado" : "Registrado"
+                        mostrarAlerta({tipo:'success', titulo: titulo, mensaje: message});
+                        cerrarModalPracticante();
+                        await cargarPracticantes();
+                    } else {
+                        mostrarAlerta({tipo:'error', titulo: 'Error', mensaje: res.message});
+                    }
+                } catch (error) {
+                    mostrarAlerta({tipo:'error', titulo: 'Error', mensaje: "Error en formulario: " + error.message});
+                }
+            });
+        }
+
+        // Select de decisión
+        const decisionSelect = document.getElementById('decisionAceptacion');
+        if (decisionSelect) {
+            decisionSelect.removeEventListener('change', manejarCambioDecision);
+            decisionSelect.addEventListener('change', manejarCambioDecision);
+        }
+
+        
+        // Formulario de aceptar/rechazar
+        const formAceptar = document.getElementById('formAceptarPracticante');
+        if (formAceptar) {
+            formAceptar.addEventListener('submit', manejarSubmitAceptar);
+        }
+        
+        // Botón enviar solicitud a área
+        const btnEnviarSolicitud = document.getElementById('btnEnviarSolicitudArea');
+        if (btnEnviarSolicitud) {
+            btnEnviarSolicitud.addEventListener('click', () => {
+                openModal('modalEnviarSolicitud');
+            });
+        }
+    }
+
+    // 🔹 Manejar submit del formulario de aceptar/rechazar
+    async function manejarSubmitAceptar(e) {
+        e.preventDefault();
+
+        const decision = document.getElementById('decisionAceptacion')?.value;
+        const practicanteID = document.getElementById('aceptarPracticanteID')?.value;
+        const solicitudID = document.getElementById('aceptarSolicitudID')?.value;
+        const mensajeRespuesta = document.getElementById('mensajeRespuesta')?.value;
+
+        if (!decision || !practicanteID || !solicitudID) {
+            mostrarAlerta({tipo:'info', mensaje:'Faltan datos en el formulario'});
+            return;
+        }
+
+        if (decision === 'aceptar') {
+            await procesarAceptacion(practicanteID, solicitudID, mensajeRespuesta);
+        } else if (decision === 'rechazar') {
+            await procesarRechazo(practicanteID, solicitudID, mensajeRespuesta);
+        }
+    }
+
+    // ===================================== UTILIDADES ====================================
+
+    // 🔹 Obtener clase CSS según estado
+    function obtenerClaseEstado(estado) {
+        const estados = {
+            'Vigente': 'badge-success',
+            'Aprobado': 'badge-success',
+            'Rechazado': 'badge-danger',
+            'Pendiente': 'badge-warning',
+            'En revisión': 'badge-warning'
+        };
+        return estados[estado] || 'badge-secondary';
+    }
+
+    // 🔹 Abrir modal genérico
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    // 🔹 Cerrar modal genérico
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // 🔹 Cerrar modal de enviar solicitud
+    function cerrarModalEnviarSolicitud() {
+        closeModal('modalEnviarSolicitud');
+        document.getElementById('formEnviarSolicitud')?.reset();
+    }
+
+    function mostrarAlerta({
+        tipo = "info",
+        titulo = "",
+        mensaje = "",
+        showConfirmButton = true,
+        showCancelButton = false,
+        confirmText = "Aceptar",
+        cancelText = "Cancelar",
+        input = null,
+        inputPlaceholder = "",
+        inputValue = "",
+        callback = null
+    }) {
+        
+        // IMPORTANTE: devolver la promesa
+        return Swal.fire({
+            icon: tipo,
+            title: titulo,
+            text: mensaje,
+            position: "center",
+            showConfirmButton,
+            showCancelButton,
+            confirmButtonText: confirmText,
+            cancelButtonText: cancelText,
+            input,
+            inputPlaceholder,
+            inputValue,
+            backdrop: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+        }).then((result) => {
+            if (callback) callback(result);
+            return result; // También devolver el resultado
+        });
+    }
+
+    // ===================================== FUNCIONES GLOBALES ====================================
+    // Estas funciones deben estar disponibles globalmente para los onclick en HTML
+
+    window.eliminarMensaje = eliminarMensaje;
+    window.abrirModalAceptar = abrirModalAceptar;
+    window.cerrarModalAceptar = cerrarModalAceptar;
+    window.cerrarModalMensajes = cerrarModalMensajes;
+    window.cerrarModalEnviarSolicitud = cerrarModalEnviarSolicitud;
+    window.actualizarTablaPracticantes = actualizarTablaPracticantes;
+    window.cerrarModalPracticante = cerrarModalPracticante;
+
+
+    cargarPracticantes();
+};
+
+

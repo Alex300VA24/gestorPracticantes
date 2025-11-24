@@ -231,11 +231,12 @@ class AsistenciaRepository {
     /**
      * Obtener asistencias por área con información completa
      */
-    public function obtenerAsistenciasPorArea($areaID) {
+    public function obtenerAsistenciasPorArea($areaID, $fecha = null) {
         try {
             error_log("===> Repository obtenerAsistenciasPorArea con areaID: $areaID");
 
-            $fechaHoy = date('Y-m-d');
+            // Si no hay fecha específica, usar fecha de hoy
+            $fechaConsulta = $fecha ?? date('Y-m-d');
 
             $sql = "
                 SELECT 
@@ -273,15 +274,19 @@ class AsistenciaRepository {
                     AND eS.Abreviatura = 'APR'
                 ORDER BY 
                     p.Nombres, p.ApellidoPaterno, p.ApellidoMaterno;
-
             ";
 
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$fechaHoy, $areaID]);
-            $asistencias = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $stmt->execute([$fechaConsulta, $areaID]);
+            $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Agregar pausas a cada asistencia
             foreach ($asistencias as &$asistencia) {
+                // Agregar la fecha consultada si no existe (para registros sin asistencia)
+                if (!$asistencia['Fecha']) {
+                    $asistencia['Fecha'] = $fechaConsulta;
+                }
+                
                 if ($asistencia['AsistenciaID']) {
                     $asistencia['Pausas'] = $this->obtenerPausas($asistencia['AsistenciaID']);
                     
@@ -300,12 +305,13 @@ class AsistenciaRepository {
                     $asistencia['TiempoPausas'] = 0;
                 }
             }
+            unset($asistencia); // Romper la referencia
 
-            error_log("===> Resultado obtenido: " . count($asistencias) . " registros");
+            error_log("===> Resultado obtenido: " . count($asistencias) . " registros para fecha: $fechaConsulta");
 
             return [
                 'success' => true,
-                'data' => $asistencias
+                'data' => $asistencias  // Ahora sí retorna el array modificado
             ];
 
         } catch (\Throwable $e) {
@@ -335,7 +341,7 @@ class AsistenciaRepository {
             
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([$practicanteID, $fecha]);
-            $asistencia = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $asistencia = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if (!$asistencia) {
                 return null;

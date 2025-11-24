@@ -31,18 +31,29 @@ class MensajeRepository {
     public function eliminarMensaje($mensajeID)
     {
         try {
-            // 🔹 Preparamos el DELETE directo
+            // 🔹 1. Eliminar el mensaje
             $sql = "DELETE FROM Mensajes WHERE MensajeID = :mensajeID";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':mensajeID', $mensajeID, PDO::PARAM_INT);
-            
             $stmt->execute();
 
-            // 🔹 Verificamos si realmente eliminó algo
             if ($stmt->rowCount() > 0) {
+
+                // 🔹 2. Obtener el MAX actual de MensajeID
+                $sqlMax = "SELECT ISNULL(MAX(MensajeID), 0) AS MaxID FROM Mensajes";
+                $stmtMax = $this->conn->prepare($sqlMax);
+                $stmtMax->execute();
+                $row = $stmtMax->fetch(PDO::FETCH_ASSOC);
+                $maxID = $row['MaxID'];
+
+                // 🔹 3. Reiniciar el IDENTITY
+                // NOTA: DBCC necesita ejecutarse con prepare() normal sin parámetros dinámicos
+                $sqlReseed = "DBCC CHECKIDENT ('Mensajes', RESEED, $maxID)";
+                $this->conn->exec($sqlReseed);
+
                 return [
                     'success' => true,
-                    'message' => 'Mensaje eliminado correctamente.'
+                    'message' => 'Mensaje eliminado'
                 ];
             } else {
                 return [
@@ -50,6 +61,7 @@ class MensajeRepository {
                     'message' => 'No se encontró el mensaje o ya fue eliminado.'
                 ];
             }
+
         } catch (\PDOException $e) {
             return [
                 'success' => false,
@@ -57,6 +69,7 @@ class MensajeRepository {
             ];
         }
     }
+
 
 
 

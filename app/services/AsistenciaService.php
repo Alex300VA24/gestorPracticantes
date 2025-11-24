@@ -168,13 +168,13 @@ class AsistenciaService {
     /**
      * Listar asistencias por área
      */
-    public function listarAsistencias($areaID) {
+    public function listarAsistencias($areaID, $fecha = null) {
         try {
             if (!$areaID) {
                 throw new \Exception("El área del usuario no está definida.");
             }
 
-            $asistencias = $this->repository->obtenerAsistenciasPorArea($areaID);
+            $asistencias = $this->repository->obtenerAsistenciasPorArea($areaID, $fecha);
             return $asistencias;
 
         } catch (\Throwable $e) {

@@ -66,6 +66,7 @@ class PracticanteService {
         $p->setNombres($nombres);
         $p->setApellidoPaterno($apellidoP ?? '');
         $p->setApellidoMaterno($apellidoM ?? '');
+        $p->setGenero($datos['genero'] ?? '');
         $p->setCarrera($datos['Carrera']);
         $p->setEmail($datos['Email'] ?? null);
         $p->setTelefono($datos['Telefono'] ?? null);
@@ -81,6 +82,7 @@ class PracticanteService {
     }
 
     public function actualizar($id, $data) {
+        error_log("Este es el valor de id: " . $id);
         return $this->repo->actualizar($id, $data);
     }
 
@@ -99,6 +101,10 @@ class PracticanteService {
 
     public function rechazarPracticante($practicanteID, $solicitudID, $mensajeRespuesta) {
         return $this->repo->rechazarPracticante($practicanteID, $solicitudID, $mensajeRespuesta);
+    }
+
+    public function listarNombresPracticantes() {
+        return $this->repo->listarNombresPracticantes();
     }
 
 

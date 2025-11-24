@@ -484,6 +484,7 @@
 }
 
 #formPracticante input,
+#formPracticante select,
 #formAceptarPracticante input:not([type="checkbox"]),
 #formAceptarPracticante select,
 #formAceptarPracticante textarea {
@@ -499,12 +500,14 @@
 }
 
 #formPracticante input::placeholder,
+#formPracticante select::placeholder,
 #formAceptarPracticante input::placeholder,
 #formAceptarPracticante textarea::placeholder {
     color: var(--gray-400);
 }
 
 #formPracticante input:hover,
+#formPracticante select:hover,
 #formAceptarPracticante input:hover,
 #formAceptarPracticante select:hover,
 #formAceptarPracticante textarea:hover {
@@ -512,6 +515,7 @@
 }
 
 #formPracticante input:focus,
+#formPracticante select:focus,
 #formAceptarPracticante input:focus,
 #formAceptarPracticante select:focus,
 #formAceptarPracticante textarea:focus {
@@ -1135,3 +1139,6 @@
     }
 }
 
+.swal2-container {
+    z-index: 99999 !important;
+}

@@ -2,35 +2,33 @@
 namespace App\Controllers;
 
 use App\Services\DashboardService;
+use App\Config\Database;
 
 class DashboardController {
     private $service;
+    private $db;
 
     public function __construct() {
         $this->service = new DashboardService();
+        $this->db = Database::getInstance()->getConnection();
     }
 
     public function obtenerDatosInicio() {
         header('Content-Type: application/json');
 
         try {
-            // Leer área desde query string (?areaID=3)
+            // Obtener parámetros
             $areaID = $_GET['areaID'] ?? null;
+            $usuarioID = $_SESSION['usuarioID'] ?? null;
+            $cargoID = $_SESSION['cargoID'] ?? null;
 
-            // Crear texto de depuración
-            $debugData = [
-                'timestamp' => date('Y-m-d H:i:s'),
-                'areaID_recibido' => $areaID,
-                'query_string' => $_SERVER['QUERY_STRING'] ?? '',
-                'request_uri' => $_SERVER['REQUEST_URI'] ?? ''
-            ];
-
-            // Guardar datos en debug.txt (modo append)
-            $debugFile = __DIR__ . '/../../debug.txt';
-            file_put_contents($debugFile, print_r($debugData, true) . "\n", FILE_APPEND);
+            // Establecer contexto de usuario para los triggers
+            if ($usuarioID) {
+                $this->establecerContextoUsuario($usuarioID);
+            }
 
             // Llamar al servicio
-            $data = $this->service->obtenerDatosInicio($areaID);
+            $data = $this->service->obtenerDatosInicio($usuarioID, $areaID, $cargoID);
 
             echo json_encode([
                 'success' => true,
@@ -38,15 +36,8 @@ class DashboardController {
             ]);
 
         } catch (\Exception $e) {
-            // También logueamos los errores
-            $errorLog = [
-                'timestamp' => date('Y-m-d H:i:s'),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ];
-            $debugFile = __DIR__ . '/../../debug.txt';
-            file_put_contents($debugFile, print_r($errorLog, true) . "\n", FILE_APPEND);
-
+            error_log("Error en obtenerDatosInicio: " . $e->getMessage());
+            
             echo json_encode([
                 'success' => false,
                 'message' => 'Error al obtener los datos del inicio',
@@ -55,6 +46,16 @@ class DashboardController {
         }
     }
 
-
+    /**
+     * Establece el contexto del usuario en SQL Server para los triggers
+     */
+    private function establecerContextoUsuario($usuarioID) {
+        try {
+            $stmt = $this->db->prepare("EXEC sp_SetCurrentUser @UsuarioID = ?");
+            $stmt->execute([$usuarioID]);
+        } catch (\Exception $e) {
+            error_log("Error al establecer contexto de usuario: " . $e->getMessage());
+            // No lanzar excepción, solo loguear
+        }
+    }
 }
-

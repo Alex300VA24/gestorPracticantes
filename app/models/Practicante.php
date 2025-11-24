@@ -7,6 +7,7 @@ class Practicante {
     private $nombres;
     private $apellidoPaterno;
     private $apellidoMaterno;
+    private $genero;
     private $carrera;
     private $email;
     private $telefono;
@@ -23,6 +24,7 @@ class Practicante {
     public function getNombres() { return $this->nombres; }
     public function getApellidoPaterno() { return $this->apellidoPaterno; }
     public function getApellidoMaterno() { return $this->apellidoMaterno; }
+    public function getGenero() { return $this->genero; }
     public function getCarrera() { return $this->carrera; }
     public function getEmail() { return $this->email; }
     public function getTelefono() { return $this->telefono; }
@@ -39,6 +41,7 @@ class Practicante {
     public function setNombres($nombres) { $this->nombres = $nombres; }
     public function setApellidoPaterno($apellidoPaterno) { $this->apellidoPaterno = $apellidoPaterno; }
     public function setApellidoMaterno($apellidoMaterno) { $this->apellidoMaterno = $apellidoMaterno; }
+    public function setGenero($genero) { $this->genero = $genero; }
     public function setCarrera($carrera) { $this->carrera = $carrera; }
     public function setEmail($email) { $this->email = $email; }
     public function setTelefono($telefono) { $this->telefono = $telefono; }
@@ -60,6 +63,7 @@ class Practicante {
             'nombres' => $this->nombres,
             'apellidoPaterno' => $this->apellidoPaterno,
             'apellidoMaterno' => $this->apellidoMaterno,
+            'genero' => $this->genero,
             'carrera' => $this->carrera,
             'email' => $this->email,
             'telefono' => $this->telefono,

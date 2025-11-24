@@ -21,7 +21,6 @@ async function inicializarModulo() {
 document.getElementById('btnMensajes')?.addEventListener('click', async () => {
     try {
         const areaUsuario = areaID();
-        console.log("Cargando mensajes para área:", areaUsuario);
         
         const response = await api.listarMensajes(areaUsuario);
         
@@ -29,11 +28,13 @@ document.getElementById('btnMensajes')?.addEventListener('click', async () => {
             mostrarMensajes(response.data);
             openModal('modalMensajes');
         } else {
-            alert('Error al cargar mensajes: ' + response.message);
+            mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                mensaje: 'Error al cargar mensajes: ' + response.message});
+
         }
     } catch (error) {
-        console.error('❌ Error al cargar mensajes:', error);
-        alert('No se pudieron cargar los mensajes');
+        mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                mensaje: 'No se pudieron cargar los mensajes'});
     }
 });
 
@@ -86,11 +87,12 @@ async function eliminarMensaje(mensajeID) {
     if (!confirm('¿Seguro que deseas eliminar este mensaje?')) return;
 
     try {
-        console.log("🗑️ Eliminando mensaje:", mensajeID);
         const respuesta = await api.eliminarMensaje(mensajeID);
         
         if (respuesta.success) {
-            alert(respuesta.message);
+            mostrarAlerta({tipo: 'success', titulo: 'Eliminado', 
+                mensaje: respuesta.message});
+            
             
             // Recargar mensajes
             const response = await api.listarMensajes(areaID());
@@ -98,11 +100,12 @@ async function eliminarMensaje(mensajeID) {
                 mostrarMensajes(response.data);
             }
         } else {
-            alert(respuesta.message || "No se pudo eliminar el mensaje.");
+            mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                mensaje: respuesta.message || "No se pudo eliminar el mensaje."});
         }
     } catch (error) {
-        console.error("❌ Error al eliminar mensaje:", error);
-        alert("Error al eliminar mensaje.");
+        mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                mensaje: "Error al eliminar mensaje."});
     }
 }
 
@@ -190,7 +193,8 @@ async function abrirModalAceptar(practicanteID) {
         const responseSolicitud = await api.obtenerSolicitudPorPracticante(practicanteID);
         
         if (!responseSolicitud.success || !responseSolicitud.data) {
-            alert('No se pudo obtener la solicitud del practicante');
+            mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                mensaje: "No se pudo obtener la solicitud del practicante."});
             return;
         }
         
@@ -211,8 +215,8 @@ async function abrirModalAceptar(practicanteID) {
         openModal('modalAceptarPracticante');
         
     } catch (error) {
-        console.error('❌ Error al abrir modal:', error);
-        alert('Error al cargar información del practicante');
+        mostrarAlerta({tipo: 'error', titulo: 'Error', 
+                mensaje: "Error al cargar información del practicante"});
     }
 }
 
@@ -285,16 +289,29 @@ async function procesarAceptacion(practicanteID, solicitudID, mensajeRespuesta) 
     const fechaSalida = document.getElementById('fechaSalida')?.value;
 
     if (!fechaEntrada || !fechaSalida) {
-        alert('Debes ingresar las fechas de entrada y salida.');
+        mostrarAlerta({tipo:'info', mensaje:'Debes ingresar las fechas de entrada y salida.'});
+        
         return false;
     }
 
-    console.log("Datos de aceptación:", {
-        practicanteID,
-        solicitudID,
-        fechaEntrada,
-        fechaSalida
-    });
+    // Convertir a objetos Date
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Para comparar solo fechas sin hora
+
+    const entrada = new Date(fechaEntrada);
+    const salida = new Date(fechaSalida);
+
+    // Validar que fechaEntrada no sea anterior a hoy
+    if (entrada < hoy) {
+        mostrarAlerta({tipo:'warning', mensaje:'La fecha de entrada no puede ser anterior a hoy.'});
+        return false;
+    }
+
+    // Validar que fechaEntrada no sea mayor que fechaSalida
+    if (entrada > salida) {
+        mostrarAlerta({tipo:'warning', mensaje:'La fecha de entrada no puede ser mayor a la fecha de salida.'});
+        return false;
+    }
 
     const btn = document.getElementById("btnEnviarRespuesta");
 
@@ -313,17 +330,15 @@ async function procesarAceptacion(practicanteID, solicitudID, mensajeRespuesta) 
         });
 
         if (result.success) {
-            alert('Practicante aceptado correctamente');
+            mostrarAlerta({tipo:'success', titulo:'Aceptado', mensaje:'Practicante aceptado correctamente'});
             cerrarModalAceptar();
-            location.reload();
             return true;
         } else {
-            alert('Error: ' + response.message);
+            mostrarAlerta({tipo:'error', titulo:'Error', mensaje:response.message});
             return false;
         }
     } catch (error) {
-        console.error('Error al aceptar practicante:', error);
-        alert('Error al aceptar practicante');
+        mostrarAlerta({tipo:'error', titulo:'Error', mensaje:'Error al aceptar practicante'});
         return false;
     }
 }
@@ -343,17 +358,15 @@ async function procesarRechazo(practicanteID, solicitudID, mensajeRespuesta) {
         });
 
         if (result.success) {
-            alert('Practicante rechazado');
+            mostrarAlerta({tipo:'info', mensaje:'Practicante rechazado correctamente'});
             cerrarModalAceptar();
-            location.reload();
             return true;
         } else {
-            alert('❌ Error: ' + response.message);
+            mostrarAlerta({tipo:'error', titulo:'Error', mensaje:response.message});
             return false;
         }
     } catch (error) {
-        console.error('❌ Error al rechazar practicante:', error);
-        alert('Error al rechazar practicante');
+        mostrarAlerta({tipo:'error', titulo:'Error', mensaje:'Error al rechazar practicante'});
         return false;
     }
 }
@@ -398,7 +411,7 @@ async function manejarSubmitAceptar(e) {
     const mensajeRespuesta = document.getElementById('mensajeRespuesta')?.value;
 
     if (!decision || !practicanteID || !solicitudID) {
-        alert('❌ Faltan datos en el formulario');
+        mostrarAlerta({tipo:'info', mensaje:'Faltan datos en el formulario'});
         return;
     }
 

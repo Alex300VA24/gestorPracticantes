@@ -54,7 +54,16 @@ class PracticanteController {
         }
     }
     
-    // Metodo para registrar un nuevo practicante
+    /* Metodo Controller para registrar un nuevo practicante 
+     * Lo que envia:
+        {
+            "success": true,
+            "message": "Practicante registrado exitosamente",
+            "data": {
+                "practicanteID": valor
+            }
+        }
+    */
     public function registrarPracticante() {
         try {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -123,8 +132,12 @@ class PracticanteController {
 
     public function filtrarPracticantes() {
         try {
-            $nombre = $_GET['nombre'] ?? null;
-            $areaID = $_GET['areaID'] ?? null;
+            // Leer el json del body
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            $nombre = $input['nombre'] ?? null;
+            $areaID = $input['areaID'] ?? null;
+            file_put_contents('debug_filtrado_controller.txt', "Nombre: $nombre | Área: $areaID\n", FILE_APPEND);
             
             $practicantes = $this->practicanteService->filtrarPracticantes($nombre, $areaID);
             $this->jsonResponse([
@@ -147,8 +160,8 @@ class PracticanteController {
                 $data['practicanteID'],
                 $data['solicitudID'],
                 $data['areaID'],
-                $data['fechaEntrada'],
-                $data['fechaSalida'],
+                $data['fechaEntradaVal'],
+                $data['fechaSalidaVal'],
                 $data['mensajeRespuesta']
             );
             
@@ -187,7 +200,10 @@ class PracticanteController {
         }
     }
 
-
+    public function listarNombresPracticantes() {
+        $data = $this->practicanteService->listarNombresPracticantes();
+        echo json_encode($data);
+    }
 
     
     protected function jsonResponse($data, $status = 200) {

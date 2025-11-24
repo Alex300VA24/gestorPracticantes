@@ -95,4 +95,23 @@ class DashboardRepository {
         $stmt->execute();
         return $stmt->fetch()['total'] ?? 0;
     }
+    // En DashboardRepository.php - después del método obtenerAsistenciasHoy()
+
+    public function obtenerActividadReciente($limite = 10, $usuarioID = null, $areaID = null, $cargoID = null) {
+        try {
+            $usuarioIDParam = $usuarioID ?? 0;
+            $areaIDParam = $areaID ?? 0;
+            $cargoIDParam = $cargoID ?? 0;
+            
+            error_log("Parametors: ". $limite . " " . $areaID . " " . $cargoID . " " . $usuarioID);
+            $sql = "EXEC sp_ObtenerActividadReciente @Limite = ?, @AreaID = ?, @UsuarioID = ?, @CargoID = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$limite, $areaIDParam, $usuarioIDParam, $cargoIDParam]);
+            
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            error_log("Error en obtenerActividadReciente: " . $e->getMessage());
+            return [];
+        }
+    }
 }

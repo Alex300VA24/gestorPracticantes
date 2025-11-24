@@ -58,13 +58,14 @@ class PracticanteRepository {
      */
     public function registrarPracticante($p, $areaID = null) {
         try {
-            $stmt = $this->db->prepare("EXEC sp_RegistrarPracticante ?, ?, ?, ?, ?, ?, ?, ?, ?");
+            $stmt = $this->db->prepare("EXEC sp_RegistrarPracticante ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
             $stmt->execute([
                 $p->getDNI(),
                 $p->getNombres(),
                 $p->getApellidoPaterno(),
                 $p->getApellidoMaterno(),
+                $p->getGenero(),
                 $p->getCarrera(),
                 $p->getEmail(),
                 $p->getTelefono(),
@@ -77,7 +78,7 @@ class PracticanteRepository {
             $nuevoID = $row['PracticanteID'] ?? null;
 
             return $nuevoID;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             error_log("PracticanteRepository::crear - " . $e->getMessage());
             throw new \Exception("Error al crear practicante: " . $e->getMessage());
         }
@@ -85,19 +86,20 @@ class PracticanteRepository {
 
 
     public function actualizar($id, $data) {
-        $sql = "EXEC sp_ActualizarPracticante 
+        error_log("Este es el id: " . $id);
+        try{
+            $sql = "EXEC sp_ActualizarPracticante 
             @PracticanteID = :id,
             @DNI = :DNI,
             @Nombres = :Nombres,
             @ApellidoPaterno = :ApellidoPaterno,
             @ApellidoMaterno = :ApellidoMaterno,
+            @Genero = :Genero,
             @Carrera = :Carrera,
             @Email = :Email,
             @Telefono = :Telefono,
             @Direccion = :Direccion,
-            @Universidad = :Universidad,
-            @FechaEntrada = :FechaEntrada,
-            @FechaSalida = :FechaSalida";
+            @Universidad = :Universidad";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
@@ -106,37 +108,69 @@ class PracticanteRepository {
             ':Nombres' => $data['Nombres'],
             ':ApellidoPaterno' => $data['ApellidoPaterno'],
             ':ApellidoMaterno' => $data['ApellidoMaterno'],
+            ':Genero' => $data['genero'],
             ':Carrera' => $data['Carrera'],
             ':Email' => $data['Email'],
             ':Telefono' => $data['Telefono'],
             ':Direccion' => $data['Direccion'],
-            ':Universidad' => $data['Universidad'],
-            ':FechaEntrada' => $data['FechaEntrada'],
-            ':FechaSalida' => $data['FechaSalida']
+            ':Universidad' => $data['Universidad']
         ]);
         return "Practicante actualizado correctamente";
+        } catch (PDOException $e) {
+            error_log("Error al actualizar practicante". $e->getMessage());
+        }
     }
 
     public function eliminar($id) {
-        $stmt = $this->db->prepare("EXEC sp_EliminarPracticante @PracticanteID = :id");
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return "Practicante eliminado correctamente";
+        try{
+            $stmt = $this->db->prepare("EXEC sp_EliminarPracticante @PracticanteID = :id");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return "Practicante eliminado correctamente";
+        }catch (PDOException $e) {
+            $msg = $e->errorInfo[2] ?? null;
+
+            // Si el SP devolvió mensaje válido
+            if ($msg) {
+                // Limpieza del prefijo de SQL Server
+                $msg = preg_replace('/^(.*SQL Server\])/', '', $msg);
+                $msg = trim($msg);
+
+                throw new \Exception($msg);
+            }
+
+            // Si NO hay mensaje del SP → error del motor SQL
+            throw new \Exception("No se puede eliminar el practicante. Existen datos relacionados.");
+        }
+
     }
 
     public function filtrarPracticantes($nombre = null, $areaID = null) {
         try {
-            $stmt = $this->db->prepare("EXEC sp_FiltrarPracticantes ?, ?");
-            $stmt->execute([$nombre, $areaID]);
+            $sql = "EXEC sp_FiltrarPracticantes @Nombre = :nombre, @AreaID = :areaID";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->bindParam(':areaID', $areaID);
+            $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         } catch (PDOException $e) {
             error_log("Error al filtrar practicantes: " . $e->getMessage());
             throw new \Exception("Error al filtrar practicantes");
         }
     }
 
+    public function listarNombresPracticantes() {
+        $stmt = $this->db->prepare("EXEC sp_ListarNombresPracticantes");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    
+
     public function aceptarPracticante($practicanteID, $solicitudID, $areaID, $fechaEntrada, $fechaSalida, $mensajeRespuesta) {
         try {
+            error_log("Fechas: " . $fechaEntrada . " " . $fechaSalida);
             $stmt = $this->db->prepare("EXEC sp_AceptarPracticante ?, ?, ?, ?, ?, ?");
             $stmt->execute([
                 $practicanteID,
