@@ -101,8 +101,7 @@ class UsuarioService {
      * Cambiar contraseña
      */
     public function cambiarPassword($usuarioID, $nuevaPassword) {
-        $passwordHash = password_hash($nuevaPassword, PASSWORD_BCRYPT);
-        return $this->usuarioRepository->cambiarPassword($usuarioID, $passwordHash);
+        return $this->usuarioRepository->cambiarPassword($usuarioID, $nuevaPassword);
     }
 
     /**

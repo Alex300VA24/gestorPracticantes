@@ -138,6 +138,8 @@ async function cargarInicio() {
         const actividadDiv = document.getElementById('actividadReciente');
         actividadDiv.innerHTML = '';
 
+        console.log(data.actividadReciente);
+
         if (data.actividadReciente && data.actividadReciente.length > 0) {
             data.actividadReciente.forEach(act => {
                 const div = document.createElement('div');

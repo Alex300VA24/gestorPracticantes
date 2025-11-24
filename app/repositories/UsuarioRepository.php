@@ -234,78 +234,41 @@ class UsuarioRepository {
      */
     public function actualizar($usuarioID, $data) {
         try {
-            // Construir query dinámicamente
-            $campos = [];
-            $params = [':usuarioID' => $usuarioID];
-            
-            if (isset($data['nombreUsuario'])) {
-                $campos[] = "NombreUsuario = :nombreUsuario";
-                $params[':nombreUsuario'] = $data['nombreUsuario'];
-            }
-            
-            if (isset($data['nombres'])) {
-                $campos[] = "Nombres = :nombres";
-                $params[':nombres'] = $data['nombres'];
-            }
-            
-            if (isset($data['apellidoPaterno'])) {
-                $campos[] = "ApellidoPaterno = :apellidoPaterno";
-                $params[':apellidoPaterno'] = $data['apellidoPaterno'];
-            }
-            
-            if (isset($data['apellidoMaterno'])) {
-                $campos[] = "ApellidoMaterno = :apellidoMaterno";
-                $params[':apellidoMaterno'] = $data['apellidoMaterno'];
-            }
-            
-            if (!empty($data['password'])) {
-                $campos[] = "Password = :password";
-                $params[':password'] = $data['password'];
-            }
-            
-            if (isset($data['dni'])) {
-                $campos[] = "DNI = :dni";
-                $params[':dni'] = $data['dni'];
-            }
-            
-            if (isset($data['cui'])) {
-                $campos[] = "CUI = :cui";
-                $params[':cui'] = $data['cui'];
-            }
-            
-            if (isset($data['cargoID'])) {
-                $campos[] = "CargoID = :cargoID";
-                $params[':cargoID'] = $data['cargoID'];
-            }
-            
-            if (isset($data['areaID'])) {
-                $campos[] = "AreaID = :areaID";
-                $params[':areaID'] = $data['areaID'];
-            }
-            
-            if (isset($data['activo'])) {
-                $campos[] = "Activo = :activo";
-                $params[':activo'] = $data['activo'];
-            }
-            
-            if (empty($campos)) {
-                throw new \Exception("No hay campos para actualizar");
-            }
-            
-            $query = "UPDATE Usuario SET " . implode(', ', $campos) . " WHERE UsuarioID = :usuarioID";
-            
+            $query = "EXEC sp_ActualizarUsuario
+                :usuarioID,
+                :nombreUsuario,
+                :nombres,
+                :apellidoPaterno,
+                :apellidoMaterno,
+                :password,
+                :dni,
+                :cui,
+                :cargoID,
+                :areaID,
+                :activo";
+
             $stmt = $this->db->prepare($query);
-            
-            foreach ($params as $key => $value) {
-                $stmt->bindValue($key, $value);
-            }
-            
+
+            // parámetros (aceptan null sin problema)
+            $stmt->bindValue(':usuarioID', $usuarioID, PDO::PARAM_INT);
+            $stmt->bindValue(':nombreUsuario', $data['nombreUsuario'] ?? null);
+            $stmt->bindValue(':nombres', $data['nombres'] ?? null);
+            $stmt->bindValue(':apellidoPaterno', $data['apellidoPaterno'] ?? null);
+            $stmt->bindValue(':apellidoMaterno', $data['apellidoMaterno'] ?? null);
+            $stmt->bindValue(':password', $data['password'] ?? null);
+            $stmt->bindValue(':dni', $data['dni'] ?? null);
+            $stmt->bindValue(':cui', $data['cui'] ?? null);
+            $stmt->bindValue(':cargoID', $data['cargoID'] ?? null);
+            $stmt->bindValue(':areaID', $data['areaID'] ?? null);
+            $stmt->bindValue(':activo', $data['activo'] ?? null);
+
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Error en actualizar usuario: " . $e->getMessage());
             throw new \Exception("Error al actualizar usuario");
         }
     }
+
 
     /**
      * Eliminar usuario
@@ -326,19 +289,22 @@ class UsuarioRepository {
     /**
      * Cambiar contraseña
      */
-    public function cambiarPassword($usuarioID, $passwordHash) {
+    public function cambiarPassword($usuarioID, $passwordPlano) {
         try {
-            $query = "UPDATE Usuario SET Password = :password WHERE UsuarioID = :usuarioID";
+            $query = "EXEC sp_CambiarPassword :usuarioID, :password";
+
             $stmt = $this->db->prepare($query);
-            $stmt->bindParam(':password', $passwordHash);
             $stmt->bindParam(':usuarioID', $usuarioID, PDO::PARAM_INT);
-            
+            $stmt->bindParam(':password', $passwordPlano);
+
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Error en cambiarPassword: " . $e->getMessage());
             throw new \Exception("Error al cambiar contraseña");
         }
     }
+
+
 
     /**
      * Filtrar usuarios
