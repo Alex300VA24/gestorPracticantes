@@ -129,10 +129,10 @@ window.initCertificados = function() {
                 return;
             }
 
-            // Validar formato del expediente (XXXXX-YYYY-X)
-            const regexExpediente = /^\d{5}-\d{4}-\d{1}$/;
+            // Validar formato del expediente (XXXXXX-YYYY-X)
+            const regexExpediente = /^\d{6}-\d{4}-\d{1}$/;
             if (!regexExpediente.test(numeroExpediente)) {
-                mostrarMensajeDialog('Formato de expediente inválido. Use: XXXXX-YYYY-X', 'error');
+                mostrarMensajeDialog('Formato de expediente inválido. Use: XXXXXX-YYYY-X', 'error');
                 return;
             }
 

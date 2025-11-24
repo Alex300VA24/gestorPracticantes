@@ -38,7 +38,6 @@
             <table id="tablaPracticantes" class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>DNI</th>
                         <th>Nombre Completo</th>
                         <th>Carrera</th>
@@ -63,19 +62,31 @@
     <h3 id="tituloModalPracticante">Nuevo Practicante</h3>
     <form id="formPracticante">
       <input type="hidden" id="practicanteID" name="ID">
-      <input type="text" id="DNI" name="DNI" placeholder="DNI" required>
-      <input type="text" id="Nombres" name="Nombres" placeholder="Nombres" required>
-      <input type="text" id="ApellidoPaterno" name="ApellidoPaterno" placeholder="Apellido Paterno" required>
-      <input type="text" id="ApellidoMaterno" name="ApellidoMaterno" placeholder="Apellido Materno" required>
+      
+      <input type="text" id="DNI" name="DNI" placeholder="Ej: 12345678" required maxlength="8" pattern="\d{8}" title="Ingrese exactamente 8 dígitos">
+      
+      <input type="text" id="Nombres" name="Nombres" placeholder="Ej: Juan Carlos" required>
+      
+      <input type="text" id="ApellidoPaterno" name="ApellidoPaterno" placeholder="Ej: García" required>
+      
+      <input type="text" id="ApellidoMaterno" name="ApellidoMaterno" placeholder="Ej: Rodríguez" required>
+      
       <select id="genero" name="genero" required>
+        <option value="">Seleccione género</option>
         <option value="M">Masculino</option>
         <option value="F">Femenino</option>
       </select>
-      <input type="text" id="Carrera" name="Carrera" placeholder="Carrera" required>
-      <input type="email" id="Email" name="Email" placeholder="Correo">
-      <input type="text" id="Telefono" name="Telefono" placeholder="Teléfono">
-      <input type="text" id="Direccion" name="Direccion" placeholder="Dirección">
-      <input type="text" id="Universidad" name="Universidad" placeholder="Universidad">
+      
+      <input type="text" id="Carrera" name="Carrera" placeholder="Ej: Ingeniería de Sistemas, Licenciatura en Administración" required minlength="15" title="Escriba el nombre completo de la carrera (mínimo 15 caracteres)">
+      
+      <input type="email" id="Email" name="Email" placeholder="Ej: correo@ejemplo.com" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Ingrese un correo válido con @ y dominio">
+      
+      <input type="tel" id="Telefono" name="Telefono" placeholder="Ej: +51 987654321" required pattern="\+51\s?\d{9}" title="Ingrese +51 seguido de 9 dígitos">
+      
+      <input type="text" id="Direccion" name="Direccion" placeholder="Ej: Av. España 123, Urb. El Golf - Trujillo" required>
+      
+      <input type="text" id="Universidad" name="Universidad" placeholder="Ej: Universidad Nacional de Trujillo, Universidad Privada Antenor Orrego" required minlength="20" title="Escriba el nombre completo de la universidad (mínimo 20 caracteres)">
+      
       <button type="submit">Guardar</button>
       <button type="button" onclick="cerrarModalPracticante()">Cancelar</button>
     </form>

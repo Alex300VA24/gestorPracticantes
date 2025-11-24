@@ -143,7 +143,6 @@ window.initPracticantes = function() {
 
             // Construir fila
             fila.innerHTML = `
-                <td>${p.PracticanteID}</td>
                 <td>${p.DNI}</td>
                 <td>${nombreCompleto}</td>
                 <td>${p.Carrera || '-'}</td>
@@ -185,7 +184,6 @@ window.initPracticantes = function() {
     // 🔹 Abrir modal para EDITAR
     async function abrirModalEditarPracticante(id) {
         try {
-            console.log('Este es el id: ', id);
             modoEdicion = true;
             document.getElementById("tituloModalPracticante").textContent = "Editar Practicante";
 
@@ -484,7 +482,6 @@ window.initPracticantes = function() {
                 }
                 // Construir fila
                 fila.innerHTML = `
-                    <td>${p.PracticanteID}</td>
                     <td>${p.DNI}</td>
                     <td>${nombreCompleto}</td>
                     <td>${p.Carrera || '-'}</td>
@@ -680,38 +677,38 @@ window.initPracticantes = function() {
 
     // 🔹 Crear HTML de fila de practicante
     function crearFilaPracticante(p, mostrarBotonAceptar) {
+        const estadoBadge = `<span class="status-badge status-${p.EstadoDescripcion.toLowerCase()}">${p.EstadoDescripcion || 'Pendiente'}</span>`;
         return `
-            <td>${p.PracticanteID}</td>
             <td>${p.DNI}</td>
             <td>${p.Nombres} ${p.ApellidoPaterno} ${p.ApellidoMaterno}</td>
             <td>${p.Carrera}</td>
             <td>${p.Universidad}</td>
             <td>${p.FechaRegistro ? new Date(p.FechaRegistro).toLocaleDateString() : '-'}</td>
             <td>${p.NombreArea || '-'}</td>
-            <td><span class="badge ${obtenerClaseEstado(p.EstadoDescripcion)}">${p.EstadoDescripcion || 'Pendiente'}</span></td>
+            <td>${estadoBadge}</td>
             <td>
-                <button onclick="verPracticante(${p.PracticanteID})" 
-                        class="btn-info btn-sm" 
-                        title="Ver">
-                    <i class="fas fa-eye"></i>
-                </button>
                 <button onclick="editarPracticante(${p.PracticanteID})" 
-                        class="btn-warning btn-sm" 
+                        class="btn-primary" 
                         title="Editar">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button onclick="eliminarPracticante(${p.PracticanteID})" 
-                        class="btn-danger btn-sm" 
-                        title="Eliminar">
-                    <i class="fas fa-trash"></i>
+                <button onclick="verPracticante(${p.PracticanteID})" 
+                        class="btn-success" 
+                        title="Ver">
+                    <i class="fas fa-eye"></i>
                 </button>
                 ${mostrarBotonAceptar ? `
                     <button onclick="abrirModalAceptar(${p.PracticanteID})" 
-                            class="btn-success btn-sm" 
+                            class="btn-warning" 
                             title="Aceptar/Rechazar">
                         <i class="fas fa-check"></i>
                     </button>
                 ` : ''}
+                <button onclick="eliminarPracticante(${p.PracticanteID})" 
+                        class="btn-danger" 
+                        title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
             </td>
         `;
     }
@@ -939,6 +936,150 @@ window.initPracticantes = function() {
         }
     }
 
+    function configurarValidacionesInputs() {
+        const dniInput = document.getElementById('DNI');
+        const telefonoInput = document.getElementById('Telefono');
+
+        // Formateo DNI: solo números, máximo 8 dígitos
+        if (dniInput) {
+            dniInput.addEventListener('input', function () {
+                this.value = this.value.replace(/\D/g, '').slice(0, 8);
+            });
+        }
+
+        // Formateo de teléfono con +51
+        if (telefonoInput) {
+            telefonoInput.addEventListener('focus', function () {
+                if (!this.value.startsWith('+51')) {
+                    this.value = '+51 ';
+                }
+            });
+
+            telefonoInput.addEventListener('input', function () {
+                let numeros = this.value.replace(/\D/g, '').slice(0, 11); // 11 = 51 + 9 dígitos
+                if (!numeros.startsWith("51")) numeros = "51" + numeros;
+                this.value = "+51 " + numeros.slice(2);
+            });
+        }
+    }
+
+
+    function validarFormularioPracticante() {
+        const dniInput = document.getElementById('DNI');
+        const carreraInput = document.getElementById('Carrera');
+        const universidadInput = document.getElementById('Universidad');
+        const telefonoInput = document.getElementById('Telefono');
+        const emailInput = document.getElementById('Email');
+
+        // --- Validar DNI ---
+        if (dniInput && dniInput.value.replace(/\D/g, '').length !== 8) {
+            mostrarAlerta({
+                tipo: 'warning',
+                titulo: 'DNI inválido',
+                mensaje: 'El DNI debe tener exactamente 8 dígitos'
+            });
+            dniInput.focus();
+            return false;
+        }
+
+        // --- Validar teléfono (+51 + 9 dígitos) ---
+        if (telefonoInput) {
+            const telefonoNumeros = telefonoInput.value.replace(/\D/g, '');
+            if (telefonoNumeros.length !== 11) { // "51" + 9 dígitos = 11
+                mostrarAlerta({
+                    tipo: 'warning',
+                    titulo: 'Teléfono inválido',
+                    mensaje: 'El teléfono debe tener 9 dígitos después del +51'
+                });
+                telefonoInput.focus();
+                return false;
+            }
+        }
+
+        // --- Validar correo (JS) ---
+        if (emailInput) {
+            // regex JS seguro
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value.trim())) {
+                mostrarAlerta({
+                    tipo: 'warning',
+                    titulo: 'Correo inválido',
+                    mensaje: 'Por favor ingrese un correo electrónico válido'
+                });
+                emailInput.focus();
+                return false;
+            }
+        }
+
+        // --- Validación de abreviaciones en carrera ---
+        const abreviacionesCarrera = ['ing.', 'lic.', 'adm.', 'cont.', 'arq.', 'med.', 'der.', 'psic.'];
+        const carreraValor = (carreraInput && carreraInput.value || '').toLowerCase().trim();
+        if (carreraInput && abreviacionesCarrera.some(abrev => carreraValor.includes(abrev))) {
+            mostrarAlerta({
+                tipo: 'warning',
+                titulo: 'Nombre incompleto',
+                mensaje: 'Escriba el nombre completo de la carrera sin abreviaciones.'
+            });
+            carreraInput.focus();
+            return false;
+        }
+
+        if (carreraInput && carreraValor.length < 8) { // mínimo coherente: 15
+            mostrarAlerta({
+                tipo: 'warning',
+                titulo: 'Carrera incompleta',
+                mensaje: 'La carrera debe tener mínimo 8 caracteres.'
+            });
+            carreraInput.focus();
+            return false;
+        }
+
+        // --- Validación de siglas en universidad ---
+        const siglasComunes = ['unt','upao','upt','ucv','upc','upn','ulima','pucp','usmp','uap','utp','unfv','unmsm'];
+        const excepcionesPalabrasCortas = ['de','la','del','y','e','en','para','por','el','los','las'];
+        const universidadValorRaw = (universidadInput && universidadInput.value) || '';
+        const universidadValor = universidadValorRaw.toLowerCase().trim();
+
+        // 1) Comprueba si es exactamente una sigla común:
+        if (siglasComunes.includes(universidadValor.replace(/\./g, ''))) {
+            mostrarAlerta({
+                tipo: 'warning',
+                titulo: 'Universidad incompleta',
+                mensaje: 'Por favor, escriba el nombre completo de la universidad.'
+            });
+            universidadInput.focus();
+            return false;
+        }
+
+        // 2) Comprueba palabras cortas (pero ignora preposiciones comunes)
+        const palabras = universidadValor.split(/\s+/).filter(Boolean);
+        const tienePalabraCortaNoPermitida = palabras.some(p => (p.length <= 3) && !excepcionesPalabrasCortas.includes(p));
+        if (tienePalabraCortaNoPermitida) {
+            mostrarAlerta({
+                tipo: 'warning',
+                titulo: 'Universidad incompleta',
+                mensaje: 'Por favor, escriba el nombre completo de la universidad (evite usar solo siglas o palabras muy cortas).'
+            });
+            universidadInput.focus();
+            return false;
+        }
+
+        // 3) Comprobar longitud final (con trim)
+        if (universidadValor.length < 20) {
+            mostrarAlerta({
+                tipo: 'warning',
+                titulo: 'Universidad incompleta',
+                mensaje: 'Debe tener mínimo 20 caracteres.'
+            });
+            universidadInput.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+
+
     // ===================================== EVENT LISTENERS ====================================
 
     function configurarEventListeners() {
@@ -947,21 +1088,26 @@ window.initPracticantes = function() {
         // Botón nuevo practicante
         const btnNuevo = document.getElementById("btnNuevoPracticante");
         if (btnNuevo) {
-            // Primero remueve cualquier listener previo (opcional pero recomendado)
             btnNuevo.removeEventListener("click", abrirModalNuevoPracticante);
             btnNuevo.addEventListener("click", abrirModalNuevoPracticante);
         }
 
+        // ========== LLAMAR A LAS VALIDACIONES ==========
+        configurarValidacionesInputs();
+
         // Formulario practicante
         const formPracticante = document.getElementById("formPracticante");
         if (formPracticante) {
-            // Remueve listeners previos para evitar duplicados
-            const nuevoForm = formPracticante.cloneNode(true);
-            formPracticante.parentNode.replaceChild(nuevoForm, formPracticante);
+            formPracticante.onsubmit = null; // Limpiar handler previo
             
-            // Ahora registra el listener una sola vez
-            nuevoForm.addEventListener("submit", async (e) => {
+            formPracticante.addEventListener("submit", async (e) => {
                 e.preventDefault();
+                
+                // ========== VALIDAR ANTES DE ENVIAR ==========
+                if (!validarFormularioPracticante()) {
+                    return; // Si no pasa las validaciones, no continuar
+                }
+                
                 const formData = Object.fromEntries(new FormData(e.target).entries());
                 console.log(formData);
                 let res;
@@ -1009,6 +1155,7 @@ window.initPracticantes = function() {
                 openModal('modalEnviarSolicitud');
             });
         }
+        
     }
 
     // 🔹 Manejar submit del formulario de aceptar/rechazar

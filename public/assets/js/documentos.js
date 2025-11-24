@@ -1,6 +1,11 @@
 
 window.initDocumentos = function() {
     console.log("Documentos iniciado");
+    if (window.documentosInicializado) {
+        console.warn("initDocumentos ya fue ejecutado");
+        return;
+    }
+    window.documentosInicializado = true;
     // ===================================== Documentos ====================================================
     const inicializar = async () => {
         console.log('Esto no se ejecuta');
@@ -639,7 +644,7 @@ window.initDocumentos = function() {
         }
 
         // Validar formato del expediente (opcional)
-        const regexExpediente = /^\d{4,6}-\d{4}-\d{1,2}$/;
+        const regexExpediente = /^\d{6}-\d{4}-\d{1,2}$/;
         if (!regexExpediente.test(numeroExpediente)) {
             mostrarMensaje('Formato de expediente inválido. Use: XXXXX-YYYY-X', 'error');
             inputExpediente.focus();

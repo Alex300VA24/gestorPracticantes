@@ -36,6 +36,18 @@ window.initAsistencias = function() {
             salidaMaxima: '16:45:00'
         }
     };
+    function esHoy(fecha) {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
+        
+        // Extraer año, mes y día de la fecha string (formato: YYYY-MM-DD)
+        const partes = fecha.split('-');
+        const fechaComparar = new Date(partes[0], partes[1] - 1, partes[2]);
+        fechaComparar.setHours(0, 0, 0, 0);
+        
+        return hoy.getTime() === fechaComparar.getTime();
+    }
+    
 
     let cronometroInterval = null;
     let tiempoInicio = null;
@@ -92,6 +104,8 @@ window.initAsistencias = function() {
                 const f = new Date(row.Fecha);
                 fechaFormateada = `${String(f.getDate()).padStart(2,'0')}-${String(f.getMonth()+1).padStart(2,'0')}-${f.getFullYear()}`;
 
+                const permitirRegistro = esHoy(row.Fecha);
+                const btnDisabled = !permitirRegistro ? 'disabled' : '';
 
                 tr.innerHTML = `
                     <td>${row.Fecha}</td>
@@ -102,7 +116,7 @@ window.initAsistencias = function() {
                     <td>${duracion}</td>
                     <td><span class="badge badge-${getBadgeClass(row.Estado)}">${row.Estado}</span></td>
                     <td>
-                        <button class="btn-primary" onclick='abrirModalAsistencia(${row.PracticanteID}, "${row.NombreCompleto}")'>
+                        <button class="btn-primary" ${btnDisabled} onclick='abrirModalAsistencia(${row.PracticanteID}, "${row.NombreCompleto}", "${row.Fecha}")'>
                             <i class="fas fa-clock"></i> Registrar
                         </button>
                     </td>
@@ -249,8 +263,17 @@ window.initAsistencias = function() {
     // ============================================
     // ABRIR MODAL CON CARGA DESDE API
     // ============================================
-    async function abrirModalAsistencia(practicanteID, nombreCompleto) {
+    async function abrirModalAsistencia(practicanteID, nombreCompleto, fecha) {
         try {
+
+            if (fecha && !esHoy(fecha)) {
+                mostrarAlerta({
+                    tipo: 'warning', 
+                    titulo: 'Día no válido', 
+                    mensaje: 'Solo se puede registrar asistencia el día actual'
+                });
+                return;
+            }
             // Resetear estado anterior antes de abrir
             resetearEstadoModal();
             
@@ -477,6 +500,20 @@ window.initAsistencias = function() {
         return { valido: true };
     }
 
+    function validarSalidaPosteriorEntrada(horaEntrada, horaSalida) {
+        const entrada = new Date(`1970-01-01T${horaEntrada}`);
+        const salida = new Date(`1970-01-01T${horaSalida}`);
+        
+        if (salida <= entrada) {
+            return {
+                valido: false,
+                mensaje: 'La hora de salida debe ser posterior a la hora de entrada'
+            };
+        }
+        
+        return { valido: true };
+    }
+
     async function registrarEntrada() {
         try {
             const turnoSeleccionado = parseInt(document.querySelector('input[name="turno"]:checked').value);
@@ -537,6 +574,19 @@ window.initAsistencias = function() {
                 }
             } else {
                 horaRegistro = new Date().toTimeString().slice(0, 8);
+            }
+
+            const validacionPosterior = validarSalidaPosteriorEntrada(
+                asistenciaActual.horaEntrada, 
+                horaRegistro
+            );
+            if (!validacionPosterior.valido) {
+                mostrarAlerta({
+                    tipo: 'error',
+                    titulo: 'Error',
+                    mensaje: validacionPosterior.mensaje
+                });
+                return;
             }
 
             const turnoID = determinarTurnoPorHora(asistenciaActual.horaEntrada);
