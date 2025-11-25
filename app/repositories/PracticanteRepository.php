@@ -79,8 +79,16 @@ class PracticanteRepository {
 
             return $nuevoID;
         } catch (PDOException $e) {
-            error_log("PracticanteRepository::crear - " . $e->getMessage());
-            throw new \Exception("Error al crear practicante: " . $e->getMessage());
+            // Obtener mensaje exacto del RAISERROR
+            $msg = $e->errorInfo[2] ?? $e->getMessage();
+
+            // Limpiar mensajes del driver ODBC
+            if (strpos($msg, ':') !== false) {
+                $parts = explode(':', $msg);
+                $msg = trim(end($parts)); // Última parte (que contiene tu mensaje)
+            }
+
+            throw new \Exception($msg);
         }
     }
 

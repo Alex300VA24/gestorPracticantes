@@ -223,8 +223,16 @@ class UsuarioRepository {
             return $stmt->fetch(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
-            error_log("Error en crear usuario: " . $e->getMessage());
-            throw new \Exception("Error al crear usuario");
+            // Obtener mensaje exacto del RAISERROR
+            $msg = $e->errorInfo[2] ?? $e->getMessage();
+
+            // Limpiar mensajes del driver ODBC
+            if (strpos($msg, ':') !== false) {
+                $parts = explode(':', $msg);
+                $msg = trim(end($parts)); // Última parte (que contiene tu mensaje)
+            }
+
+            throw new \Exception($msg);
         }
     }
 

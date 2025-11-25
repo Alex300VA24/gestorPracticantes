@@ -131,7 +131,6 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th><i class="fas fa-hashtag"></i> ID</th>
                             <th><i class="fas fa-user"></i> Usuario</th>
                             <th><i class="fas fa-id-card"></i> Nombre Completo</th>
                             <th><i class="fas fa-id-badge"></i> CUI</th>

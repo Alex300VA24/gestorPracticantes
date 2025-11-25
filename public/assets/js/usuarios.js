@@ -107,7 +107,6 @@ window.initUsuarios = function() {
             
             return `
                 <tr>
-                    <td>${usuario.UsuarioID}</td>
                     <td><strong>${usuario.NombreUsuario}</strong></td>
                     <td>${nombreCompleto}</td>
                     <td>${usuario.DNI}</td>
